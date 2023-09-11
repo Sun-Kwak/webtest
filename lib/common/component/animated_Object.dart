@@ -20,9 +20,9 @@ class _AnimatedObjectState extends State<AnimatedObject>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 500),
     );
-    _animation = Tween<double> (begin: 1.0, end: 0.9).animate(_animationController);
+    _animation = Tween<double> (begin: 1.0, end: 0.6).animate(_animationController);
   }
 
   @override

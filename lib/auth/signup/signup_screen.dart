@@ -6,8 +6,11 @@ import 'package:web_test2/common/component/custom_text_fromfield.dart';
 import 'package:web_test2/common/component/logo.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:web_test2/common/component/error_dialog.dart';
 
-class SignUpScreen extends StatefulWidget {
+import 'controller/signup_state.dart';
+
+class SignUpScreen extends ConsumerWidget {
   final double columnWidth;
   final FocusNode nameFieldFocusNode;
   final FocusNode emailFieldFocusNode;
@@ -34,44 +37,55 @@ class SignUpScreen extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
-}
-
-class _SignUpScreenState extends State<SignUpScreen> {
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen<SignUpState>(
+      signUpProvider,
+      (previous, current) {
+        if (current.status.isSubmissionInProgress) {
+          LoadingSheet.show(context);
+        } else if (current.status.isSubmissionFailure) {
+          Navigator.of(context).pop();
+          ErrorDialog.show(context, '${current.errorMessage}');
+        } else if (current.status.isSubmissionSuccess) {
+          Navigator.of(context).pop();
+        }
+      },
+    );
     double screenWidth = MediaQuery.of(context).size.width;
     double minLogoWidth = 300.0;
     double logoWidth = screenWidth * 0.1;
     return Column(
       children: [
-        CompanyLogo(logoWidth: logoWidth, minLogoWidth: minLogoWidth,),
-        const HeightGap(),
+        CompanyLogo(
+          logoWidth: logoWidth,
+          minLogoWidth: minLogoWidth,
+        ),
+        const HeightGap(defaultHeight: 20),
         _NameField(
-            onFieldSubmitted: widget.nameOnFieldSubmitted,
-            nameFieldFocusNode: widget.nameFieldFocusNode,
+          onFieldSubmitted: nameOnFieldSubmitted,
+          nameFieldFocusNode: nameFieldFocusNode,
         ),
         const HeightGap(),
         _EmailField(
-            onFieldSubmitted: widget.emailOnFieldSubmitted,
-            emailFieldFocusNode: widget.emailFieldFocusNode),
+            onFieldSubmitted: emailOnFieldSubmitted,
+            emailFieldFocusNode: emailFieldFocusNode),
         const HeightGap(),
         _PasswordField(
-          onFieldSubmitted: widget.passwordOnFieldSubmitted,
-          obscureText: widget.obscureText,
-          onPressed: widget.obscureIconOnPressed,
-          passwordFieldFocusNode: widget.passwordFieldFocusNode,
+          onFieldSubmitted: passwordOnFieldSubmitted,
+          obscureText: obscureText,
+          onPressed: obscureIconOnPressed,
+          passwordFieldFocusNode: passwordFieldFocusNode,
         ),
         const HeightGap(),
         _SignUpButton(
-          loginButtonFocusNode: widget.loginButtonFocusNode,
-          columnWidth: widget.columnWidth,
+          loginButtonFocusNode: loginButtonFocusNode,
+          columnWidth: columnWidth,
         ),
       ],
     );
   }
 }
+
 //----------------------------------------------------------------------------
 class _NameField extends ConsumerWidget {
   final FocusNode nameFieldFocusNode;
@@ -79,27 +93,27 @@ class _NameField extends ConsumerWidget {
 
   const _NameField(
       {required this.onFieldSubmitted,
-        required this.nameFieldFocusNode,
-        super.key});
+      required this.nameFieldFocusNode,
+      super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final signUpState = ref.watch(signUpProvider);
     final showError = signUpState.name.invalid;
     final signUpController = ref.read(signUpProvider.notifier);
-    
+
     return CustomTextFormField(
       onFieldSubmitted: onFieldSubmitted,
       autofocus: true,
       focusNode: nameFieldFocusNode,
       hintText: '이름 입력',
-      errorText: showError
-          ? Name.showNameErrorMessage(signUpState.name.error)
-          :null,
+      errorText:
+          showError ? Name.showNameErrorMessage(signUpState.name.error) : null,
       onChanged: (name) => signUpController.onNameChange(name),
     );
   }
 }
+
 //----------------------------------------------------------------------------
 class _EmailField extends ConsumerWidget {
   final FocusNode emailFieldFocusNode;
@@ -107,8 +121,8 @@ class _EmailField extends ConsumerWidget {
 
   const _EmailField(
       {required this.onFieldSubmitted,
-        required this.emailFieldFocusNode,
-        super.key});
+      required this.emailFieldFocusNode,
+      super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -127,6 +141,7 @@ class _EmailField extends ConsumerWidget {
     );
   }
 }
+
 //----------------------------------------------------------------------------
 class _PasswordField extends ConsumerWidget {
   final FocusNode onFieldSubmitted;
@@ -143,19 +158,19 @@ class _PasswordField extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context,WidgetRef ref ) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final signUpState = ref.watch(signUpProvider);
     final showError = signUpState.password.invalid;
     final signUpController = ref.read(signUpProvider.notifier);
-    
+
     return CustomTextFormField(
       onFieldSubmitted: onFieldSubmitted,
       obscureText: obscureText,
       focusNode: passwordFieldFocusNode,
       hintText: '비밀번호 입력',
       errorText: showError
-      ? Password.showPasswordErrorMessage(signUpState.password.error)
-      : null,
+          ? Password.showPasswordErrorMessage(signUpState.password.error)
+          : null,
       onChanged: (password) => signUpController.onPasswordChange(password),
       suffixIcon: IconButton(
         icon: obscureText ? Icon(Icons.visibility_off) : Icon(Icons.visibility),
@@ -166,6 +181,7 @@ class _PasswordField extends ConsumerWidget {
     );
   }
 }
+
 //----------------------------------------------------------------------------
 class _SignUpButton extends ConsumerWidget {
   final FocusNode loginButtonFocusNode;
@@ -187,9 +203,10 @@ class _SignUpButton extends ConsumerWidget {
       focusNode: loginButtonFocusNode,
       onPressed: isValidated
           ? () {
-        signUpController.signUpWithEmailAndPassword();
-        print('성공$signUpState.status');
-      }: (){print('실패$signUpState.status');},
+              signUpController.signUpWithEmailAndPassword();
+            }
+          : () {
+            },
       child: Text('가입'),
       style: ElevatedButton.styleFrom(
         backgroundColor: PRIMARY_COLOR,
@@ -199,4 +216,3 @@ class _SignUpButton extends ConsumerWidget {
     );
   }
 }
-

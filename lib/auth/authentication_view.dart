@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form_validator/form_validators.dart';
 import 'package:web_test2/auth/signin/signin_screen.dart';
-import 'package:web_test2/auth/signup/controller/singup_controller.dart';
 import 'package:web_test2/auth/signup/signup_screen.dart';
 import 'package:web_test2/common/component/Gap.dart';
 import 'package:web_test2/common/component/auth_switch_button.dart';
-import 'package:web_test2/common/component/error_dialog.dart';
-import 'package:web_test2/common/component/logo.dart';
 import 'package:web_test2/common/component/side_fade_switcher.dart';
 import 'package:web_test2/common/layout/default_layout.dart';
 
 class AuthenticationView extends StatefulWidget {
   const AuthenticationView({super.key});
+
+  static String get routeName => '';
 
   @override
   State<AuthenticationView> createState() => _AuthenticationViewState();
