@@ -24,7 +24,4 @@ class AuthUser extends Equatable{
     name,
     emailVerified,
   ];
-
-
-
 }

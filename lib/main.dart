@@ -1,18 +1,22 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:web_test2/auth/authentication_view.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/firebase_options.dart';
 import 'package:web_test2/auth/controller/authentication_controller.dart';
-import 'package:web_test2/screen/profile.dart';
-
+import 'package:web_test2/screen/user_profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  KakaoSdk.init(
+    nativeAppKey: '83f7860e16be3ceaa90d6d0cc408e407',
+    javaScriptAppKey: '76648842040726cf58adb8c643b0a6a5',
+  );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp( ProviderScope(child: MyApp()),
+  runApp(
+    const ProviderScope(child: MyApp()),
   );
 }
 
@@ -21,29 +25,37 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authnticationState = ref.watch(authProvider);
+    final authenticationState = ref.watch(userMeProvider);
+
+    // final router = ref.watch(routerProvider);
 
     Widget getHome() {
-      if(authnticationState.status == AuthenticationStatus.authenticated) {
-        return const Profile();
-      } else if (authnticationState.status == AuthenticationStatus.unauthenticated){
+      if (authenticationState.status == AuthenticationStatus.authenticated) {
+        // final signInUserState = ref.read(signedInUserProvider);
+        // if (signInUserState.value!.level < 5) {
+        //   return const UserManagementScreen();
+        // } else {
+          return const UserProfile();
+        // }
+      } else if (authenticationState.status ==
+          AuthenticationStatus.unauthenticated) {
         return const AuthenticationView();
       } else {
         return const AuthenticationView();
       }
     }
+
     return MaterialApp(
       theme: ThemeData(
-        textTheme: TextTheme(
-          bodyText1: TextStyle(
-            fontSize: 14,
-            color: PRIMARY_COLOR,
-            fontWeight: FontWeight.w300,
-          )
-        )
-      ),
+          textTheme: TextTheme(
+              bodyText1: TextStyle(
+        fontSize: 14,
+        color: PRIMARY_COLOR,
+        fontWeight: FontWeight.w300,
+      ))),
       debugShowCheckedModeBanner: false,
       home: getHome(),
+      // routerConfig: router,
     );
   }
 }

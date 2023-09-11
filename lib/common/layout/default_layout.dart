@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class DefaultLayout extends StatelessWidget {
   final Color? backgroundColor;
@@ -20,7 +19,6 @@ class DefaultLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       bottomNavigationBar: bottomNavigationBar,
@@ -30,18 +28,18 @@ class DefaultLayout extends StatelessWidget {
         child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
           double screenWidth = constraints.maxWidth;
-          double defaultWidth = screenWidth * this.defaultWidth;
-          double minWidth = this.minWidth;
+          final double calculatedDefaultWidth = screenWidth * defaultWidth;
+          final double effectiveMinWidth = minWidth;
 
-          double columnWidth = defaultWidth;
-          if (defaultWidth <= minWidth) {
-            columnWidth = minWidth - 30;
+          double columnWidth = calculatedDefaultWidth;
+          if (calculatedDefaultWidth <= effectiveMinWidth) {
+            columnWidth = effectiveMinWidth - 30;
           }
+
           return Center(
               child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Container(
-              //height: screenHeight,
               width: columnWidth,
               child: child,
             ),

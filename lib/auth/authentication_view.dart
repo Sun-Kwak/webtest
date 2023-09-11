@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form_validator/form_validators.dart';
 import 'package:web_test2/auth/signin/signin_screen.dart';
-import 'package:web_test2/auth/signup/controller/singup_controller.dart';
 import 'package:web_test2/auth/signup/signup_screen.dart';
 import 'package:web_test2/common/component/Gap.dart';
 import 'package:web_test2/common/component/auth_switch_button.dart';
-import 'package:web_test2/common/component/error_dialog.dart';
-import 'package:web_test2/common/component/logo.dart';
 import 'package:web_test2/common/component/side_fade_switcher.dart';
 import 'package:web_test2/common/layout/default_layout.dart';
 
 class AuthenticationView extends StatefulWidget {
   const AuthenticationView({super.key});
+
+  static String get routeName => 'home';
 
   @override
   State<AuthenticationView> createState() => _AuthenticationViewState();
@@ -48,7 +45,6 @@ class _AuthenticationViewState extends State<AuthenticationView> {
     return Stack(
       //alignment: AlignmentDirectional.bottomEnd,
       children: [
-
         DefaultLayout(
           defaultWidth: 0.3,
           child: Column(
@@ -57,7 +53,7 @@ class _AuthenticationViewState extends State<AuthenticationView> {
               SlideFadeSwitcher(
                 child: _showSignIn
                     ? SignInScreen(
-                  loginButtonOnPressed: (){},
+                        loginButtonOnPressed: () {},
                         emailFieldFocusNode: _emailFocusNode,
                         passwordFieldFocusNode: _passwordFocusNode,
                         loginButtonFocusNode: _loginFocusNode,
@@ -66,8 +62,8 @@ class _AuthenticationViewState extends State<AuthenticationView> {
                         obscureText: _obscureText,
                         obscureIconOnPressed: _toggleObscureText,
                         columnWidth: columnWidth,
-                          // ErrorDialog.show(context, "접속 실패");
-                          //LoadingSheet.show(context);
+                        // ErrorDialog.show(context, "접속 실패");
+                        //LoadingSheet.show(context);
                       )
                     : SignUpScreen(
                         nameFieldFocusNode: _nameFocusNode,
@@ -94,7 +90,6 @@ class _AuthenticationViewState extends State<AuthenticationView> {
             onTap: () {
               setState(() {
                 _showSignIn = !_showSignIn;
-                print("C");
               });
             },
             showSignIn: _showSignIn,
