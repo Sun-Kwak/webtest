@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  sdk: '>=3.0.5 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -37,10 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.7
   firebase_core: ^2.15.1
-  firebase_auth: ^4.8.0
-  cloud_firestore: ^4.9.0
+#  firebase_auth: ^4.8.0
+#  cloud_firestore: ^4.9.0
   flutter_riverpod: ^2.0.2
-  riverpod_annotation: ^2.1.5
+  riverpod_annotation: ^1.0.4
   sprung: ^3.0.0
   loading_animation_widget:
   equatable: ^2.0.5
@@ -48,16 +48,6 @@ dependencies:
     path: packages/form_validators
   authentication_repository:
     path: packages/firebase_auth_repository
-  kakao_flutter_sdk_user: ^1.5.0
-  shared_preferences:
-  go_router: ^9.0.3
-  foundation: ^0.0.5
-  freezed: ^2.4.2
-  freezed_annotation: ^2.4.1
-  hooks_riverpod: ^2.2.0
-  firebase_storage: ^11.2.6
-  syncfusion_flutter_datagrid: ^23.1.36
-
 
 
 dev_dependencies:
@@ -70,8 +60,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-  build_runner:
-  json_serializable:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
