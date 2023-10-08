@@ -14,18 +14,6 @@ class FirebaseAuthRemoteDataSource {
 
     return customTokenResponse.body;
   }
-// Future<Map<String, dynamic>> getUserData(String uid) async {
-//
-//   final response = await http.post(Uri.parse(url), body: {'uid': uid});
-//   if (response.statusCode == 200) {
-//     // 함수가 성공적으로 실행되고 데이터를 반환한 경우
-//     final data = json.decode(response.body);
-//     return data;
-//   } else {
-//     // 함수 실행 중 오류가 발생한 경우
-//     throw Exception('Failed to load user data');
-//   }
-// }
 }
 
 class SignUpWithEmailAndPasswordFailure implements Exception {
@@ -79,7 +67,7 @@ class AuthenticationRepository {
     );
     try {
       await FirebaseAuth.instance.signInWithCustomToken(token);
-       _employeeRepository.signUpUpdateUserData(user.kakaoAccount!.email!, user.kakaoAccount!.profile!.nickname!);
+       _employeeRepository.signUpSetUserData(user.kakaoAccount!.email!, user.kakaoAccount!.profile!.nickname!);
 
     } catch (e) {
       throw SignInWithKakaoFailure();
@@ -97,7 +85,7 @@ class AuthenticationRepository {
         email: email,
         password: password,
       );
-      _employeeRepository.signUpUpdateUserData(email, displayName);
+      _employeeRepository.signUpSetUserData(email, displayName);
     } on FirebaseAuthException catch (e) {
       throw SignUpWithEmailAndPasswordFailure(e.code);
     }

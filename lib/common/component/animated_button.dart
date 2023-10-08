@@ -22,17 +22,17 @@ class AnimatedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedObject(
       onTap: onTap,
-      child: Container(
+      child: SizedBox(
         height: 50,
         child: ElevatedButton(
           focusNode: focusNode,
           onPressed: onPressed,
-          child: Text(buttonText),
           style: ElevatedButton.styleFrom(
             backgroundColor: backgroundColor,
-            minimumSize: Size(columnWidth + 10, 65),
+            minimumSize: Size(columnWidth + 10, 50),
             padding: EdgeInsets.zero,
           ),
+          child: Text(buttonText),
         ),
       ),
     );

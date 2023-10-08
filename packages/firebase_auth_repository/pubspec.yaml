@@ -10,3 +10,8 @@ dependencies:
   firebase_auth: ^4.8.0
   equatable: ^2.0.5
   google_sign_in: ^6.1.5
+  hooks_riverpod: ^2.4.0
+  cloud_firestore: ^4.9.2
+  kakao_flutter_sdk: ^1.6.0
+  syncfusion_flutter_datagrid: ^23.1.36
+  syncfusion_flutter_core: ^23.1.36

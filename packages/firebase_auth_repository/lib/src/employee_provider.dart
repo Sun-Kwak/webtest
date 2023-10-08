@@ -1,34 +1,28 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'employee_model.dart';
 
-final employeeProvider = Provider((ref) => EmployeeRepository());
+final employeeProvider = StateNotifierProvider<EmployeeProvider, List<Employee>>((ref) {
+  final repository = ref.watch(employeeRepositoryProvider);
+  return EmployeeProvider(repository: repository);
+});
 
-class EmployeeRepository {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  Future<void> signUpUpdateUserData(String email, String displayName) async {
-    User? user = FirebaseAuth.instance.currentUser;
-    Employee employee = Employee.empty();
-
-    try {
-      // 해당 문서의 참조 가져오기
-      DocumentReference userDocRef = _firestore.collection('employees').doc(user!.uid);
-
-      // 해당 문서가 존재하지 않을 때만 생성
-      DocumentSnapshot userDoc = await userDocRef.get();
-      if (!userDoc.exists) {
-        await _firestore.collection('employees').doc(user!.uid).set(employee.copyWith(
-          id: user.uid,
-          email: email,
-          displayName: displayName,
-        ).toMap());
-      }
-    } catch (e) {
-      print(e);
-      throw Exception(e);
-    }
+class EmployeeProvider extends StateNotifier<List<Employee>> {
+  final EmployeeRepository repository;
+  
+  EmployeeProvider({
+    required this.repository,
+}) : super([]);
+  
+  Future<void> getEmployee ({DateTime? startDate, DateTime? endDate}) async {
+    endDate ??= DateTime.now();
+    startDate ??= endDate.subtract(Duration(days: 30));
+    await repository.getEmployeeData(
+      endDate: endDate,
+      startDate: startDate,
+    );
   }
 }

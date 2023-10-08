@@ -7,10 +7,14 @@ class DefaultLayout extends StatelessWidget {
   final Widget? floatingActionButton;
   final double defaultWidth;
   final double minWidth;
+  final double defaultHeight;
+  final PreferredSizeWidget? appBar;
 
   const DefaultLayout(
-      {this.defaultWidth = 0.9,
+      {this.defaultHeight = 0.9,
+      this.defaultWidth = 0.9,
       this.minWidth = 400,
+      this.appBar,
       this.floatingActionButton,
       this.bottomNavigationBar,
       this.backgroundColor,
@@ -19,15 +23,16 @@ class DefaultLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
+      appBar: appBar,
       bottomNavigationBar: bottomNavigationBar,
-      backgroundColor: backgroundColor ?? Colors.white,
+      backgroundColor: backgroundColor,
       floatingActionButton: floatingActionButton,
       body: SafeArea(
         child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
           double screenWidth = constraints.maxWidth;
+          double screenHeight = constraints.maxHeight;
           final double calculatedDefaultWidth = screenWidth * defaultWidth;
           final double effectiveMinWidth = minWidth;
 
@@ -40,6 +45,7 @@ class DefaultLayout extends StatelessWidget {
               child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             child: Container(
+              height: defaultHeight * screenHeight,
               width: columnWidth,
               child: child,
             ),

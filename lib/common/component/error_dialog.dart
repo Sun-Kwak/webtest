@@ -9,7 +9,7 @@ class ErrorDialog extends StatelessWidget {
   const ErrorDialog._(this.error, {Key? key}) : super(key: key);
 
   static Future<void> show(BuildContext context, String errorMessage) {
-    return showCupertinoDialog(
+    return showDialog(
       context: context,
       builder: (_) => ErrorDialog._(errorMessage),
     );
@@ -17,10 +17,10 @@ class ErrorDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoAlertDialog(
+    return AlertDialog(
       title: Text(error),
       actions: [
-        CupertinoDialogAction(
+        TextButton(
           child: const Text('확인'),
           onPressed: () => Navigator.of(context).pop(),
         ),

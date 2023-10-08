@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:web_test2/auth/social_signin/controller/google_signin_controller.dart';
-import 'package:web_test2/auth/social_signin/controller/kakao_signin_controller.dart';
 import 'package:web_test2/common/component/animated_Object.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/common/component/error_dialog.dart';
 import 'package:web_test2/common/extensions/hover_extensions.dart';
+import 'package:web_test2/screen/auth/social_signin/controller/google_signin_controller.dart';
+import 'package:web_test2/screen/auth/social_signin/controller/kakao_signin_controller.dart';
 import 'package:web_test2/screen/user_profile.dart';
 
 class CompanyLogo extends StatelessWidget {
@@ -75,7 +75,7 @@ class AppleLogo extends StatelessWidget {
       borderColor: INPUT_BORDER_COLOR,
       borderWidth: 1,
       radius: 25.0,
-    );
+    ).showCursorOnHover;
   }
 }
 

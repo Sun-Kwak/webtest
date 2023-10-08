@@ -34,6 +34,7 @@ class AutoSwitchButton extends StatelessWidget {
                 child: Text(
                   showSignIn ? '간편 회원가입' : '로그인 페이지',
                   style: TextStyle(
+                    fontFamily: 'SebangGothic',
                     fontSize: 14,
                     fontWeight: FontWeight.w300,
                     color: color,
