@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:web_test2/common/const/colors.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
-class CustomDropdownInputWidget extends StatelessWidget {
+class CustomSearchTextInputWidget extends StatelessWidget {
   final String? selectedValue;
   final ValueChanged<String?>? onChanged;
   final List<String> dropdownItems;
@@ -11,8 +12,10 @@ class CustomDropdownInputWidget extends StatelessWidget {
   final String? hintText;
   final double? labelBoxWidth;
   final double? textBoxWidth;
+  final Widget child;
 
-  const CustomDropdownInputWidget({
+  const CustomSearchTextInputWidget({
+    required this.child,
     this.labelBoxWidth = 50,
     this.textBoxWidth = 170,
     required this.onChanged,
@@ -53,18 +56,21 @@ class CustomDropdownInputWidget extends StatelessWidget {
         ),
 
         SizedBox(
-            width: textBoxWidth,
-            height: height,
-            child: CustomDropdownFormField(
-                dropdownItems: dropdownItems,
-                selectedValue: selectedValue,
-                onChanged: onChanged))
+          width: textBoxWidth,
+          height: height,
+          child: CustomSearchDropdownFormField(
+            child: child,
+            dropdownItems: dropdownItems,
+            selectedValue: selectedValue,
+            onChanged: onChanged,
+          ),
+        ),
       ],
     );
   }
 }
 
-class CustomDropdownFormField extends StatelessWidget {
+class CustomSearchDropdownFormField extends StatelessWidget {
   final String? hintText;
   final String? errorText;
   final List<String> dropdownItems;
@@ -73,8 +79,12 @@ class CustomDropdownFormField extends StatelessWidget {
   final FocusNode? focusNode;
   final FocusNode? onFieldSubmitted;
   final double? height;
+  final Icon? icon;
+  final Widget child;
 
-  const CustomDropdownFormField({
+  const CustomSearchDropdownFormField({
+    required this.child,
+    this.icon,
     this.height = 40,
     required this.dropdownItems,
     required this.selectedValue,
@@ -108,18 +118,25 @@ class CustomDropdownFormField extends StatelessWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
+          icon: icon ??
+              const Icon(
+                Icons.search_outlined,
+                color: CONSTRAINT_PRIMARY_COLOR,
+              ),
+          hint: const Text(
+            '검색',
+            style: TextStyle(
+              color: CONSTRAINT_PRIMARY_COLOR,
+              fontSize: 12,
+            ),
+          ),
           value: selectedValue,
-          isDense: true,
+          // isDense: true,
           onChanged: onChanged,
           items: dropdownItems.map((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 12,
-                ),
-              ),
+              child: child,
             );
           }).toList(),
         ),

@@ -75,7 +75,7 @@ class MyApp extends ConsumerWidget {
           bodyMedium: TextStyle(
               color: Colors.black87,
               fontWeight: FontWeight.w400,
-              fontSize: 13,
+              fontSize: 12,
               fontFamily: 'SebangGothic'), // 다른 텍스트 유형에 대해서도 스타일을 지정할 수 있습니다.
           // 필요한 다른 텍스트 스타일을 지정할 수 있습니다.
         ),

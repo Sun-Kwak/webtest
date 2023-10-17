@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:web_test2/common/component/custom_text_fromfield.dart';
 import 'package:web_test2/common/component/size_fade_switcher.dart';
 
-class CustomTextInputWidget extends StatelessWidget {
+class CustomPhoneInputWidget extends StatelessWidget {
   final double? height;
   final bool? isRequired;
   final String label;
-  final String? hintText;
   final ValueChanged<String>? onChanged;
   final double? labelBoxWidth;
   final double? textBoxWidth;
   final TextEditingController? controller;
   final String? errorText;
 
-  const CustomTextInputWidget({
+  const CustomPhoneInputWidget({
     this.errorText,
     this.controller,
     this.labelBoxWidth = 50,
     this.textBoxWidth = 170,
-    this.hintText,
     required this.label,
     this.isRequired = false,
     required this.onChanged,
@@ -57,12 +56,19 @@ class CustomTextInputWidget extends StatelessWidget {
             ),
 
             CustomInputFormField(
+
               controller: controller,
-              hintText: hintText,
+              hintText: '숫자만 입력 (010 제외)',
               width: textBoxWidth,
               height: height,
               onChanged: onChanged,
               errorText: errorText,
+              keyboardType: TextInputType.phone,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(11),
+                PhoneInputFormatter(),
+              ],
             ),
           ],
         ),
@@ -80,71 +86,6 @@ class CustomTextInputWidget extends StatelessWidget {
               : const SizedBox.shrink(),
         )
 
-      ],
-    );
-  }
-}
-
-class LargeTextInputWidget extends StatelessWidget {
-  final double? height;
-  final double? textHeight;
-  final bool? isRequired;
-  final String label;
-  final String? hintText;
-  final ValueChanged<String>? onChanged;
-  final double? labelBoxWidth;
-  final double? textBoxWidth;
-  final TextEditingController? controller;
-
-  const LargeTextInputWidget({
-    this.controller,
-    this.labelBoxWidth = 50,
-    this.textBoxWidth = 440,
-    this.hintText,
-    required this.label,
-    this.isRequired = false,
-    required this.onChanged,
-    this.height = 75,
-    this.textHeight = 40,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: labelBoxWidth,
-          height: textHeight,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                label,
-
-                // style: TextStyle(fontSize: textHeight! * 0.35),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: height,
-          width: 10,
-          child: Center(
-            child: isRequired == true
-                ? const Text('\*', style: TextStyle(color: Colors.redAccent))
-                : null,
-          ),
-        ),
-        CustomInputFormField(
-            controller: controller,
-            maxLines: 4,
-            hintText: hintText,
-            width: textBoxWidth,
-            height: height,
-            onChanged: onChanged),
       ],
     );
   }

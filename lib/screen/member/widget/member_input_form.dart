@@ -1,33 +1,141 @@
+import 'dart:async';
+
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:form_validator/form_validators.dart';
+import 'package:web_test2/common/component/custom_message_screen.dart';
+import 'package:web_test2/common/component/custom_refresh_icon.dart';
+import 'package:web_test2/common/component/error_dialog.dart';
 import 'package:web_test2/common/component/input_widget/custom_dateSelection_input_widget.dart';
 import 'package:web_test2/common/component/custom_boxRadius_form.dart';
 import 'package:web_test2/common/component/input_widget/custom_dropdown_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_genderSelection_input_widget.dart';
+import 'package:web_test2/common/component/input_widget/custom_phone_input_widget.dart';
+import 'package:web_test2/common/component/input_widget/custom_search_text_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_text_input_widget.dart';
+import 'package:web_test2/common/component/side_fade_switcher.dart';
+import 'package:web_test2/common/component/size_fade_switcher.dart';
 import 'package:web_test2/common/const/colors.dart';
+import 'package:web_test2/screen/auth/controller/signedIn_user_provider.dart';
+import 'package:web_test2/screen/member/controller/member_input_controller.dart';
+import 'package:web_test2/screen/member/controller/member_input_state.dart';
+import 'package:another_flushbar/flushbar.dart';
+import 'package:another_flushbar/flushbar_helper.dart';
+import 'package:another_flushbar/flushbar_route.dart';
+import 'package:web_test2/screen/member/widget/member_search_form.dart';
 
-class MemberInputForm extends StatefulWidget {
+class MemberInputForm extends ConsumerStatefulWidget {
   const MemberInputForm({super.key});
 
   @override
-  State<MemberInputForm> createState() => _MemberInputFormState();
+  ConsumerState<MemberInputForm> createState() => MemberInputFormState();
 }
 
-class _MemberInputFormState extends State<MemberInputForm> {
+class MemberInputFormState extends ConsumerState<MemberInputForm> {
+  String? errorText;
   final double height = 40;
-  String selectedValue = '지인소개';
+  DateTime? selectedDate;
+  String selectedValue = '기타';
+  bool isNew = true;
+  String? selectedGender = '여성';
+  TextEditingController nameController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController memoController = TextEditingController();
   final List<String> dropdownItems = [
+    '기타',
     '지인소개',
     '신문광고',
     '전단지',
     '배너',
     'SNS',
-    '기타',
   ];
+  Member member = Member.empty();
+
+  @override
+  void initState() {
+    member = member.copyWith(
+      signUpPath: '기타',
+    );
+    super.initState();
+  }
+
+  final List<String> referralDropdownItems = [];
+
+  void _resetFields() {
+    final memberInputController = ref.read(memberInputProvider.notifier);
+    setState(() {
+      selectedValue = '기타';
+      selectedDate = null;
+      isNew = true;
+      selectedGender = '여성';
+      nameController.text = '';
+      phoneNumberController.text = '';
+      addressController.text = '';
+      memoController.text = '';
+      memberInputController.resetAll();
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final memberInputController = ref.read(memberInputProvider.notifier);
+    DateTime now = DateTime.now();
+    DateTime threeYearsLater =
+        now.add(const Duration(days: 3 * 365)); // 3 years later from now
+
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: DateTime(1900),
+      lastDate: threeYearsLater,
+    );
+
+    if (pickedDate != null && pickedDate != selectedDate) {
+      String formattedDate =
+          "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
+      setState(() {
+        selectedDate = pickedDate;
+      });
+      memberInputController.onDateChange(formattedDate);
+    } else {
+      memberInputController.onDateChange('날짜 선택');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<MemberInputState>(
+      memberInputProvider,
+      (previous, current) {
+        if (current.status.isSubmissionInProgress) {
+          LoadingSheet.show(context);
+        } else if (current.status.isSubmissionFailure) {
+          CustomMessageScreen.showMessage(context, '${current.errorMessage}',
+              Colors.red, Icons.dangerous_outlined);
+          // ErrorDialog.show(context, '${current.errorMessage}');
+        } else if (current.status.isSubmissionSuccess) {
+          Navigator.of(context).pop();
+          CustomMessageScreen.showMessage(
+              context, '저장', Colors.white, Icons.check);
+          _resetFields();
+        }
+      },
+    );
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double formWidth = screenWidth >= 650
+        ? 535
+        : screenWidth >= 640
+            ? screenWidth * 0.82
+            : screenWidth - 20;
+    final double widgetGap = screenWidth >= 650 ? 20 : 8;
+    final double textBoxWidth = screenWidth >= 650 ? 170 : formWidth * 0.33;
+    final double labelBoxWidth = screenWidth >= 650 ? 50 : formWidth * 0.1;
+    final double largeTextBoxWidth =
+        (textBoxWidth * 2) + labelBoxWidth + 10 + widgetGap;
+
     return CustomBoxRadiusForm(
+      width: formWidth,
       title: '회원가입',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,136 +143,415 @@ class _MemberInputFormState extends State<MemberInputForm> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              const SizedBox(
+                width: 10,
+              ),
+              const Expanded(
+                child: Text(
+                  '필수정보',
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+              CustomRefreshIcon(onPressed: _resetFields),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            children: [
+              const SizedBox(
+                width: 20,
+              ),
+              _NameField(
+                labelBoxWidth: labelBoxWidth,
+                textBoxWidth: textBoxWidth,
+                controller: nameController,
+              ),
+              SizedBox(
+                width: widgetGap,
+              ),
+              CustomGenderSelectionInputWidget(
+                textBoxWidth: textBoxWidth,
+                labelBoxWidth: labelBoxWidth,
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedGender = value;
+                    member = member.copyWith(
+                      gender: value.toString(),
+                    );
+                  });
+                },
+                selectedGender: selectedGender,
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+
+          Row(
+            children: [
+              const SizedBox(
+                width: 20,
+              ),
+              _BirthDayField(
+                onTap: () {
+                  _selectDate(context);
+                },
+                selectedDate: selectedDate,
+                labelBoxWidth: labelBoxWidth,
+                textBoxWidth: textBoxWidth,
+              ),
+              SizedBox(
+                width: widgetGap,
+              ),
+              _PhoneField(
+                labelBoxWidth: labelBoxWidth,
+                textBoxWidth: textBoxWidth,
+                controller: phoneNumberController,
+              ),
+            ],
+          ),
+
+          const SizedBox(
+            height: 20,
+          ),
+          const Divider(),
+          const SizedBox(
+            height: 10,
+          ),
+          const Row(
+            children: [
+              SizedBox(
+                width: 10,
+              ),
               Text(
-                '필수정보',
+                '추가정보',
                 style: TextStyle(fontSize: 14),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.refresh),
-                tooltip: '새로고침',
-              ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
           Row(
             children: [
-              CustomTextInputWidget(
-                label: '성함',
-                hintText: '2글자 이상',
-                onChanged: (v) {},
-                isRequired: true,
-              ),
-              SizedBox(
-                width: 35,
-              ),
-              CustomGenderSelectionInputWidget(),
-            ],
-          ),
-          SizedBox(
-            height: 10,
-          ),
-
-          Row(
-            children: [
-              CustomDateSelectionInputWidget(
-                label: '생년월일',
-                isRequired: true,
+              const SizedBox(
+                width: 20,
               ),
               CustomTextInputWidget(
-                label: '전화번호',
-                hintText: '숫자만 입력',
-                onChanged: (v) {},
-                isRequired: true,
-              ),
-            ],
-          ),
-
-          SizedBox(
-            height: 20,
-          ),
-          Divider(),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            '추가정보',
-            style: TextStyle(fontSize: 14),
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Row(
-            children: [
-              CustomTextInputWidget(
+                controller: addressController,
+                labelBoxWidth: labelBoxWidth,
                 label: '행정동',
                 hintText: '자유기입',
-                onChanged: (v) {},
+                onChanged: (v) {
+                  member = member.copyWith(address: v);
+                },
+                textBoxWidth: textBoxWidth,
               ),
               SizedBox(
-                width: 35,
+                width: widgetGap,
               ),
               CustomDropdownInputWidget(
+                labelBoxWidth: labelBoxWidth,
                 onChanged: (String? value) {
                   setState(() {
                     selectedValue = value!;
+                    member = member.copyWith(
+                      signUpPath: value,
+                    );
                   });
                 },
                 label: '등록경위',
                 dropdownItems: dropdownItems,
                 selectedValue: selectedValue,
+                textBoxWidth: textBoxWidth,
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Row(
             children: [
-              CustomTextInputWidget(
+              const SizedBox(
+                width: 20,
+              ),
+              CustomSearchTextInputWidget(
+                labelBoxWidth: labelBoxWidth,
+                child: const Center(),
+                dropdownItems: [],
+                selectedValue: '',
+                onChanged: (v) {
+                  member = member.copyWith(
+                    referralID: v,
+                  );
+                },
                 label: '추천인',
-                hintText: '검색',
-                onChanged: (v) {},
+                textBoxWidth: textBoxWidth,
               ),
               SizedBox(
-                width: 35,
+                width: widgetGap,
               ),
-              CustomTextInputWidget(
+              CustomSearchTextInputWidget(
+                labelBoxWidth: labelBoxWidth,
+                child: const Center(),
+                dropdownItems: [],
+                selectedValue: '',
+                onChanged: (v) {
+                  member = member.copyWith(
+                    accountLinkID: v,
+                  );
+                },
                 label: '계정연결',
-                hintText: '검색',
-                onChanged: (v) {},
+                textBoxWidth: textBoxWidth,
               ),
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          LargeTextInputWidget(
-            label: '메모',
-            hintText: '덮어쓰기',
-            onChanged: (v) {},
+          Row(
+            children: [
+              const SizedBox(
+                width: 20,
+              ),
+              LargeTextInputWidget(
+                labelBoxWidth: labelBoxWidth,
+                controller: memoController,
+                label: '메모',
+                hintText: '덮어쓰기',
+                onChanged: (v) {
+                  member = member.copyWith(
+                    memo: v,
+                  );
+                },
+                textBoxWidth: largeTextBoxWidth,
+              ),
+            ],
           ),
           //
-          // SizedBox(height: 10,),
+          const SizedBox(
+            height: 10,
+          ),
           Expanded(
             child: Center(
               child: SizedBox(
                 width: 100,
-                height: 30,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: PRIMARY_COLOR,
-                  ),
-                  onPressed: () {},
-                  child: Text('저장'),
+                child: _AddMemberButton(
+                  member: member,
                 ),
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+//----------------------------------------------------------------------------
+class _AddMemberButton extends ConsumerWidget {
+  final Member member;
+
+  const _AddMemberButton({
+    required this.member,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final memberInputState = ref.watch(memberInputProvider);
+    final bool isValidated = memberInputState.status.isValidated;
+    final memberInputController = ref.read(memberInputProvider.notifier);
+    // final memberSearchFormState = ref.read(memberSearchFormStateProvider);
+    // final signInUserState = ref.watch(signedInUserProvider);
+
+    return SizedBox(
+      width: 100,
+      child: ElevatedButton(
+        onPressed: isValidated
+            ? () {
+                memberInputController.addMember(member);
+                // memberSearchFormState.fetchMembersData();
+              }
+            : () {
+                CustomMessageScreen.showMessage(
+                    context, '필수값 확인', Colors.amber, Icons.info_outline);
+              },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: PRIMARY_COLOR,
+          padding: EdgeInsets.zero,
+        ),
+        child: const Text('등록'),
+      ),
+    );
+  }
+}
+
+//------------------------------------------------------------------------------------------
+class _NameField extends ConsumerWidget {
+  // final FocusNode nameFieldFocusNode;
+  // final FocusNode onFieldSubmitted;
+  final double labelBoxWidth;
+  final double textBoxWidth;
+  final TextEditingController controller;
+
+  const _NameField({
+    required this.labelBoxWidth,
+    required this.textBoxWidth,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final memberInputState = ref.watch(memberInputProvider);
+    final showError = memberInputState.name.invalid;
+    final memberInputController = ref.read(memberInputProvider.notifier);
+
+    return CustomTextInputWidget(
+      onChanged: (name) => memberInputController.onNameChange(name),
+      labelBoxWidth: labelBoxWidth,
+      controller: controller,
+      label: '성함',
+      hintText: '2글자 이상',
+      isRequired: true,
+      textBoxWidth: textBoxWidth,
+      errorText: showError
+          ? Name.showNameErrorMessage(memberInputState.name.error)
+          : null,
+    );
+  }
+}
+
+//---------------------------------------------------------------------------------------------
+class _BirthDayField extends ConsumerWidget {
+  final double labelBoxWidth;
+  final double textBoxWidth;
+  final DateTime? selectedDate;
+  final GestureTapCallback onTap;
+
+  const _BirthDayField({
+    required this.selectedDate,
+    required this.onTap,
+    required this.labelBoxWidth,
+    required this.textBoxWidth,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final memberInputState = ref.watch(memberInputProvider);
+    final showError = memberInputState.date.invalid;
+
+    return CustomDateSelectionInputWidget(
+      onTap: onTap,
+      selectedDate: selectedDate,
+      labelBoxWidth: labelBoxWidth,
+      // onTap: onTap,
+      label: '생년월일',
+      isRequired: true,
+      textBoxWidth: textBoxWidth,
+      errorText: showError
+          ? Date.showDateErrorMessage(memberInputState.date.error)
+          : null,
+    );
+  }
+}
+
+//---------------------------------------------------------------------------------------------
+class _PhoneField extends ConsumerStatefulWidget {
+  final double labelBoxWidth;
+  final double textBoxWidth;
+  final TextEditingController controller;
+
+  const _PhoneField({
+    required this.labelBoxWidth,
+    required this.textBoxWidth,
+    required this.controller,
+  });
+
+  @override
+  ConsumerState<_PhoneField> createState() => _PhoneFieldState();
+}
+
+class _PhoneFieldState extends ConsumerState<_PhoneField> {
+  Stream<bool> _verifyPhoneNumber(String phone) async* {
+    final memberRepository = ref.watch(memberRepositoryProvider);
+
+    if (phone.length == 13) {
+      bool isPhoneNumberDuplicate =
+          await memberRepository.checkPhoneNumber(phone);
+      yield !isPhoneNumberDuplicate;
+    } else {
+      yield false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final memberInputState = ref.watch(memberInputProvider);
+    final showError = memberInputState.phone.invalid;
+    final memberInputController = ref.read(memberInputProvider.notifier);
+    bool showIcon = widget.controller.text.length == 13;
+
+    return Row(
+      children: [
+        CustomPhoneInputWidget(
+          onChanged: (phone) {
+            memberInputController.onPhoneChange(phone);
+          },
+          labelBoxWidth: widget.labelBoxWidth,
+          controller: widget.controller,
+          label: '전화번호',
+          isRequired: true,
+          textBoxWidth: widget.textBoxWidth,
+          errorText: showError
+              ? Phone.showPhoneErrorMessages(memberInputState.phone.error)
+              : null,
+        ),
+        const SizedBox(
+          width: 5,
+        ),
+        StreamBuilder<bool>(
+          stream: _verifyPhoneNumber(widget.controller.text),
+          initialData: false, // 초기값 설정
+          builder: (context, snapshot) {
+            if (!showIcon) {
+              return const SizedBox(); // 13자리 미만일 때 로딩 표시
+            } else {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox();
+              } else {
+                if (snapshot.data == true) {
+                  return const Tooltip(
+                    message: '확인',
+                      child: Icon(
+                    Icons.verified_outlined,
+                    color: Colors.blueGrey,
+                  ));
+                } else if (snapshot.data == false) {
+                  return Tooltip(
+                    message: '중복',
+                    child: GestureDetector(
+                      onTap: (){
+                        setState(() {
+                          showIcon = false;
+                        });
+                        widget.controller.text = '010-';
+                      },
+                      child: const Icon(Icons.dangerous_outlined,
+                          color: Colors.redAccent),
+                    ),
+                  );
+                } else {
+                  return const SizedBox();
+                }
+              }
+            }
+          },
+        ),
+      ],
     );
   }
 }

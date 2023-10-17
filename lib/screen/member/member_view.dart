@@ -15,6 +15,7 @@ class MembersViewState extends State<MembersView> {
   final ScrollController controller = ScrollController();
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Scrollbar(
       // trackVisibility: true,
       thumbVisibility: true,
@@ -22,32 +23,44 @@ class MembersViewState extends State<MembersView> {
       child: SingleChildScrollView(
         controller: controller,
         scrollDirection: Axis.horizontal,
-        child: const SingleChildScrollView(
+        child:  SingleChildScrollView(
           child: Center(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
+                 Column(
                   children: [
                     Column(
                       children: [
                         MemberInputForm(),
                         SizedBox(
-                          height: 30,
+                          height: 20,
                         ),
                         MemberInforForm(),
+                        if (screenWidth < 640) ...[
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const MemberSearchForm(),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          const MemberVOCForm(),
+                        ],
                       ],
                     ),
                   ],
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                MemberSearchForm(),
-                SizedBox(
-                  width: 10,
-                ),
-                MemberVOCForm(),
+                if (screenWidth >= 640) ...[
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const MemberSearchForm(),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const MemberVOCForm(),
+                ],
               ],
             ),
           ),

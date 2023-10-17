@@ -47,7 +47,7 @@ class _CustomSfDataGridState extends State<CustomSfDataGrid> {
         gridLinesVisibility: Sf.GridLinesVisibility.none,
         controller: widget.dataGridController,
         onQueryRowHeight: (details) {
-          return details.rowIndex == 0 ? 40.0 : 35.0;
+          return details.rowIndex == 0 ? 35.0 : 33.0;
         },
         // showCheckboxColumn: true,
         // checkboxShape: CircleBorder(),
@@ -55,6 +55,7 @@ class _CustomSfDataGridState extends State<CustomSfDataGrid> {
         columnWidthMode: Sf.ColumnWidthMode.fill,
         // frozenColumnsCount: 3,
         frozenRowsCount: 0,
+        headerGridLinesVisibility: Sf.GridLinesVisibility.none,
         columnResizeMode: Sf.ColumnResizeMode.onResize,
         selectionMode: Sf.SelectionMode.single,
         allowColumnsResizing: true,

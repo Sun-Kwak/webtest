@@ -61,7 +61,7 @@ class _SettingsViewState extends State<SettingsView> {
             ),
           ],
         ),
-         Expanded(child: groupValue == 2 ? EmployeesView() : EmptyView()),
+         Expanded(child: groupValue == 2 ? EmployeesTable() : EmptyView()),
       ],
     );
   }

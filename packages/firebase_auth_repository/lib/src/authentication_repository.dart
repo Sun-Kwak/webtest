@@ -40,9 +40,17 @@ class CustomException implements Exception {
   const CustomException({required this.message});
 }
 
-class SignInWithGoogleFailure implements Exception {}
+class SignInWithGoogleFailure implements Exception {
+  final String code;
 
-class SignInWithKakaoFailure implements Exception {}
+  const SignInWithGoogleFailure(this.code);
+}
+
+class SignInWithKakaoFailure implements Exception {
+  final String code;
+
+  const SignInWithKakaoFailure(this.code);
+}
 
 class SignOutFailure implements Exception {}
 
@@ -70,16 +78,17 @@ class AuthenticationRepository {
        _employeeRepository.signUpSetUserData(user.kakaoAccount!.email!, user.kakaoAccount!.profile!.nickname!);
 
     } catch (e) {
-      throw SignInWithKakaoFailure();
+      throw SignInWithKakaoFailure(e.toString());
     }
   }
 
 
 
-  Future<void> signUpWithEmailAndPassword(
-      {required String email,
+  Future<void> signUpWithEmailAndPassword({
+    required String email,
       required String password,
-      required String displayName}) async {
+      required String displayName,
+  }) async {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,

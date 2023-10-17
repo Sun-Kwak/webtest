@@ -6,10 +6,13 @@ class MemberVOCForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CustomBoxRadiusForm(
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double formWidth = screenWidth >= 712 ? 580 : screenWidth >= 640 ? screenWidth *0.82 : screenWidth -20;
+    return CustomBoxRadiusForm(
+      width: formWidth,
       title: '회원상담',
-      height: 1030,
-      child: Column(
+      height: 820,
+      child: const Column(
         children: [],
       ),
     );

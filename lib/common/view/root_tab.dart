@@ -46,12 +46,12 @@ class _RootTabState extends ConsumerState<RootTab>
     }
   // }
   final List<Widget> _mainContents = [
-     MembersView(),
-     ContractView(),
-     CourseView(),
-     MeasurementView(),
-     AttendanceCheckView(),
-     SettingsView(),
+     const MembersView(),
+     const ContractView(),
+     const CourseView(),
+     const MeasurementView(),
+     const AttendanceCheckView(),
+     const SettingsView(),
   ];
 
   @override
@@ -73,7 +73,7 @@ class _RootTabState extends ConsumerState<RootTab>
           child: Align(
             alignment: Alignment.centerLeft,
             child: DropdownButton<String>(
-              underline: SizedBox(),
+              underline: const SizedBox(),
                 value: dropdownValue,
                 icon: const Icon(Icons.arrow_drop_down),
                 // underline: Container(
@@ -190,6 +190,7 @@ class _RootTabState extends ConsumerState<RootTab>
           : null,
       body: Row(
         mainAxisSize: MainAxisSize.max,
+        // mainAxisAlignment: MainAxisAlignment.start,
         children: [
           if (screenWidth >= 640)
             NavigationRail(
@@ -250,11 +251,12 @@ class _RootTabState extends ConsumerState<RootTab>
             ),
           Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 40,),
+                const SizedBox(height: 40,),
                 Expanded(
                     child: Padding(
-                  padding: const EdgeInsets.only(left: 10, top: 10,right: 10),
+                  padding: screenWidth>640 ? const EdgeInsets.only(left: 10, top: 13,right: 10) : const EdgeInsets.only(left: 10, top: 3,right: 10) ,
                   child: _mainContents[_selectedIndex],
                 )),
               ],

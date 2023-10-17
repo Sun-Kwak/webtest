@@ -7,73 +7,98 @@ class MemberInforForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CustomBoxRadiusForm(
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double formWidth = screenWidth >= 650 ? 535 : screenWidth >= 640 ? screenWidth *0.82 : screenWidth-20;
+    final double widgetGap = screenWidth >= 650 ?  20 : 8;
+    final double textBoxWidth = screenWidth >= 650 ?  170 : formWidth * 0.33;
+    final double labelBoxWidth = screenWidth >= 650 ?  50 : formWidth * 0.1;
+    return CustomBoxRadiusForm(
+      width: formWidth,
       height: 290,
       title: '계약정보',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 30,),
+          const SizedBox(height: 30,),
           Row(
             children: [
+              const SizedBox(width: 20,),
               CustomTextOutputWidget(
+                labelBoxWidth: labelBoxWidth,
                 label: '회원번호',
                 outputText: '',
+                textBoxWidth: textBoxWidth,
               ),
               SizedBox(
-                width: 35,
+                width: widgetGap,
               ),
+              // CustomTextOutputWidget(
+              //   label: '계약상태',
+              //   outputText: '',
+              //   textBoxWidth: textBoxWidth,
+              // ),
+            ],
+          ),
+          const SizedBox(height: 10,),
+          Row(
+            children: [
+              const SizedBox(width: 20,),
               CustomTextOutputWidget(
+                labelBoxWidth: labelBoxWidth,
                 label: '계약상태',
                 outputText: '',
-              ),
-            ],
-          ),
-          SizedBox(height: 10,),
-          Row(
-            children: [
-              CustomTextOutputWidget(
-                label: '나이',
-                outputText: '',
+                textBoxWidth: textBoxWidth,
               ),
               SizedBox(
-                width: 35,
+                width: widgetGap,
               ),
               CustomTextOutputWidget(
+                labelBoxWidth: labelBoxWidth,
                 label: '추천인수',
                 outputText: '',
+                textBoxWidth: textBoxWidth,
               ),
             ],
           ),
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           Row(
             children: [
+              const SizedBox(width: 20,),
               CustomTextOutputWidget(
-                label: '첫 수강일',
+                labelBoxWidth: labelBoxWidth,
+                label: '첫수강일',
                 outputText: '',
+                textBoxWidth: textBoxWidth,
               ),
               SizedBox(
-                width: 35,
+                width: widgetGap,
               ),
               CustomTextOutputWidget(
-                label: '수강종료일',
+                labelBoxWidth: labelBoxWidth,
+                label: '종료예정',
                 outputText: '',
+                textBoxWidth: textBoxWidth,
               ),
             ],
           ),
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           Row(
             children: [
+              const SizedBox(width: 20,),
               CustomTextOutputWidget(
-                label: '총 납부금액',
+                labelBoxWidth: labelBoxWidth,
+                label: '총납부금',
                 outputText: '',
+                textBoxWidth: textBoxWidth,
               ),
               SizedBox(
-                width: 35,
+                width: widgetGap,
               ),
               CustomTextOutputWidget(
-                label: '총 출석일',
+                labelBoxWidth: labelBoxWidth,
+                label: '총출석일',
                 outputText: '',
+                textBoxWidth: textBoxWidth,
               ),
             ],
           ),

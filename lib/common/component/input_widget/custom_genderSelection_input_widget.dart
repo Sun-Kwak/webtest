@@ -1,62 +1,85 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:web_test2/common/const/colors.dart';
 
-
-enum Gender { male, female }
 
 class CustomGenderSelectionInputWidget extends StatefulWidget {
-  const CustomGenderSelectionInputWidget({super.key});
+  final double? labelBoxWidth;
+  final String? selectedGender;
+  final ValueChanged<String?> onChanged;
+  final double? textBoxWidth;
+
+   const CustomGenderSelectionInputWidget({
+    required this.onChanged,
+    this.selectedGender = '여성',
+    this.labelBoxWidth = 50,
+     this.textBoxWidth = 170,
+    super.key,
+  });
 
   @override
   CustomGenderSelectionInputWidgetState createState() => CustomGenderSelectionInputWidgetState();
 }
 
 class CustomGenderSelectionInputWidgetState extends State<CustomGenderSelectionInputWidget> {
-  Gender? _selectedGender = Gender.female;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
-        Container(
-            width: 70,
-            height: 40,
-            child: const Center(
-                child: Text(
+        SizedBox(
+            width: widget.labelBoxWidth,
+            height: 37,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
                   '성별',
                   // style: TextStyle(fontSize: 40 * 0.35),
-                ))),
+                ),
+              ],
+            )),
         const SizedBox(
           width: 10,
-          height: 40,
+          height: 37,
           child: Center(
-            child: Text('\*',style: TextStyle(color: Colors.redAccent)),
+            child: Text('*',style: TextStyle(color: Colors.redAccent)),
           ),
         ),
-        const SizedBox(width: 10,),
-        Radio<Gender>(
-          value: Gender.female,
-          groupValue: _selectedGender,
-          onChanged: (Gender? value) {
-            setState(() {
-              _selectedGender = value;
-            });
-          },
-        ),
-        const Text('여자',
-          // style: TextStyle(fontSize: 40 * 0.35),
-        ),
-        const SizedBox(width: 20),
-        Radio<Gender>(
-          value: Gender.male,
-          groupValue: _selectedGender,
-          onChanged: (Gender? value) {
-            setState(() {
-              _selectedGender = value;
-            });
-          },
-        ),
-        const Text('남자',
-          // style: TextStyle(fontSize: 40 * 0.35),
+        Container(
+          width: widget.textBoxWidth,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Radio<String>(
+                    value: '여성',
+                    groupValue: widget.selectedGender,
+                    onChanged: widget.onChanged,
+                  ),
+                  const Text('여성',
+                    // style: TextStyle(fontSize: 40 * 0.35),
+                  ),
+                ],
+              ),
+              SizedBox(width: widget.textBoxWidth! * 0.2,),
+              Row(
+                children: [
+                  Radio<String>(
+                    value: '남성',
+                    groupValue: widget.selectedGender,
+                    onChanged: widget.onChanged,
+                  ),
+                  const Text('남성',
+                    // style: TextStyle(fontSize: 40 * 0.35),
+                  ),
+                ],
+              )
+              // const SizedBox(width: 20),
+            ],
+          ),
         ),
       ],
     );

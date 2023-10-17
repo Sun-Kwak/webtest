@@ -37,7 +37,7 @@ class Employee {
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
       level: level ?? 5,
-      updatedBy: updatedBy ?? displayName ?? '',
+      updatedBy: updatedBy ?? displayName ?? this.updatedBy,
       createdAt: createdAt ?? DateTime.now(),
       updatedAt: updatedAt ?? DateTime.now(),
       // actions: actions,

@@ -13,14 +13,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 DataGridController dataGridController = DataGridController();
 
-class EmployeesView extends ConsumerStatefulWidget {
-  const EmployeesView({super.key});
+class EmployeesTable extends ConsumerStatefulWidget {
+  const EmployeesTable({super.key});
 
   @override
-  ConsumerState<EmployeesView> createState() => _SettingsViewState();
+  ConsumerState<EmployeesTable> createState() => EmployeesTableState();
 }
 
-class _SettingsViewState extends ConsumerState<EmployeesView> {
+class EmployeesTableState extends ConsumerState<EmployeesTable> {
   late EmployeeDataSource employeeDataSource;
   late Future<List<Employee>> employeesFuture;
   late Map<String, double> columnWidths = {
@@ -71,7 +71,7 @@ class _SettingsViewState extends ConsumerState<EmployeesView> {
               child: LayoutBuilder(
                 builder: (context, constraint){
                   double containerWidth = screenWidth > 1200 ? 800 : screenWidth * 0.9;
-                  double containerHeight = 450;
+                  double containerHeight = 700;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -79,7 +79,7 @@ class _SettingsViewState extends ConsumerState<EmployeesView> {
                       Container(
                         color: Colors.white,
                         height: containerHeight -_dataPagerHeight,
-                        width: containerWidth,
+                        // width: containerWidth,
                         child: SelectionArea(
                           child: CustomSfDataGrid(
                             allowEditing: true,

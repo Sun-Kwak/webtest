@@ -8,9 +8,9 @@ class CustomBoxRadiusForm extends StatelessWidget {
   final String title;
 
   const CustomBoxRadiusForm({
-    this.titleHeight = 40,
+    this.titleHeight = 33,
     this.height = 510,
-    this.width = 600,
+    this.width = 580,
     required this.child,
     required this.title,
     super.key});
@@ -38,12 +38,9 @@ class CustomBoxRadiusForm extends StatelessWidget {
 
             child: Center(child: Text(title,style: const TextStyle(color: Colors.white,fontSize: 14),)),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10,bottom: 10,right: 10),
-            child: SizedBox(
-              height: height! - titleHeight! - 10,
-              child: child,
-            ),
+          SizedBox(
+            height: height! - titleHeight! - 10,
+            child: child,
           )
         ],
       ),

@@ -7,12 +7,16 @@ class CustomTextOutputWidget extends StatelessWidget {
   final bool? isRequired;
   final String label;
   final String outputText;
+  final double? labelBoxWidth;
+  final double? textBoxWidth;
 
   const CustomTextOutputWidget({
+    this.labelBoxWidth = 60,
+    this.textBoxWidth = 170,
     required this.outputText,
     required this.label,
     this.isRequired = false,
-    this.height = 40,
+    this.height = 37,
     super.key,
   });
 
@@ -21,14 +25,19 @@ class CustomTextOutputWidget extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-            width: 70,
+            width: labelBoxWidth,
             height: height,
-            child: Center(
-                child: Text(
-              label,
-            ))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                ),
+              ],
+            )),
         SizedBox(
-          width: 10,
+          width: 3,
           height: height,
           child: Center(
             child: isRequired == true
@@ -37,10 +46,10 @@ class CustomTextOutputWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(
-          width: 10,
+          width: 8,
         ),
         Container(
-          width: 170,
+          width:  textBoxWidth,
           height: height,
 
           decoration: BoxDecoration(

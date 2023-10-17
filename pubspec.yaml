@@ -64,6 +64,9 @@ dependencies:
     sdk: flutter
   syncfusion_localizations: ^23.1.38
   kakao_flutter_sdk_user: ^1.6.0
+  dropdown_button2: ^2.3.9
+  another_flushbar: ^1.12.30
+  debounce_throttle: ^2.0.0
 
 
 dev_dependencies:
