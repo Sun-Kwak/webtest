@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as Sf;
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:web_test2/common/const/colors.dart';
 
 class CustomSfDataGrid extends StatefulWidget {
@@ -12,9 +13,14 @@ class CustomSfDataGrid extends StatefulWidget {
   final Sf.ColumnResizeUpdateCallback? onColumnResizeUpdate;
   final int? rowsPerPage;
   final bool allowEditing;
+  // final CurrentCellActivatedCallback onCurrentCellActivated;
+  final Sf.SelectionChangedCallback onSelectionChanged;
+
 
 
   const CustomSfDataGrid({
+    required this.onSelectionChanged,
+    // required this.onCurrentCellActivated,
     required this.allowEditing,
     required this.rowsPerPage,
     required this.dataGridSource,
@@ -42,7 +48,8 @@ class _CustomSfDataGridState extends State<CustomSfDataGrid> {
 
       ),
       child: Sf.SfDataGrid(
-
+        onSelectionChanged: widget.onSelectionChanged,
+        // onCurrentCellActivated: widget.onCurrentCellActivated,
         // highlightRowOnHover: true,
         gridLinesVisibility: Sf.GridLinesVisibility.none,
         controller: widget.dataGridController,

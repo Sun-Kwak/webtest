@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Member {
-  final String id; // Firestore 문서의 고유 ID
+  final String docId; // Firestore 문서의 고유 ID
+  final int id;
   final String displayName;
   final String? email;
   final int? level;
@@ -11,21 +12,29 @@ class Member {
   final String updatedBy;
   final DateTime createdAt;
   final DateTime updatedAt;
-  late final String? address;
-  late final String signUpPath;
-  final String? referralID;
+  final String? address;
+  final String signUpPath;
+  final int? referralID;
+  final String? referralName;
   final String? accountLinkID;
   final String? memo;
   final String? status;
   final int? referralCount;
-  final DateTime? firstDate;
-  final DateTime? expiryDate;
+  final String? firstDate;
+  final String? expiryDate;
   final int? totalFee;
   final int? totalAttendanceDays;
+  final int? openVOC;
+  final int? closeVOC;
+  final int? unresolvedVOC;
+  final String? contractStatus;
 
   // final String? actions;
 
   Member({
+    this.referralName,
+    required this.docId,
+    required this.id,
     required this.phoneNumber,
     required this.gender,
     required this.birthDay,
@@ -40,17 +49,21 @@ class Member {
     this.expiryDate,
     this.totalFee,
     this.totalAttendanceDays,
-    required this.id, // Firestore 문서의 고유 ID
     required this.displayName,
     this.email,
     this.level,
     required this.updatedBy,
     required this.createdAt,
     required this.updatedAt,
+    this.openVOC,
+    this.closeVOC,
+    this.unresolvedVOC,
+    this.contractStatus,
   });
 
   Member copyWith({
-    String? id, // Firestore 문서의 고유 ID
+    String? docId,
+    int? id,
     String? displayName,
     String? email,
     int? level,
@@ -62,18 +75,24 @@ class Member {
     String? phoneNumber,
     String? address,
     String? signUpPath,
-    String? referralID,
+    int? referralID,
+    String? referralName,
     String? accountLinkID,
     String? memo,
     String? status,
     int? referralCount,
-    DateTime? firstDate,
-    DateTime? expiryDate,
+    String? firstDate,
+    String? expiryDate,
     int? totalFee,
     int? totalAttendanceDays,
+    int? openVOC,
+    int? closeVOC,
+    int? unresolvedVOC,
+    String? contractStatus,
     // String? actions // 업데이트 시간
   }) {
     return Member(
+      docId: docId ?? this.docId,
       id: id ?? this.id,
       displayName: displayName ?? this.displayName,
       email: email ?? this.email,
@@ -82,7 +101,8 @@ class Member {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       address: address ?? this.address,
       signUpPath: signUpPath ?? this.signUpPath,
-      referralID: referralID ?? referralID,
+      referralID: referralID ?? this.referralID,
+      referralName: referralName ?? this.referralName,
       accountLinkID: accountLinkID ?? this.accountLinkID,
       status: status ?? this.status,
       referralCount: referralCount ?? this.referralCount,
@@ -94,6 +114,10 @@ class Member {
       updatedBy: updatedBy ?? displayName ?? this.updatedBy,
       createdAt: createdAt ?? DateTime.now(),
       updatedAt: updatedAt ?? DateTime.now(),
+      openVOC: openVOC ?? this.openVOC,
+      closeVOC: closeVOC ?? this.closeVOC,
+      unresolvedVOC: unresolvedVOC ?? this.unresolvedVOC,
+      contractStatus: contractStatus ?? this.contractStatus,
     );
   }
 
@@ -109,17 +133,22 @@ class Member {
       'address': address,
       'signUpPath':signUpPath,
       'referralID': referralID,
+      'referralName': referralName,
       'accountLinkID': accountLinkID,
       'memo': memo,
       'status': status.toString(),
       'referralCount': referralCount,
-      'firstDate': firstDate == null ? null : Timestamp.fromDate(firstDate!),
-      'expiryDate': expiryDate == null ? null : Timestamp.fromDate(expiryDate!),
+      'firstDate': firstDate,
+      'expiryDate': expiryDate,
       'totalFee': totalFee,
       'totalAttendanceDays': totalAttendanceDays,
       'updatedBy': updatedBy,
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
+      'openVOC': openVOC,
+      'closeVOC': closeVOC,
+      'unresolvedVOC': unresolvedVOC,
+      'contractStatus': contractStatus,
       // 'actions': actions,
     };
   }
@@ -127,8 +156,9 @@ class Member {
   factory Member.fromFirestore(DocumentSnapshot doc) {
     final map = doc.data() as Map<String, dynamic>;
     return Member(
-      id: doc.id,
-      displayName: map['displayName'] ?? '',
+      docId: doc.id,
+      id: map['id'],
+      displayName: map['displayName'],
       email: map['email'] ?? '',
       level: map['level'],
       gender: map['gender'],
@@ -136,25 +166,30 @@ class Member {
       phoneNumber: map['phoneNumber'],
       address: map['address'] ?? '',
       signUpPath: map['signUpPath'],
-      referralID: map['referralID'] ?? '',
+      referralID: map['referralID'],
+      referralName: map['referralName'] ?? '',
       accountLinkID: map['accountLinkID'] ?? '',
       memo: map['memo'] ?? '',
       status: map['status'],
       referralCount: map['referralCount'],
-      firstDate: map['firstDate'] == null ? null : map['firstDate'].toData(),
-      expiryDate: map['expiryDate'] == null ? null : map['expiryDate'].toDate(),
+      firstDate: map['firstDate'] ?? '',
+      expiryDate: map['expiryDate'] ?? '',
       totalFee: map['totalFee'],
       totalAttendanceDays: map['totalAttendanceDays'],
       updatedBy: map['updatedBy'] ?? '',
       createdAt: map['createdAt'].toDate(),
       updatedAt: map['updatedAt'].toDate(),
-      // actions: null,
+      openVOC: map['openVOC'] ?? '',
+      closeVOC: map['closeVOC'] ?? '',
+      unresolvedVOC: map['unresolvedVOC'] ?? '',
+      contractStatus: map['contractStatus'] ?? '',
     );
   }
 
   factory Member.empty() =>
       Member(
-        id: '',
+        docId: '',
+        id: 0,
         displayName: '',
         email: '',
         level: 5,
@@ -163,11 +198,11 @@ class Member {
         birthDay: '',
         phoneNumber: '',
         address: null,
-        signUpPath: '',
+        signUpPath: '기타',
         referralID: null,
         accountLinkID: null,
         memo: null,
-        status: '신규',
+        status: '활성',
         referralCount: 0,
         firstDate: null,
         expiryDate: null,
@@ -175,6 +210,39 @@ class Member {
         totalAttendanceDays: 0,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        openVOC: 0,
+        closeVOC: 0,
+        unresolvedVOC: 0,
+        contractStatus: '신규',
         // actions: null,
       );
+}
+
+class MonthlyMemberModel {
+  final int month;
+  final int count;
+  MonthlyMemberModel({
+    required this.month,
+    required this.count,
+});
+}
+
+class MemberCountModel {
+  final int totalCount;
+  final int newCount;
+  final int contractCount;
+  final int expiredCount;
+  MemberCountModel({
+    required this.totalCount,
+    required this.newCount,
+    required this.contractCount,
+    required this.expiredCount,
+  });
+}
+
+enum MembersCountFilterState {
+  totalCount,
+  newCount,
+  contractCount,
+  expiredCount,
 }

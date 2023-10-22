@@ -92,6 +92,9 @@ class UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                     SizedBox(
                       height: screenHeight < 700 ? screenHeight - 100 : 600,
                       child: CustomSfDataGrid(
+                        onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows){
+
+                        },
                         allowEditing: true,
                         rowsPerPage: _rowsPerPage,
                         onColumnResizeStart:

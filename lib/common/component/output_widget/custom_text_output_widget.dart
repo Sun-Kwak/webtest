@@ -9,8 +9,12 @@ class CustomTextOutputWidget extends StatelessWidget {
   final String outputText;
   final double? labelBoxWidth;
   final double? textBoxWidth;
+  final Color? color;
+  final Color? textColor;
 
   const CustomTextOutputWidget({
+    this.textColor,
+    this.color,
     this.labelBoxWidth = 60,
     this.textBoxWidth = 170,
     required this.outputText,
@@ -53,11 +57,13 @@ class CustomTextOutputWidget extends StatelessWidget {
           height: height,
 
           decoration: BoxDecoration(
-            color: TABLE_COLOR,
-            border: Border.all(color: INPUT_BORDER_COLOR),
+            color: color ?? TABLE_COLOR,
+            border: Border.all(color:INPUT_BORDER_COLOR),
             borderRadius: BorderRadius.circular(4),
           ),
-          child: Text(outputText),
+          child: Center(child: Text(outputText,style: TextStyle(
+            color: textColor ?? PRIMARY_COLOR,
+          ),)),
         ),
       ],
     );

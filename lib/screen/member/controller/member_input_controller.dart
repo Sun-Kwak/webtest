@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:web_test2/screen/member/controller/member_input_state.dart';
 import 'package:web_test2/screen/member/data/member_data_table.dart';
+import 'package:authentication_repository/src/members_repository.dart';
 import 'package:web_test2/screen/member/widget/member_search_form.dart';
 
 final memberInputProvider =
@@ -98,12 +99,12 @@ class MemberInputController extends StateNotifier<MemberInputState> {
         referralID: member.referralID,
         accountLinkID: member.accountLinkID,
         memo: member.memo,
-        status: member.status,
-        referralCount: member.referralCount,
-        firstDate: member.firstDate,
-        expiryDate: member.expiryDate,
-        totalFee: member.totalFee,
-        totalAttendanceDays: member.totalAttendanceDays,
+        // status: member.status,
+        // referralCount: member.referralCount,
+        // firstDate: member.firstDate,
+        // expiryDate: member.expiryDate,
+        // totalFee: member.totalFee,
+        // totalAttendanceDays: member.totalAttendanceDays,
       );
       state = state.copyWith(status: FormzStatus.submissionSuccess);
       await _memberRepository.addMember(newMember);

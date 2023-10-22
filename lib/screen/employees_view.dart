@@ -82,6 +82,10 @@ class EmployeesTableState extends ConsumerState<EmployeesTable> {
                         // width: containerWidth,
                         child: SelectionArea(
                           child: CustomSfDataGrid(
+                            onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows){
+
+                            },
+
                             allowEditing: true,
                             rowsPerPage: _rowsPerPage,
                             onColumnResizeStart:
@@ -227,6 +231,10 @@ class EmployeesTableState extends ConsumerState<EmployeesTable> {
   Widget _buildDataGrid(BoxConstraints constraints) {
     double screenWidth = MediaQuery.of(context).size.width;
     return CustomSfDataGrid(
+      onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows){
+
+      },
+
       allowEditing: true,
       rowsPerPage: _rowsPerPage,
       onColumnResizeStart:

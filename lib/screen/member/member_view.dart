@@ -1,20 +1,56 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/screen/member/widget/member_infor_form.dart';
 import 'package:web_test2/screen/member/widget/member_input_form.dart';
 import 'package:web_test2/screen/member/widget/member_search_form.dart';
 import 'package:web_test2/screen/member/widget/member_voc_form.dart';
 
-class MembersView extends StatefulWidget {
+class MembersView extends ConsumerStatefulWidget {
   const MembersView({super.key});
 
   @override
-  State<MembersView> createState() => MembersViewState();
+  ConsumerState<MembersView> createState() => MembersViewState();
 }
 
-class MembersViewState extends State<MembersView> {
+class MembersViewState extends ConsumerState<MembersView> {
   final ScrollController controller = ScrollController();
+
+  bool isRefresh = false;
+  bool isEditing = false;
+  Member member = Member.empty();
+  void onSaveButtonClicked() {
+    final memberUpdateProviderValue = ref.watch(memberUpdateProvider);
+    if (memberUpdateProviderValue.status == MemberUpdateStatus.on) {
+      isRefresh = false;
+    } else {
+      isRefresh = true;
+    }
+  }
+  void onEditButtonClicked() {
+    final isEditingControl = ref.watch(memberEditingProvider);
+    setState(() {
+      if (isEditingControl.isEditing == true) {
+        final selectedMember = ref.watch(selectedMemberProvider);
+        member = selectedMember;
+        isEditing = true;
+      } else {
+        isEditing = false;
+      }
+    });
+  }
+
+  @override
+  void initState() {
+
+    print('view 시작 $isEditing');
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+    // final selectedMember = ref.watch(selectedMemberProvider);
+    final isEditingControl = ref.watch(memberEditingProvider);
+
     final double screenWidth = MediaQuery.of(context).size.width;
     return Scrollbar(
       // trackVisibility: true,
@@ -32,7 +68,13 @@ class MembersViewState extends State<MembersView> {
                   children: [
                     Column(
                       children: [
-                        MemberInputForm(),
+                        MemberInputForm(
+                          isEditing: isEditingControl.isEditing,
+                          member: member,
+                          onPressed: (){
+                            onSaveButtonClicked();
+                          },
+                        ),
                         SizedBox(
                           height: 20,
                         ),
@@ -41,7 +83,12 @@ class MembersViewState extends State<MembersView> {
                           const SizedBox(
                             height: 20,
                           ),
-                          const MemberSearchForm(),
+                          MemberSearchForm(
+                            onPressed: (){
+                              onEditButtonClicked();
+                            },
+                            isRefresh: isRefresh,
+                          ),
                           const SizedBox(
                             height: 20,
                           ),
@@ -55,7 +102,12 @@ class MembersViewState extends State<MembersView> {
                   const SizedBox(
                     width: 10,
                   ),
-                  const MemberSearchForm(),
+                  MemberSearchForm(
+                    onPressed: (){
+                      onEditButtonClicked();
+                    },
+                    isRefresh: isRefresh,
+                  ),
                   const SizedBox(
                     width: 10,
                   ),

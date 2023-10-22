@@ -60,10 +60,10 @@ class _RootTabState extends ConsumerState<RootTab>
     final signInUserState = ref.watch(signedInUserProvider);
     final double screenWidth = MediaQuery.of(context).size.width;
     final EdgeInsets appBarMargin = screenWidth < 640 ? const EdgeInsets.only(left: 20,top: 12) : screenWidth < 1200 || isSwitched == false ? const EdgeInsets.only(left: 100,top: 12) : const EdgeInsets.only(left: 170,top: 12);
-    const TextStyle textStyle = TextStyle(
-      fontFamily: 'SebangGothic',
-      fontWeight: FontWeight.w400,
-    );
+    // const TextStyle textStyle = TextStyle(
+    //   fontFamily: 'SebangGothic',
+    //   fontWeight: FontWeight.w400,
+    // );
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 29,
@@ -227,26 +227,26 @@ class _RootTabState extends ConsumerState<RootTab>
               elevation: 5,
               backgroundColor: PRIMARY_COLOR,
               selectedIconTheme: const IconThemeData(color: Colors.white),
-              selectedLabelTextStyle: const TextStyle(color: Colors.white,fontWeight: FontWeight.w700),
+              selectedLabelTextStyle: const TextStyle(color: Colors.white,fontWeight: FontWeight.w400,fontFamily: 'SebangGothic'),
               unselectedLabelTextStyle:
-                  const TextStyle(color: INPUT_BORDER_COLOR,fontWeight: FontWeight.w400),
+                  const TextStyle(color: INPUT_BORDER_COLOR,fontWeight: FontWeight.w100,fontFamily: 'SebangGothic'),
               unselectedIconTheme:
                   const IconThemeData(color: INPUT_BORDER_COLOR),
               // groupAlignment: 50,
               destinations: const [
                 NavigationRailDestination(
-                    icon: Icon(Icons.people), label: Text('회원관리 ',style: textStyle,)),
+                    icon: Icon(Icons.people), label: Text('회원관리 ')),
                 NavigationRailDestination(
                     icon: Icon(Icons.edit_calendar_outlined),
-                    label: Text('계약관리 ')),
+                    label: Text('계약관리 ',)),
                 NavigationRailDestination(
-                    icon: Icon(Icons.calendar_month), label: Text('강의등록 ',style: textStyle,)),
+                    icon: Icon(Icons.calendar_month), label: Text('강의등록 ')),
                 NavigationRailDestination(
-                    icon: Icon(Icons.monitor_heart), label: Text('건강측정 ',style: textStyle,)),
+                    icon: Icon(Icons.monitor_heart), label: Text('건강측정 ')),
                 NavigationRailDestination(
-                    icon: Icon(Icons.fact_check), label: Text('출결관리 ',style: textStyle,)),
+                    icon: Icon(Icons.fact_check), label: Text('출결관리 ')),
                 NavigationRailDestination(
-                    icon: Icon(Icons.settings), label: Text('기본설정 ',style: textStyle,)),
+                    icon: Icon(Icons.settings), label: Text('기본설정 ')),
               ],
             ),
           Expanded(

@@ -2,27 +2,25 @@ import 'package:authentication_repository/authentication_repository.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/common/data_table/custom_grid_column.dart';
 import 'package:web_test2/common/data_table/custom_sfDataGrid.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 DataGridController dataGridController = DataGridController();
 
 class MembersTable extends ConsumerStatefulWidget {
   final bool showMore;
   final List<Member> members;
+  final double? height;
 
   const MembersTable({
+    this.height = 400,
     required this.members,
     required this.showMore,
     super.key,
   });
-
-
 
   @override
   ConsumerState<MembersTable> createState() => MembersTableState();
@@ -30,8 +28,11 @@ class MembersTable extends ConsumerStatefulWidget {
 
 class MembersTableState extends ConsumerState<MembersTable> {
   late MembersDataSource membersDataSource;
+
   // late List<Member> membersFuture;
   late Map<String, double> columnWidths = {
+    'docId': double.nan,
+    'status': double.nan,
     'id': double.nan,
     'displayName': double.nan,
     'birthDay': double.nan,
@@ -40,14 +41,18 @@ class MembersTableState extends ConsumerState<MembersTable> {
     'address': double.nan,
     'signUpPath': double.nan,
     'referralID': double.nan,
+    'referralName': double.nan,
     'accountLinkID': double.nan,
     'memo': double.nan,
-    'status': double.nan,
+    'contractStatus': double.nan,
     'referralCount': double.nan,
     'firstDate': double.nan,
     'expiryDate': double.nan,
     'totalFee': double.nan,
     'totalAttendanceDays': double.nan,
+    'openVOC': double.nan,
+    'closeVOC': double.nan,
+    'unresolvedVOC': double.nan,
     'updatedAt': double.nan,
     'createdAt': double.nan,
     'updatedBy': double.nan,
@@ -57,12 +62,14 @@ class MembersTableState extends ConsumerState<MembersTable> {
 
   @override
   void initState() {
-    super.initState(); {
+    super.initState();
+    {
       setState(() {
         membersDataSource = MembersDataSource(membersData: widget.members);
       });
     }
   }
+
   @override
   void didUpdateWidget(MembersTable oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -82,13 +89,17 @@ class MembersTableState extends ConsumerState<MembersTable> {
   //   });
   // }
 
-  int _rowsPerPage = 10;
+  int _rowsPerPage = 20;
   final double _dataPagerHeight = 50.0;
 
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final visible = screenWidth <= 640 ? false : widget.showMore ? true : false;
+    final visible = screenWidth <= 640
+        ? false
+        : widget.showMore
+            ? true
+            : false;
 
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -98,24 +109,32 @@ class MembersTableState extends ConsumerState<MembersTable> {
         children: [
           Container(
             color: Colors.white,
-            height: 500,
+            height: widget.height! - _dataPagerHeight,
             // width: containerWidth,
             child: SelectionArea(
               child: CustomSfDataGrid(
+                onSelectionChanged: (List<DataGridRow> addedRows,
+                    List<DataGridRow> removedRows) {
+                  print(widget.members[dataGridController.selectedIndex].id);
+                  ref.read(selectedRowProvider.notifier).setSelectedRow(
+                      widget.members[dataGridController.selectedIndex].id);
+                },
+                // onCurrentCellActivated: (RowColumnIndex currentRowColumnIndex,
+                //     RowColumnIndex previousRowColumnIndex) {
+                //   print(widget.members[dataGridController.selectedIndex].id);
+                //   ref.read(selectedRowProvider.notifier).setSelectedRow(widget.members[dataGridController.selectedIndex].id);
+                // },
                 allowEditing: true,
                 rowsPerPage: _rowsPerPage,
-                onColumnResizeStart:
-                    (ColumnResizeStartDetails details) {
+                onColumnResizeStart: (ColumnResizeStartDetails details) {
                   if (details.columnIndex == 0) {
                     return false;
                   }
                   return true;
                 },
-                onColumnResizeUpdate:
-                    (ColumnResizeUpdateDetails details) {
+                onColumnResizeUpdate: (ColumnResizeUpdateDetails details) {
                   setState(() {
-                    columnWidths[details.column.columnName] =
-                        details.width;
+                    columnWidths[details.column.columnName] = details.width;
                   });
                   return true;
                 },
@@ -124,9 +143,15 @@ class MembersTableState extends ConsumerState<MembersTable> {
                 columnWidths: columnWidths,
                 columns: <GridColumn>[
                   CustomGridColumn(
-                    width: columnWidths['id']!,
-                    label: '아이디',
-                    columnName: 'id',
+                    width: columnWidths['docId']!,
+                    label: 'id',
+                    columnName: 'docId',
+                    visible: false,
+                  ),
+                  CustomGridColumn(
+                    width: columnWidths['status']!,
+                    label: 'status',
+                    columnName: 'status',
                     visible: false,
                   ),
                   CustomGridColumn(
@@ -168,8 +193,15 @@ class MembersTableState extends ConsumerState<MembersTable> {
                   CustomGridColumn(
                     allowEditing: true,
                     width: columnWidths['referralID']!,
-                    label: '추천인',
+                    label: '추천인ID',
                     columnName: 'referralID',
+                    visible: false,
+                  ),
+                  CustomGridColumn(
+                    allowEditing: true,
+                    width: columnWidths['referralName']!,
+                    label: '추천인',
+                    columnName: 'referralName',
                     visible: screenWidth <= 640 ? false : true,
                   ),
                   CustomGridColumn(
@@ -188,9 +220,16 @@ class MembersTableState extends ConsumerState<MembersTable> {
                   ),
                   CustomGridColumn(
                     allowEditing: true,
-                    width: columnWidths['status']!,
+                    width: columnWidths['id']!,
+                    label: '아이디',
+                    columnName: 'id',
+                    visible: visible,
+                  ),
+                  CustomGridColumn(
+                    allowEditing: true,
+                    width: columnWidths['contractStatus']!,
                     label: '계약상태',
-                    columnName: 'status',
+                    columnName: 'contractStatus',
                     visible: visible,
                   ),
                   CustomGridColumn(
@@ -229,6 +268,27 @@ class MembersTableState extends ConsumerState<MembersTable> {
                     visible: visible,
                   ),
                   CustomGridColumn(
+                    allowEditing: true,
+                    width: columnWidths['openVOC']!,
+                    label: '진행',
+                    columnName: 'openVOC',
+                    visible: visible,
+                  ),
+                  CustomGridColumn(
+                    allowEditing: true,
+                    width: columnWidths['closeVOC']!,
+                    label: '완료',
+                    columnName: 'closeVOC',
+                    visible: visible,
+                  ),
+                  CustomGridColumn(
+                    allowEditing: true,
+                    width: columnWidths['unresolvedVOC']!,
+                    label: '미결',
+                    columnName: 'unresolvedVOC',
+                    visible: visible,
+                  ),
+                  CustomGridColumn(
                     width: columnWidths['createdAt']!,
                     label: '입력 날짜',
                     columnName: 'createdAt',
@@ -238,12 +298,14 @@ class MembersTableState extends ConsumerState<MembersTable> {
                     width: columnWidths['updatedAt']!,
                     label: '수정 날짜',
                     columnName: 'updatedAt',
-                    visible: visible,),
+                    visible: visible,
+                  ),
                   CustomGridColumn(
                     width: columnWidths['updatedBy']!,
                     label: '최종 수정',
                     columnName: 'updatedBy',
-                    visible: visible,)
+                    visible: visible,
+                  )
                 ],
               ),
             ),
@@ -254,7 +316,6 @@ class MembersTableState extends ConsumerState<MembersTable> {
             height: _dataPagerHeight,
             child: SfDataPagerTheme(
               data: SfDataPagerThemeData(
-
                 selectedItemColor: PRIMARY_COLOR,
                 itemTextStyle: TextStyle(
                   fontFamily: 'SebangGothic',
@@ -267,15 +328,14 @@ class MembersTableState extends ConsumerState<MembersTable> {
                 itemHeight: 40,
 
                 delegate: membersDataSource,
-                availableRowsPerPage: const [10, 50, 100],
+                availableRowsPerPage: const [20, 50, 100],
                 onRowsPerPageChanged: (int? rowsPerPage) {
                   setState(() {
                     _rowsPerPage = rowsPerPage!;
                   });
                 },
-                pageCount: ((widget.members.length / _rowsPerPage)
-                    .ceil()
-                    .toDouble()),
+                pageCount:
+                    ((widget.members.length / _rowsPerPage).ceil().toDouble()),
                 // itemWidth: 50,
               ),
             ),
@@ -295,24 +355,6 @@ class MembersTableState extends ConsumerState<MembersTable> {
       ),
     );
   }
-
-  // Future<List<Member>> getMembersData() async {
-  //   List<Member> members = [];
-  //   try {
-  //     CollectionReference collection =
-  //         FirebaseFirestore.instance.collection('members');
-  //     QuerySnapshot querySnapshot = await collection.get();
-  //
-  //     for (var document in querySnapshot.docs) {
-  //       Member member = Member.fromFirestore(document);
-  //       members.add(member);
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //     throw Exception(e);
-  //   }
-  //   return members;
-  // }
 }
 
 class MembersDataSource extends DataGridSource {
@@ -389,7 +431,8 @@ class MembersDataSource extends DataGridSource {
     _membersDataGridRows = _membersData
         .map<DataGridRow>((e) => DataGridRow(cells: [
               // DataGridCell<IconButton>(columnName: 'actions', value: null),
-              DataGridCell<String>(columnName: 'id', value: e.id),
+              DataGridCell<String>(columnName: 'docId', value: e.docId),
+              DataGridCell<String>(columnName: 'status', value: e.status),
               DataGridCell<String>(
                   columnName: 'displayName', value: e.displayName),
               DataGridCell<String>(columnName: 'gender', value: e.gender),
@@ -399,22 +442,29 @@ class MembersDataSource extends DataGridSource {
               DataGridCell<String>(columnName: 'address', value: e.address),
               DataGridCell<String>(
                   columnName: 'signUpPath', value: e.signUpPath),
+              DataGridCell<int>(columnName: 'referralID', value: e.referralID),
               DataGridCell<String>(
-                  columnName: 'referralID', value: e.referralID),
+                  columnName: 'referralName', value: e.referralName),
               DataGridCell<String>(
                   columnName: 'accountLinkID', value: e.accountLinkID),
               DataGridCell<String>(columnName: 'memo', value: e.memo),
-              DataGridCell<String>(columnName: 'status', value: e.status),
+              DataGridCell<int>(columnName: 'id', value: e.id),
+              DataGridCell<String>(
+                  columnName: 'contractStatus', value: e.contractStatus),
               DataGridCell<int>(
                   columnName: 'referralCount', value: e.referralCount),
-              DataGridCell<DateTime?>(
+              DataGridCell<String?>(
                   columnName: 'firstDate', value: e.firstDate),
-              DataGridCell<DateTime?>(
+              DataGridCell<String?>(
                   columnName: 'expiryDate', value: e.expiryDate),
               DataGridCell<int>(columnName: 'totalFee', value: e.totalFee),
               DataGridCell<int>(
                   columnName: 'totalAttendanceDays',
                   value: e.totalAttendanceDays),
+              DataGridCell<int>(columnName: 'openVOC', value: e.openVOC),
+              DataGridCell<int>(columnName: 'closeVOC', value: e.closeVOC),
+              DataGridCell<int>(
+                  columnName: 'unresolvedVOC', value: e.unresolvedVOC),
               DataGridCell<DateTime>(
                   columnName: 'createdAt', value: e.createdAt),
               DataGridCell<DateTime>(

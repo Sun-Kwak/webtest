@@ -25,9 +25,16 @@ class MemberCheckPhoneNumberFailure implements Exception {
   const MemberCheckPhoneNumberFailure(this.code);
 }
 
-final memberRepositoryProvider = Provider<MemberRepository>((_) => MemberRepository());
+
+final memberRepositoryProvider = Provider<MemberRepository>(
+      (ref) => MemberRepository(ref.watch(memberUpdateProvider), ref.watch(memberEditingProvider), ref.watch(selectedReferralIDProvider)),
+);
 
 class MemberRepository {
+  MemberUpdateProvider memberUpdateProvider;
+  MemberEditingProvider memberEditingProvider;
+  SelectedReferralIDProvider selectedReferralIDProvider;
+  MemberRepository(this.memberUpdateProvider, this.memberEditingProvider, this.selectedReferralIDProvider);
 
   Future<void> addMember(Member member) async {
     try {
@@ -36,6 +43,8 @@ class MemberRepository {
       CollectionReference members = firestore.collection('members');
       Map<String, dynamic> memberData = member.toMap();
 
+
+
       await firestore.runTransaction((transaction) async {
         QuerySnapshot querySnapshot = await members.orderBy('id', descending: true).limit(1).get();
         int maxId = 0;
@@ -43,12 +52,16 @@ class MemberRepository {
           maxId = querySnapshot.docs[0]['id'];
         }
 
-        // 새로운 문서에 할당할 ID 값 계산
         int newId = maxId + 1;
         memberData['id'] = newId;
         memberData['updatedBy'] = user?.displayName;
+        memberData['referralID'] = selectedReferralIDProvider.selectedReferralId;
+        memberData['referralName'] = selectedReferralIDProvider.selectedReferralName;
         await members.add(memberData).then((_){
-
+          memberUpdateProvider.toggleStatus();
+          memberEditingProvider.toggleStatus(
+            false
+          );
         });
 
       });
@@ -64,7 +77,6 @@ class MemberRepository {
       CollectionReference members = firestore.collection('members');
       QuerySnapshot querySnapshot = await members.where('phoneNumber', isEqualTo: phoneNumber).get();
 
-      // 중복된 번호가 있으면 true를 반환, 없으면 false를 반환
       return querySnapshot.docs.isNotEmpty;
     } on FirebaseException catch (e){
       print('??$e');
@@ -73,7 +85,7 @@ class MemberRepository {
   }
 
   Future<List<Member>> getMembersData() async {
-    List<Member> members = [];
+    List<Member> members =[];
     try {
       CollectionReference collection =
       FirebaseFirestore.instance.collection('members');
@@ -83,6 +95,7 @@ class MemberRepository {
         Member member = Member.fromFirestore(document);
         members.add(member);
       }
+
     } on FirebaseException catch (e){
       print(e);
       throw MemberGetFailure(e.toString());
@@ -91,23 +104,22 @@ class MemberRepository {
   }
 }
 
-Future<List<Member>> getMembersData() async {
-  List<Member> members = [];
-  try {
-    CollectionReference collection =
-    FirebaseFirestore.instance.collection('members');
-    QuerySnapshot querySnapshot = await collection.get();
+Future<List<int>> getMonthlyMemberCounts(List<Member> members) async {
+  Map<String, int> monthlyCounts = {};
 
-    for (var document in querySnapshot.docs) {
-      Member member = Member.fromFirestore(document);
-      members.add(member);
-    }
-  } on FirebaseException catch (e){
-    print(e);
-    throw MemberGetFailure(e.toString());
+  // members 리스트의 각 멤버의 createdAt 필드를 이용하여 월별로 그룹화합니다.
+  for (var member in members) {
+    String monthYear = '${member.createdAt.month}-${member.createdAt.year}';
+    monthlyCounts.update(monthYear, (value) => value + 1, ifAbsent: () => 1);
   }
-  return members;
+
+  // 월별 멤버 수를 정수 리스트로 변환합니다.
+  List<int> monthlyCountsList = monthlyCounts.values.toList();
+
+  // 월별 멤버 수 리스트를 반환합니다.
+  return monthlyCountsList;
 }
+
 
 
   // Future<void> getEmployeeData({required DateTime startDate,

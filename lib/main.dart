@@ -30,9 +30,9 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       // 이 코드는 화면이 렌더링된 후에 실행됩니다.
-      var screenSize = MediaQuery.of(context).size;
-      print('화면 너비: ${screenSize.width}');
-      print('화면 높이: ${screenSize.height}');
+      // var screenSize = MediaQuery.of(context).size;
+      // print('화면 너비: ${screenSize.width}');
+      // print('화면 높이: ${screenSize.height}');
     });
     //
     // final signInUserState = ref.watch(signedInUserProvider);
