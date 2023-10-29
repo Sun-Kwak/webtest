@@ -12,7 +12,7 @@ import 'package:web_test2/common/data_table/custom_grid_column.dart';
 import 'package:web_test2/common/layout/default_layout.dart';
 import 'package:authentication_repository/src/employee_model.dart';
 import 'package:intl/intl.dart';
-import 'package:web_test2/screen/auth/controller/authentication_controller.dart';
+import 'package:authentication_repository/src/authentication_controller.dart';
 
 
 DataGridController dataGridController = DataGridController();
@@ -187,7 +187,7 @@ class UserManagementScreenState extends ConsumerState<UserManagementScreen> {
                   TextButton(
                       child: Text('Get Selection Information'),
                       onPressed: () {
-                        print(snapshot.data?[dataGridController.selectedIndex].email);
+
                         // dataGridController.beginEdit(RowColumnIndex(3, 3));
                       }),
                   // Container(
@@ -339,7 +339,7 @@ class EmployeeDataSource extends DataGridSource {
                     onPressed: () {
                       dataGridController.selectedIndex = index;
                       dataGridController.beginEdit(RowColumnIndex(index, 4));
-                      print(RowColumnIndex(index, 3));
+
                     },
                     icon: Icon(Icons.edit),
                     color: Colors.blueAccent,
@@ -418,7 +418,7 @@ class EmployeeDataSource extends DataGridSource {
         .getCells()
         .firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName)
-        ?.value ??
+        .value ??
         '';
 
     final int dataRowIndex = _employeeDataGridRows.indexOf(dataGridRow);
@@ -452,7 +452,7 @@ class EmployeeDataSource extends DataGridSource {
         .getCells()
         .firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName)
-        ?.value
+        .value
         ?.toString() ??
         '';
 

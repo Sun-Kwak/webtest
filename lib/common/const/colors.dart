@@ -17,3 +17,9 @@ const TABLE_COLOR = Color(0x4DE4E7E7);
 const TABLE_SELECTION_COLOR = Color(0x80829A91);
 
 const BACKGROUND_COLOR = Color(0x80E9E8E2);
+
+const CUSTOM_RED = Color(0xFFFF8181);
+
+const CUSTOM_BLUE = Color(0xFF81B3FF);
+
+const CUSTOM_BLACK = Color(0xFF494747);

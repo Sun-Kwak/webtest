@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/common/layout/default_layout.dart';
-import 'package:web_test2/screen/auth/controller/authentication_controller.dart';
-import 'package:web_test2/screen/auth/controller/signedIn_user_provider.dart';
+import 'package:authentication_repository/src/authentication_controller.dart';
+import 'package:authentication_repository/src/signedIn_user_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserProfile extends ConsumerWidget {
 
@@ -15,8 +16,9 @@ class UserProfile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final signInUserState = ref.watch(signedInUserProvider);
     final authController = ref.read(userMeProvider.notifier);
+    final signInUserState = ref.watch(signedInUserProvider);
+
 
     Future<String?> getUserData() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -27,7 +29,7 @@ class UserProfile extends ConsumerWidget {
     return FutureBuilder<String?>(
       future: getUserData(),
       builder: (context, snapshot) {
-        String? showName = snapshot.data?.toString() ?? signInUserState.value?.displayName;
+        String? showName = snapshot.data ?? signInUserState.value?.displayName;
         return DefaultLayout(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

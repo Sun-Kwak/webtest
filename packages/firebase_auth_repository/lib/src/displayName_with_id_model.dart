@@ -1,11 +1,7 @@
-abstract class DisplayNameWithId{
-  final String id;
-  final String displayName;
-  final String phoneNumber;
+class CreatedAt{
+  final DateTime? createdAt;
 
-  DisplayNameWithId({
-    required this.displayName,
-    required this.id,
-    required this.phoneNumber,
+  CreatedAt({
+     this.createdAt,
   });
 }

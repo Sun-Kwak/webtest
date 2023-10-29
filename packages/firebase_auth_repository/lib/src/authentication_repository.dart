@@ -1,7 +1,7 @@
 import 'package:authentication_repository/authentication_repository.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:http/http.dart' as http;
 
@@ -52,7 +52,14 @@ class SignInWithKakaoFailure implements Exception {
   const SignInWithKakaoFailure(this.code);
 }
 
-class SignOutFailure implements Exception {}
+class SignOutFailure implements Exception {
+  final String message;
+
+  SignOutFailure(this.message);
+
+  @override
+  String toString() => 'SignOutFailure: $message';
+}
 
 class AuthenticationRepository {
   final _firebaseAuthDataSource = FirebaseAuthRemoteDataSource();
@@ -70,24 +77,23 @@ class AuthenticationRepository {
         'uid': user.id.toString(),
         'displayName': user.kakaoAccount!.profile!.nickname,
         'email': user.kakaoAccount!.email,
-        'authPlatform': 'Kakao',
+        // 'authPlatform': 'Kakao',
       },
     );
     try {
       await FirebaseAuth.instance.signInWithCustomToken(token);
-       _employeeRepository.signUpSetUserData(user.kakaoAccount!.email!, user.kakaoAccount!.profile!.nickname!);
-
+      _employeeRepository.signUpSetUserData(
+          user.kakaoAccount!.email!, user.kakaoAccount!.profile!.nickname!);
+      kakao.UserApi.instance.logout();
     } catch (e) {
       throw SignInWithKakaoFailure(e.toString());
     }
   }
 
-
-
   Future<void> signUpWithEmailAndPassword({
     required String email,
-      required String password,
-      required String displayName,
+    required String password,
+    required String displayName,
   }) async {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
@@ -99,9 +105,6 @@ class AuthenticationRepository {
       throw SignUpWithEmailAndPasswordFailure(e.code);
     }
   }
-
-
-
 
   Future<bool?> signInWithGoogle() async {
     try {
@@ -131,23 +134,17 @@ class AuthenticationRepository {
 
         final userCredential =
             await _firebaseAuth.signInWithCredential(credential);
-        final isNewUser = userCredential.additionalUserInfo?.isNewUser;
 
-        if (isNewUser == true) {
-          // 회원가입 성공 시 signUpUpdateUserData 함수 호출
-          final email = userCredential.user?.email;
-          final displayName = userCredential.user?.displayName;
-          if (email != null && displayName != null) {
-            // await signUpUpdateUserData(email, displayName);
-          }
-        }
+        final email = userCredential.user?.email;
+        final displayName = userCredential.user?.displayName;
+        print(email);
+        print(displayName);
+        _employeeRepository.signUpSetUserData(email!, displayName!);
 
-        return isNewUser;
-      } else {
-        return null; // 구글 로그인 계정이 없는 경우 null 반환
+// 예외 발생 시 null 반환
       }
-    } catch (e) {
-      return null; // 예외 발생 시 null 반환
+    } on FirebaseAuthException catch (e) {
+      throw SignInWithGoogleFailure(e.toString());
     }
   }
 
@@ -229,36 +226,36 @@ class AuthenticationRepository {
         _firebaseAuth.signOut(),
         _googleSignIn.signOut(),
         _kakaoSignIn.logout(),
+        // kakao.UserApi.instance.logout(),
       ]);
     } catch (e) {
-      throw SignOutFailure();
+      throw SignOutFailure(e.toString());
     }
   }
 }
 
-class UserDataUpdater {
-  Future<void> signUpUpdateUserData(String email, String displayName) async {
-    Timestamp currentTimeStamp = Timestamp.fromDate(DateTime.now());
-    User? user = FirebaseAuth.instance.currentUser;
-
-    try {
-      DocumentSnapshot userDoc =
-      await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
-
-      if (!userDoc.exists) {
-        // 문서가 없는 경우에만 문서를 생성합니다.
-        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'email': email,
-          'displayName': displayName,
-          'level': 5,
-          'updatedBy': displayName,
-          'createdAt': currentTimeStamp,
-          'updatedAt': currentTimeStamp,
-        });
-      }
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
-}
-
+// class UserDataUpdater {
+//   Future<void> signUpUpdateUserData(String email, String displayName) async {
+//     Timestamp currentTimeStamp = Timestamp.fromDate(DateTime.now());
+//     User? user = FirebaseAuth.instance.currentUser;
+//
+//     try {
+//       DocumentSnapshot userDoc =
+//       await FirebaseFirestore.instance.collection('employees').doc(user!.uid).get();
+//
+//       if (!userDoc.exists) {
+//         // 문서가 없는 경우에만 문서를 생성합니다.
+//         await FirebaseFirestore.instance.collection('employees').doc(user.uid).set({
+//           'email': email,
+//           'displayName': displayName,
+//           'level': 5,
+//           'updatedBy': displayName,
+//           'createdAt': currentTimeStamp,
+//           'updatedAt': currentTimeStamp,
+//         });
+//       }
+//     } catch (e) {
+//       throw Exception(e);
+//     }
+//   }
+// }

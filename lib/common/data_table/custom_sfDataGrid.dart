@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart' as Sf;
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 import 'package:web_test2/common/const/colors.dart';
 
 class CustomSfDataGrid extends StatefulWidget {

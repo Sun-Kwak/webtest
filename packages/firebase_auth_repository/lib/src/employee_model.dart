@@ -83,36 +83,36 @@ class Employee {
       );
 }
 
-class EmployeeDataGridRow extends DataGridRow {
-  // final DataGridCell<String> displayName;
-  // final DataGridCell<String> email;
-  // final DataGridCell<int> level;
-  // final DataGridCell<String> updatedBy;
-  // final DataGridCell<DateTime> createdAt;
-  // final DataGridCell<DateTime> updatedAt;
-
-  EmployeeDataGridRow({
-    // required this.displayName,
-    // required this.email,
-    // required this.level,
-    // required this.updatedBy,
-    // required this.updatedAt,
-    // required this.createdAt,
-    required super.cells,
-  });
-
-  factory EmployeeDataGridRow.fromDataModel(List<Employee> employeeData) {
-    final map = employeeData as Map<String, dynamic>;
-    return EmployeeDataGridRow(cells: [
-      DataGridCell<String>(
-          columnName: 'displayName', value: map['displayName'] ?? ''),
-      DataGridCell<String>(columnName: 'email', value: map['email'] ?? ''),
-      DataGridCell<int>(columnName: 'level', value: map['level'] ?? ''),
-      DataGridCell<DateTime>(
-          columnName: 'createdAt', value: map['createdAt'].toDate()),
-      DataGridCell<DateTime>(
-          columnName: 'updatedAt', value: map['updatedAt'].toDate()),
-      DataGridCell(columnName: 'updatedBy', value: map['updatedBy'] ?? '')
-    ]);
-  }
-}
+// class EmployeeDataGridRow extends DataGridRow {
+//   // final DataGridCell<String> displayName;
+//   // final DataGridCell<String> email;
+//   // final DataGridCell<int> level;
+//   // final DataGridCell<String> updatedBy;
+//   // final DataGridCell<DateTime> createdAt;
+//   // final DataGridCell<DateTime> updatedAt;
+//
+//   EmployeeDataGridRow({
+//     // required this.displayName,
+//     // required this.email,
+//     // required this.level,
+//     // required this.updatedBy,
+//     // required this.updatedAt,
+//     // required this.createdAt,
+//     required super.cells,
+//   });
+//
+//   factory EmployeeDataGridRow.fromDataModel(List<Employee> employeeData) {
+//     final map = employeeData as Map<String, dynamic>;
+//     return EmployeeDataGridRow(cells: [
+//       DataGridCell<String>(
+//           columnName: 'displayName', value: map['displayName'] ?? ''),
+//       DataGridCell<String>(columnName: 'email', value: map['email'] ?? ''),
+//       DataGridCell<int>(columnName: 'level', value: map['level'] ?? ''),
+//       DataGridCell<DateTime>(
+//           columnName: 'createdAt', value: map['createdAt'].toDate()),
+//       DataGridCell<DateTime>(
+//           columnName: 'updatedAt', value: map['updatedAt'].toDate()),
+//       DataGridCell(columnName: 'updatedBy', value: map['updatedBy'] ?? '')
+//     ]);
+//   }
+// }

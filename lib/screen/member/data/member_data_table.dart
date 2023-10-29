@@ -11,13 +11,16 @@ import 'package:web_test2/common/data_table/custom_sfDataGrid.dart';
 DataGridController dataGridController = DataGridController();
 
 class MembersTable extends ConsumerStatefulWidget {
+  final double width;
   final bool showMore;
-  final List<Member> members;
+  // final List<Member> members;
   final double? height;
 
+
   const MembersTable({
-    this.height = 400,
-    required this.members,
+    this.height = 450,
+    required this.width,
+    // required this.members,
     required this.showMore,
     super.key,
   });
@@ -27,7 +30,7 @@ class MembersTable extends ConsumerStatefulWidget {
 }
 
 class MembersTableState extends ConsumerState<MembersTable> {
-  late MembersDataSource membersDataSource;
+  // late MembersDataSource membersDataSource;
 
   // late List<Member> membersFuture;
   late Map<String, double> columnWidths = {
@@ -61,22 +64,12 @@ class MembersTableState extends ConsumerState<MembersTable> {
   };
 
   @override
-  void initState() {
-    super.initState();
-    {
-      setState(() {
-        membersDataSource = MembersDataSource(membersData: widget.members);
-      });
-    }
-  }
-
-  @override
   void didUpdateWidget(MembersTable oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Check if members list has been updated
-    if (widget.members != oldWidget.members) {
+    final selectedRowController = ref.watch(selectedMemberIdProvider);
+    if (selectedRowController == 0){
       setState(() {
-        membersDataSource = MembersDataSource(membersData: widget.members);
+        dataGridController.selectedIndex = -1;
       });
     }
   }
@@ -94,6 +87,8 @@ class MembersTableState extends ConsumerState<MembersTable> {
 
   @override
   Widget build(BuildContext context) {
+    final members = ref.watch(filteredMembersProvider);
+    final memberDataSource = ref.watch(memberDataSourceProvider);
     final double screenWidth = MediaQuery.of(context).size.width;
     final visible = screenWidth <= 640
         ? false
@@ -115,9 +110,13 @@ class MembersTableState extends ConsumerState<MembersTable> {
               child: CustomSfDataGrid(
                 onSelectionChanged: (List<DataGridRow> addedRows,
                     List<DataGridRow> removedRows) {
-                  print(widget.members[dataGridController.selectedIndex].id);
-                  ref.read(selectedRowProvider.notifier).setSelectedRow(
-                      widget.members[dataGridController.selectedIndex].id);
+                  final index = memberDataSource._membersDataGridRows.indexOf(addedRows.last);
+                  Member member = members[index];
+                  ref.read(selectedMemberIdProvider.notifier).setSelectedRow(member.id);
+                  // print('선택${dataGridController.currentCell.rowIndex}');
+                  // print('아이디${member.id}');
+                  // print('선택${dataGridController.selectedIndex}');
+                  // print('선택${widget.members[dataGridController.selectedIndex].createdAt}');
                 },
                 // onCurrentCellActivated: (RowColumnIndex currentRowColumnIndex,
                 //     RowColumnIndex previousRowColumnIndex) {
@@ -138,7 +137,7 @@ class MembersTableState extends ConsumerState<MembersTable> {
                   });
                   return true;
                 },
-                dataGridSource: membersDataSource,
+                dataGridSource: memberDataSource,
                 dataGridController: dataGridController,
                 columnWidths: columnWidths,
                 columns: <GridColumn>[
@@ -312,7 +311,7 @@ class MembersTableState extends ConsumerState<MembersTable> {
           ),
           Container(
             color: Colors.white,
-            width: 1000,
+            width: widget.width,
             height: _dataPagerHeight,
             child: SfDataPagerTheme(
               data: SfDataPagerThemeData(
@@ -327,7 +326,7 @@ class MembersTableState extends ConsumerState<MembersTable> {
                 itemWidth: 40,
                 itemHeight: 40,
 
-                delegate: membersDataSource,
+                delegate: memberDataSource,
                 availableRowsPerPage: const [20, 50, 100],
                 onRowsPerPageChanged: (int? rowsPerPage) {
                   setState(() {
@@ -335,7 +334,7 @@ class MembersTableState extends ConsumerState<MembersTable> {
                   });
                 },
                 pageCount:
-                    ((widget.members.length / _rowsPerPage).ceil().toDouble()),
+                    ((members.length / _rowsPerPage).ceil().toDouble()),
                 // itemWidth: 50,
               ),
             ),
@@ -356,6 +355,12 @@ class MembersTableState extends ConsumerState<MembersTable> {
     );
   }
 }
+
+final memberDataSourceProvider = Provider<MembersDataSource>((ref) {
+  final membersState = ref.watch(filteredMembersProvider);
+  final MembersDataSource membersDataSource = MembersDataSource(membersData: membersState);
+  return membersDataSource;
+});
 
 class MembersDataSource extends DataGridSource {
   MembersDataSource({required List<Member> membersData}) {

@@ -1,6 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:state_notifier/state_notifier.dart';
 import 'package:flutter/material.dart';
 
 final membersProvider =
@@ -15,7 +14,7 @@ class MembersProvider extends StateNotifier<List<Member>> {
   MembersProvider({
     required this.repository,
   }) : super([]) {
-    getMembers(); // 생성자에서 getMembers() 호출
+    getMembers();
   }
 
   Future<void> getMembers() async {
@@ -26,40 +25,85 @@ class MembersProvider extends StateNotifier<List<Member>> {
       print('Error: $e');
     }
   }
+
+  Future<void> getDisabledMembers() async {
+    try {
+      List<Member> members = await repository.getDisabledMembersData();
+      state = members;
+    } catch (e) {
+
+    }
+  }
 }
 
+enum MembersFilterState {
+  all,
+  isNew,
+  activated,
+  expired,
+}
 
+final filterMember =
+    StateProvider<MembersFilterState>((ref) => MembersFilterState.all);
 
-class SelectedRowProvider extends StateNotifier<int> {
-  SelectedRowProvider(int initialValue) : super(initialValue);
+final filteredMembersProvider = Provider<List<Member>>(
+  (ref) {
+    final filterState = ref.watch(filterMember);
+    final members = ref.watch(membersProvider);
+
+    // if(selectedID == 0){
+    //   return members;
+    // }
+    if (filterState == MembersFilterState.all) {
+      return members;
+    }
+    return members
+        .where(
+          (element) => filterState == MembersFilterState.isNew
+              ? element.contractStatus == '신규'
+              : filterState == MembersFilterState.activated
+                  ? element.contractStatus == '계약'
+                  : element.contractStatus == '만료',
+        )
+        .toList();
+  },
+);
+
+class SelectedMemberIDProvider extends StateNotifier<int> {
+  SelectedMemberIDProvider(int initialValue) : super(initialValue);
 
   void setSelectedRow(int newValue) {
     state = newValue;
   }
 }
 
-final selectedRowProvider = StateNotifierProvider<SelectedRowProvider, int>((ref) {
-  return SelectedRowProvider(0);
+final selectedMemberIdProvider =
+    StateNotifierProvider<SelectedMemberIDProvider, int>((ref) {
+  return SelectedMemberIDProvider(0);
 });
 //------------------------------------------------------------------------------
-final selectedMemberProvider = Provider<Member>(
-    (ref) {
-      final membersState = ref.watch(membersProvider);
-      final selectedRow = ref.watch(selectedRowProvider);
-      Member selectedMember;
-      if(selectedRow == 0 || membersState.isEmpty) {
-        selectedMember = Member.empty();
-      } else {
-      selectedMember = membersState.firstWhere((element) => element.id == selectedRow);}
-      return selectedMember;
-    }
-);
+final selectedMemberProvider = Provider<Member>((ref) {
+  final membersState = ref.watch(membersProvider);
+  final selectedID = ref.watch(selectedMemberIdProvider);
+  Member selectedMember;
+  if (selectedID == 0 || membersState.isEmpty) {
+    selectedMember = Member.empty();
+  } else {
+    selectedMember =
+        membersState.firstWhere((element) => element.id == selectedID);
+  }
+  return selectedMember;
+});
+
+//------------------------------------------------------------------------------
+
 //---------------------------------------------------------------------------------
 final membersCountProvider = Provider<MemberCountModel>(
   (ref) {
     final membersState = ref.watch(membersProvider);
     int totalCount = membersState.length;
-    int newCount = membersState.where((member) => member.contractStatus == '신규').length;
+    int newCount =
+        membersState.where((member) => member.contractStatus == '신규').length;
     int contractCount =
         membersState.where((member) => member.contractStatus == '계약').length;
     int expiredCount =
@@ -106,17 +150,18 @@ final monthlyCountProvider = Provider<List<MonthlyMemberModel>>(
 class SelectedReferralIDProvider extends ChangeNotifier {
   int? selectedReferralId;
   String? selectedReferralName;
-  SelectedReferralIDProvider({required  this.selectedReferralId, required this.selectedReferralName});
+
+  SelectedReferralIDProvider(
+      {required this.selectedReferralId, required this.selectedReferralName});
 
   void setSelectedReferralID(int? newId, String? newValue) {
     selectedReferralId = newId;
     selectedReferralName = newValue;
   }
-
 }
 
 final selectedReferralIDProvider =
-ChangeNotifierProvider<SelectedReferralIDProvider>((ref) {
-  return SelectedReferralIDProvider(selectedReferralId: null, selectedReferralName: null);
+    ChangeNotifierProvider<SelectedReferralIDProvider>((ref) {
+  return SelectedReferralIDProvider(
+      selectedReferralId: null, selectedReferralName: null);
 });
-

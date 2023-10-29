@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:web_test2/common/const/colors.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 
 class CustomSearchTextInputWidget extends StatelessWidget {
   final String? selectedValue;
@@ -50,7 +49,7 @@ class CustomSearchTextInputWidget extends StatelessWidget {
           height: height,
           child: Center(
             child: isRequired == true
-                ? const Text('\*', style: TextStyle(color: Colors.redAccent))
+                ? const Text('\*', style: TextStyle(color: CUSTOM_RED))
                 : null,
           ),
         ),

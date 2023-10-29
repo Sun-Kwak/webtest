@@ -6,6 +6,7 @@ import 'package:web_test2/common/const/colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/common/component/error_dialog.dart';
 import 'package:web_test2/common/extensions/hover_extensions.dart';
+import 'package:web_test2/common/view/splash_screen.dart';
 import 'package:web_test2/screen/auth/social_signin/controller/google_signin_controller.dart';
 import 'package:web_test2/screen/auth/social_signin/controller/kakao_signin_controller.dart';
 import 'package:web_test2/screen/user_profile.dart';
@@ -47,13 +48,13 @@ class GoogleLogo extends ConsumerWidget {
         ErrorDialog.show(context, "구글 로그인 실패");
       } else {
         Navigator.of(context).pop();
-        context.goNamed(UserProfile.routeName);
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => const SplashScreen()));
+        // context.goNamed(UserProfile.routeName);
       }
     });
     return AnimatedObject(
       onTap: (){
         ref.read(googleSignInProvider.notifier).signInWithGoogle();
-        print("${GoogleSignInState.values}");
       },
       child: CircularSvgImage(
         assetPath: "asset/btn_google.svg",
@@ -92,7 +93,7 @@ class KaKaoLogo extends ConsumerWidget {
         ErrorDialog.show(context, "카카오 로그인 실패");
       } else if (current == KakaoSignInState.success){
         Navigator.of(context).pop();
-        context.goNamed(UserProfile.routeName);
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => const UserProfile()));
       } else {
         Navigator.of(context).pop();
       }
@@ -100,7 +101,7 @@ class KaKaoLogo extends ConsumerWidget {
     return AnimatedObject(
       onTap: (){
         ref.read(kakaoSignInProvider.notifier).signInWithKakao();
-        print("${KakaoSignInState.values}");
+
       },
       child: CircularSvgImage(
         assetPath: "asset/btn_kakao.svg",

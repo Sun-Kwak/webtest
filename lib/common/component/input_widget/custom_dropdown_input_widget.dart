@@ -47,7 +47,7 @@ class CustomDropdownInputWidget extends StatelessWidget {
           height: height,
           child: Center(
             child: isRequired == true
-                ? const Text('\*', style: TextStyle(color: Colors.redAccent))
+                ? const Text('\*', style: TextStyle(color: CUSTOM_RED))
                 : null,
           ),
         ),

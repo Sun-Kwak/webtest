@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:web_test2/common/component/custom_text_fromfield.dart';
 import 'package:web_test2/common/component/size_fade_switcher.dart';
+import 'package:web_test2/common/const/colors.dart';
 
 class CustomTextInputWidget extends StatelessWidget {
   final double? height;
@@ -134,7 +135,7 @@ class LargeTextInputWidget extends StatelessWidget {
           width: 10,
           child: Center(
             child: isRequired == true
-                ? const Text('\*', style: TextStyle(color: Colors.redAccent))
+                ? const Text('*', style: TextStyle(color: CUSTOM_RED))
                 : null,
           ),
         ),
@@ -144,7 +145,8 @@ class LargeTextInputWidget extends StatelessWidget {
             hintText: hintText,
             width: textBoxWidth,
             height: height,
-            onChanged: onChanged),
+            onChanged: onChanged
+        ),
       ],
     );
   }

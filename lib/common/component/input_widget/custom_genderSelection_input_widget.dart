@@ -1,4 +1,3 @@
-import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:web_test2/common/const/colors.dart';
 
@@ -44,7 +43,7 @@ class CustomGenderSelectionInputWidgetState extends State<CustomGenderSelectionI
           width: 10,
           height: 37,
           child: Center(
-            child: Text('*',style: TextStyle(color: Colors.redAccent)),
+            child: Text('*',style: TextStyle(color: CUSTOM_RED)),
           ),
         ),
         Container(
@@ -58,6 +57,7 @@ class CustomGenderSelectionInputWidgetState extends State<CustomGenderSelectionI
                     value: '여성',
                     groupValue: widget.selectedGender,
                     onChanged: widget.onChanged,
+                    activeColor: CUSTOM_BLUE,
                   ),
                   const Text('여성',
                     // style: TextStyle(fontSize: 40 * 0.35),
@@ -71,6 +71,7 @@ class CustomGenderSelectionInputWidgetState extends State<CustomGenderSelectionI
                     value: '남성',
                     groupValue: widget.selectedGender,
                     onChanged: widget.onChanged,
+                    activeColor: CUSTOM_BLUE,
                   ),
                   const Text('남성',
                     // style: TextStyle(fontSize: 40 * 0.35),

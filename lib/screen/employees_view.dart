@@ -51,8 +51,6 @@ class EmployeesTableState extends ConsumerState<EmployeesTable> {
 
   @override
   Widget build(BuildContext context) {
-    // final authController = ref.read(userMeProvider.notifier);
-    double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
 
     return FutureBuilder<List<Employee>>(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:web_test2/common/component/custom_text_fromfield.dart';
 import 'package:web_test2/common/component/size_fade_switcher.dart';
+import 'package:web_test2/common/const/colors.dart';
 
 class CustomPhoneInputWidget extends StatelessWidget {
   final double? height;
@@ -50,7 +51,7 @@ class CustomPhoneInputWidget extends StatelessWidget {
               height: height,
               child: Center(
                 child: isRequired == true
-                    ? const Text('*', style: TextStyle(color: Colors.redAccent))
+                    ? const Text('*', style: TextStyle(color: CUSTOM_RED))
                     : null,
               ),
             ),

@@ -1,12 +1,14 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/common/const/colors.dart';
+import 'package:web_test2/common/provider/selected_screen_index_provider.dart';
 import 'package:web_test2/screen/attendance_check_view.dart';
-import 'package:web_test2/screen/auth/controller/authentication_controller.dart';
-import 'package:web_test2/screen/auth/controller/signedIn_user_provider.dart';
+import 'package:authentication_repository/src/authentication_controller.dart';
+import 'package:authentication_repository/src/signedIn_user_provider.dart';
 import 'package:web_test2/screen/contract_view.dart';
 import 'package:web_test2/screen/course_view.dart';
-import 'package:web_test2/screen/measurement_view.dart';
+import 'package:web_test2/screen/measurement/measurement_view.dart';
 import 'package:web_test2/screen/member/member_view.dart';
 import 'package:web_test2/screen/settings_view.dart';
 
@@ -39,14 +41,15 @@ class _RootTabState extends ConsumerState<RootTab>
   }
 
   void tabListener() {
-    // if (this.mounted) {
+    // final selectedScreenIndex = ref.watch(selectedScreenIndexProvider);
+    // // if (this.mounted) {
       setState(() {
         _selectedIndex = controller.index;
       });
     }
   // }
   final List<Widget> _mainContents = [
-     const MembersView(),
+     const MeasurementView(),
      const ContractView(),
      const CourseView(),
      const MeasurementView(),
@@ -58,12 +61,13 @@ class _RootTabState extends ConsumerState<RootTab>
   Widget build(BuildContext context) {
     final authController = ref.read(userMeProvider.notifier);
     final signInUserState = ref.watch(signedInUserProvider);
+    final selectedIDController = ref.watch(selectedMemberIdProvider.notifier);
+    final memberController = ref.watch(membersProvider.notifier);
     final double screenWidth = MediaQuery.of(context).size.width;
-    final EdgeInsets appBarMargin = screenWidth < 640 ? const EdgeInsets.only(left: 20,top: 12) : screenWidth < 1200 || isSwitched == false ? const EdgeInsets.only(left: 100,top: 12) : const EdgeInsets.only(left: 170,top: 12);
-    // const TextStyle textStyle = TextStyle(
-    //   fontFamily: 'SebangGothic',
-    //   fontWeight: FontWeight.w400,
-    // );
+    final selectedScreenIndexController = ref.watch(selectedScreenIndexProvider.notifier);
+    final selectedIndex = ref.watch(selectedScreenIndexProvider);
+    final EdgeInsets appBarMargin = screenWidth <= 640 ? const EdgeInsets.only(left: 20,top: 12) : screenWidth < 1200 || isSwitched == false ? const EdgeInsets.only(left: 100,top: 12) : const EdgeInsets.only(left: 170,top: 12);
+
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 29,
@@ -76,10 +80,6 @@ class _RootTabState extends ConsumerState<RootTab>
               underline: const SizedBox(),
                 value: dropdownValue,
                 icon: const Icon(Icons.arrow_drop_down),
-                // underline: Container(
-                //   height: 2,
-                //   color: PRIMARY_COLOR,
-                // ),
                 onChanged: (newValue) {
                   setState(() {
                     dropdownValue = newValue!;
@@ -95,8 +95,6 @@ class _RootTabState extends ConsumerState<RootTab>
                           fontSize: 17,
                         ),
                       )),
-
-                  // DropdownMenuItem<String>(child: Text('신규'),value : '신규'),
                 ]),
           ),
         ),
@@ -157,6 +155,7 @@ class _RootTabState extends ConsumerState<RootTab>
               // unselectedItemColor: CONSTRAINT_PRIMARY_COLOR,
               type: BottomNavigationBarType.fixed,
               onTap: (int index) {
+                selectedScreenIndexController.setSelectedIndex(index);
                 controller.animateTo(index);
               },
               currentIndex: _selectedIndex,
@@ -217,11 +216,19 @@ class _RootTabState extends ConsumerState<RootTab>
                   : screenWidth >= 1200
                       ? true
                       : false,
-              selectedIndex: _selectedIndex,
+              selectedIndex: selectedIndex,
               onDestinationSelected: (int index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
+                selectedScreenIndexController.setSelectedIndex(index);
+                setState(() {
+                  _selectedIndex = index;
+                });
+                if(_selectedIndex == 0) {
+                  memberController.getMembers();
+                  selectedIDController.setSelectedRow(0);
+
+                  print(_selectedIndex);
+                }
+
                 }
               ,
               elevation: 5,
@@ -257,7 +264,7 @@ class _RootTabState extends ConsumerState<RootTab>
                 Expanded(
                     child: Padding(
                   padding: screenWidth>640 ? const EdgeInsets.only(left: 10, top: 13,right: 10) : const EdgeInsets.only(left: 10, top: 3,right: 10) ,
-                  child: _mainContents[_selectedIndex],
+                  child: _mainContents[selectedIndex],
                 )),
               ],
             ),

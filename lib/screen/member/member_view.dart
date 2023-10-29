@@ -16,78 +16,90 @@ class MembersView extends ConsumerStatefulWidget {
 class MembersViewState extends ConsumerState<MembersView> {
   final ScrollController controller = ScrollController();
 
-  bool isRefresh = false;
   bool isEditing = false;
   Member member = Member.empty();
-  void onSaveButtonClicked() {
-    final memberUpdateProviderValue = ref.watch(memberUpdateProvider);
-    if (memberUpdateProviderValue.status == MemberUpdateStatus.on) {
-      isRefresh = false;
-    } else {
-      isRefresh = true;
-    }
-  }
+  late List<Member> members;
+
+
   void onEditButtonClicked() {
     final isEditingControl = ref.watch(memberEditingProvider);
+    final selectedMember = ref.watch(selectedMemberProvider);
     setState(() {
       if (isEditingControl.isEditing == true) {
-        final selectedMember = ref.watch(selectedMemberProvider);
         member = selectedMember;
-        isEditing = true;
-      } else {
-        isEditing = false;
       }
     });
   }
+  //
+  void inputButtonsClicked() async {
+    setState(() {
+      final selectedMember = ref.watch(selectedMemberProvider);
+
+      member = selectedMember;
+
+    });
+  }
+
+//   void filterMember() {
+//     final filteredMembers = ref.watch(filteredMembersProvider);
+//     setState(() {
+//       members = filteredMembers;
+//     });
+// }
+
 
   @override
   void initState() {
 
-    print('view 시작 $isEditing');
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    // final selectedMember = ref.watch(selectedMemberProvider);
+    final members = ref.watch(filteredMembersProvider);
     final isEditingControl = ref.watch(memberEditingProvider);
-
     final double screenWidth = MediaQuery.of(context).size.width;
     return Scrollbar(
-      // trackVisibility: true,
       thumbVisibility: true,
       controller: controller,
       child: SingleChildScrollView(
         controller: controller,
         scrollDirection: Axis.horizontal,
-        child:  SingleChildScrollView(
+        child: SingleChildScrollView(
           child: Center(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                 Column(
+                Column(
                   children: [
                     Column(
                       children: [
+
                         MemberInputForm(
+                          inputButtonsOnPressed: () {
+                            inputButtonsClicked();
+                          },
                           isEditing: isEditingControl.isEditing,
                           member: member,
-                          onPressed: (){
-                            onSaveButtonClicked();
-                          },
                         ),
                         SizedBox(
                           height: 20,
                         ),
-                        MemberInforForm(),
+                        MemberInforForm(
+                          member: member,
+                        ),
                         if (screenWidth < 640) ...[
                           const SizedBox(
                             height: 20,
                           ),
                           MemberSearchForm(
-                            onPressed: (){
+                            // onTap: (){
+                            //   filterMember();
+                            // },
+                            members: members,
+                            onPressed: () {
                               onEditButtonClicked();
                             },
-                            isRefresh: isRefresh,
                           ),
                           const SizedBox(
                             height: 20,
@@ -103,15 +115,18 @@ class MembersViewState extends ConsumerState<MembersView> {
                     width: 10,
                   ),
                   MemberSearchForm(
-                    onPressed: (){
+                    // onTap: (){
+                    //   filterMember();
+                    // },
+                    members: members,
+                    onPressed: () {
                       onEditButtonClicked();
                     },
-                    isRefresh: isRefresh,
                   ),
                   const SizedBox(
                     width: 10,
                   ),
-                  const MemberVOCForm(),
+                  // const MemberVOCForm(),
                 ],
               ],
             ),

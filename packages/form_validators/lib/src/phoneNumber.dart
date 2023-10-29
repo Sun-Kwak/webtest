@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:formz/formz.dart';
 
 enum PhoneNumberValidationError { empty, invalid }

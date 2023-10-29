@@ -1,23 +1,29 @@
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/common/const/colors.dart';
+import 'package:web_test2/screen/auth/controller/auth_provider.dart';
+import 'package:authentication_repository/src/authentication_controller.dart';
+import 'package:authentication_repository/src/signedIn_user_provider.dart';
 import 'package:web_test2/screen/employees_view.dart';
 import 'package:web_test2/screen/empty_view.dart';
 
-class SettingsView extends StatefulWidget {
+class SettingsView extends ConsumerStatefulWidget {
   const SettingsView({super.key});
 
   @override
-  State<SettingsView> createState() => _SettingsViewState();
+  ConsumerState<SettingsView> createState() => _SettingsViewState();
 }
 
-class _SettingsViewState extends State<SettingsView> {
+class _SettingsViewState extends ConsumerState<SettingsView> {
   int groupValue = 0;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final signInUserState = ref.watch(signedInUserProvider);
+
+    return signInUserState.value!.level < 1 ? Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -63,7 +69,7 @@ class _SettingsViewState extends State<SettingsView> {
         ),
          Expanded(child: groupValue == 2 ? EmployeesTable() : EmptyView()),
       ],
-    );
+    ) : EmptyView();
   }
 
   Widget buildSegment(String text, int index) => Container(

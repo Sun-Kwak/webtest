@@ -2,22 +2,34 @@ import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:web_test2/common/component/animated_Object.dart';
 import 'package:web_test2/common/const/colors.dart';
+import 'package:web_test2/common/extensions/hover_extensions.dart';
 
-class MemberSummaryCard extends ConsumerWidget {
+class MemberSummaryCard extends ConsumerStatefulWidget {
+  final double width;
+  // final VoidCallback onTap;
 
-  const MemberSummaryCard(
-      {super.key});
+  const MemberSummaryCard({
+    required this.width,
+    // required this.onTap,
+    super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MemberSummaryCard> createState() => _MemberSummaryCardState();
+}
+
+class _MemberSummaryCardState extends ConsumerState<MemberSummaryCard> {
+  @override
+  Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     final membersCount = ref.watch(membersCountProvider);
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(6)),
         color: TABLE_HEADER_COLOR,
       ),
-      width: 230,
+      width: screenWidth <= 640 ? widget.width *0.47 : widget.width * 0.24,
       height: 140,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -35,68 +47,112 @@ class MemberSummaryCard extends ConsumerWidget {
             const SizedBox(
               height: 8,
             ),
-            Container(
-                width: 50,
-                height: 40,
-                child: Center(
+            SizedBox(
+              width: 50,
+              height: 40,
+              child: Center(
+                child: Tooltip(
+                  message: '검색',
+                  child: AnimatedObject(
+                    onTap: () {
+                      ref
+                          .read(filterMember.notifier)
+                          .update((state) => MembersFilterState.all);
+                      // widget.onTap();
+                    },
                     child: Text(
                       membersCount.totalCount.toString(),
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.blueGrey),
-                ))),
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.blueGrey),
+                    ),
+                  ).showCursorOnHover,
+                ),
+              ),
+            ),
             const Divider(),
             Padding(
-              padding: EdgeInsets.only(left: 10, right: 10),
+              padding: const EdgeInsets.only(left: 10, right: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    children: [
-                      Text(membersCount.newCount.toString()),
-                      SizedBox(
-                        height: 3,
+                  Tooltip(
+                    message: '검색',
+                    child: AnimatedObject(
+                      onTap: () {
+                        ref
+                            .read(filterMember.notifier)
+                            .update((state) => MembersFilterState.isNew);
+                        // widget.onTap();
+                      },
+                      child: Column(
+                        children: [
+                          Text(membersCount.newCount.toString()),
+                          const SizedBox(
+                            height: 3,
+                          ),
+                          const Text('신규',
+                              style: TextStyle(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w100,
+                                  color: BODY_TEXT_COLOR)),
+                        ],
                       ),
-                      Text('신규',
-                          style: TextStyle(
-                              fontSize: 8,
-                              fontWeight: FontWeight.w100,
-                              color: BODY_TEXT_COLOR)),
-                    ],
+                    ).showCursorOnHover,
                   ),
-                  Column(
-                    children: [
-                      Text(membersCount.contractCount.toString()),
-                      SizedBox(
-                        height: 3,
+                  Tooltip(
+                    message: '검색',
+                    child: AnimatedObject(
+                      onTap: () {
+                        ref
+                            .read(filterMember.notifier)
+                            .update((state) => MembersFilterState.activated);
+                        // widget.onTap();
+                      },
+                      child: Column(
+                        children: [
+                          Text(membersCount.contractCount.toString()),
+                          const SizedBox(
+                            height: 3,
+                          ),
+                          const Text(
+                            '계약',
+                            style: TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w100,
+                                color: BODY_TEXT_COLOR),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '계약',
-                        style: TextStyle(
-                            fontSize: 8,
-                            fontWeight: FontWeight.w100,
-                            color: BODY_TEXT_COLOR),
-                      ),
-                    ],
+                    ).showCursorOnHover,
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        membersCount.expiredCount.toString(),
-                        style: TextStyle(color: Colors.redAccent),
+                  Tooltip(
+                    message: '검색',
+                    child: AnimatedObject(
+                      onTap: () {
+                        ref.read(filterMember.notifier).update((state) => MembersFilterState.expired);
+                        // widget.onTap();
+                      },
+                      child: Column(
+                        children: [
+                          Text(
+                            membersCount.expiredCount.toString(),
+                            style: const TextStyle(color: CUSTOM_RED),
+                          ),
+                          const SizedBox(
+                            height: 3,
+                          ),
+                          const Text(
+                            '만료',
+                            style: TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.w100,
+                                color: CUSTOM_RED),
+                          ),
+                        ],
                       ),
-                      SizedBox(
-                        height: 3,
-                      ),
-                      Text(
-                        '만료',
-                        style: TextStyle(
-                            fontSize: 8,
-                            fontWeight: FontWeight.w100,
-                            color: Colors.redAccent),
-                      ),
-                    ],
+                    ).showCursorOnHover,
                   ),
                 ],
               ),
@@ -109,37 +165,41 @@ class MemberSummaryCard extends ConsumerWidget {
 }
 
 class VOCSummaryCard extends StatelessWidget {
-  const VOCSummaryCard({super.key});
+  final double width;
+  const VOCSummaryCard({
+    required this.width,
+    super.key});
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(6)),
         color: TABLE_HEADER_COLOR,
       ),
-      width: 230,
+      width: screenWidth <= 640 ? width *0.47 : width * 0.24,
       height: 140,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+      child: const Padding(
+        padding: EdgeInsets.all(8.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(
+            SizedBox(
               height: 10,
             ),
-            const Text(
+            Text(
               '문의건수',
               style: TextStyle(fontSize: 11),
             ),
-            const SizedBox(
+            SizedBox(
               height: 8,
             ),
-            Container(
+            SizedBox(
                 width: 50,
                 height: 40,
-                child: const Center(
+                child: Center(
                     child: Text(
                   '12',
                   style: TextStyle(
@@ -147,8 +207,8 @@ class VOCSummaryCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                       color: Colors.blueGrey),
                 ))),
-            const Divider(),
-            const Padding(
+            Divider(),
+            Padding(
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -185,7 +245,7 @@ class VOCSummaryCard extends StatelessWidget {
                     children: [
                       Text(
                         '2',
-                        style: TextStyle(color: Colors.redAccent),
+                        style: TextStyle(color: CUSTOM_RED),
                       ),
                       SizedBox(
                         height: 3,
@@ -195,7 +255,7 @@ class VOCSummaryCard extends StatelessWidget {
                         style: TextStyle(
                             fontSize: 8,
                             fontWeight: FontWeight.w100,
-                            color: Colors.redAccent),
+                            color: CUSTOM_RED),
                       ),
                     ],
                   ),
@@ -210,10 +270,13 @@ class VOCSummaryCard extends StatelessWidget {
 }
 
 class MonthlyMemberChart extends ConsumerWidget {
-  const MonthlyMemberChart({super.key});
+  final double width;
+  const MonthlyMemberChart({
+    required this.width,
+    super.key});
 
   @override
-  Widget build(BuildContext context,WidgetRef ref) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final monthlyCount = ref.watch(monthlyCountProvider);
     final List<Color> startColor = <Color>[];
     startColor.add(Colors.amber[50]!);
@@ -225,32 +288,39 @@ class MonthlyMemberChart extends ConsumerWidget {
     stops.add(0.5);
     stops.add(1.0);
     int maxCount = monthlyCount.isNotEmpty
-        ? monthlyCount.map((monthlyMember) => monthlyMember.count).reduce((a, b) => a > b ? a : b)
+        ? monthlyCount
+            .map((monthlyMember) => monthlyMember.count)
+            .reduce((a, b) => a > b ? a : b)
         : 0;
     int minMonth = monthlyCount.isNotEmpty
-        ? monthlyCount.map((monthlyMember) => monthlyMember.month).reduce((a, b) => a < b ? a : b)
+        ? monthlyCount
+            .map((monthlyMember) => monthlyMember.month)
+            .reduce((a, b) => a < b ? a : b)
         : 0;
 
-    final LinearGradient gradientColors = LinearGradient(colors: startColor, stops: stops);
+    final LinearGradient gradientColors =
+        LinearGradient(colors: startColor, stops: stops);
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(6)),
         color: TABLE_HEADER_COLOR,
       ),
-      width: 510,
+      width: width * 0.485,
       height: 140,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SfCartesianChart(
+          tooltipBehavior: TooltipBehavior(enable: true),
           // legend: Legend(isVisible: true),
           series: <ChartSeries>[
             AreaSeries<MonthlyMemberModel, int>(
-              selectionBehavior: SelectionBehavior(
-              ),
-              emptyPointSettings: EmptyPointSettings(mode: EmptyPointMode.zero),
-              gradient: gradientColors,
+              // enableTooltip: true,
+                selectionBehavior: SelectionBehavior(),
+                emptyPointSettings:
+                    EmptyPointSettings(mode: EmptyPointMode.zero),
+                gradient: gradientColors,
 
-                // name: '월별',
+                name: '월별',
                 // dataLabelSettings: DataLabelSettings(isVisible: true),
                 dataSource: monthlyCount,
                 xValueMapper: (MonthlyMemberModel monthlyMemberModel, _) =>
@@ -264,7 +334,7 @@ class MonthlyMemberChart extends ConsumerWidget {
             interval: 1,
           ),
           primaryYAxis: NumericAxis(
-            maximum: maxCount + maxCount*0.1,
+            maximum: maxCount + maxCount * 0.1,
           ),
         ),
       ),

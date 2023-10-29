@@ -42,9 +42,9 @@ class CustomRefreshIconState extends State<CustomRefreshIcon>
               icon: const Icon(Icons.refresh, color: PRIMARY_COLOR,),
               onPressed: () {
                 _controller.forward(from: 0.0);
-                if (widget.onPressed != null) {
-                  widget.onPressed!(); // 외부에서 전달된 onPressed 콜백을 호출
-                }
+
+                  widget.onPressed(); // 외부에서 전달된 onPressed 콜백을 호출
+
               },
             ),
           );

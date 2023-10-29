@@ -1,12 +1,18 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/common/component/custom_boxRadius_form.dart';
 import 'package:web_test2/common/component/output_widget/custom_text_output_widget.dart';
 
-class MemberInforForm extends StatelessWidget {
-  const MemberInforForm({super.key});
+class MemberInforForm extends ConsumerWidget {
+  final Member member;
+  const MemberInforForm({
+    required this.member,
+    super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context,WidgetRef ref) {
+
     final double screenWidth = MediaQuery.of(context).size.width;
     final double formWidth = screenWidth >= 650 ? 535 : screenWidth >= 640 ? screenWidth *0.82 : screenWidth-20;
     final double widgetGap = screenWidth >= 650 ?  20 : 8;
@@ -15,7 +21,7 @@ class MemberInforForm extends StatelessWidget {
     return CustomBoxRadiusForm(
       width: formWidth,
       height: 290,
-      title: '계약정보',
+      title: '생성정보',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -26,17 +32,12 @@ class MemberInforForm extends StatelessWidget {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 label: '회원번호',
-                outputText: '',
+                outputText: member.id == 0 ? '' :member.id.toString(),
                 textBoxWidth: textBoxWidth,
               ),
               SizedBox(
                 width: widgetGap,
               ),
-              // CustomTextOutputWidget(
-              //   label: '계약상태',
-              //   outputText: '',
-              //   textBoxWidth: textBoxWidth,
-              // ),
             ],
           ),
           const SizedBox(height: 10,),
@@ -46,7 +47,7 @@ class MemberInforForm extends StatelessWidget {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 label: '계약상태',
-                outputText: '',
+                outputText: member.id == 0 ? '' :member.contractStatus!,
                 textBoxWidth: textBoxWidth,
               ),
               SizedBox(
@@ -55,7 +56,7 @@ class MemberInforForm extends StatelessWidget {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 label: '추천인수',
-                outputText: '',
+                outputText: member.id == 0 ? '' :member.referralCount.toString(),
                 textBoxWidth: textBoxWidth,
               ),
             ],
@@ -67,7 +68,7 @@ class MemberInforForm extends StatelessWidget {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 label: '첫수강일',
-                outputText: '',
+                outputText: member.firstDate ?? '',
                 textBoxWidth: textBoxWidth,
               ),
               SizedBox(
@@ -76,7 +77,7 @@ class MemberInforForm extends StatelessWidget {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 label: '종료예정',
-                outputText: '',
+                outputText: member.expiryDate ?? '',
                 textBoxWidth: textBoxWidth,
               ),
             ],
@@ -88,7 +89,7 @@ class MemberInforForm extends StatelessWidget {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 label: '총납부금',
-                outputText: '',
+                outputText: member.id == 0 ? '' : member.totalFee.toString(),
                 textBoxWidth: textBoxWidth,
               ),
               SizedBox(
@@ -97,7 +98,7 @@ class MemberInforForm extends StatelessWidget {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 label: '총출석일',
-                outputText: '',
+                outputText: member.id == 0 ? '' : member.totalAttendanceDays.toString(),
                 textBoxWidth: textBoxWidth,
               ),
             ],

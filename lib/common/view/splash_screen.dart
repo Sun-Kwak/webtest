@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/common/view/root_tab.dart';
-import 'package:web_test2/screen/auth/controller/signedIn_user_provider.dart';
+import 'package:authentication_repository/src/signedIn_user_provider.dart';
 import 'package:web_test2/screen/user_profile.dart';
 
 class SplashScreen extends ConsumerWidget {

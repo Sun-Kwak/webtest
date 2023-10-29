@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:web_test2/common/component/custom_text_fromfield.dart';
 import 'package:web_test2/common/const/colors.dart';
 
 class CustomTextOutputWidget extends StatelessWidget {
@@ -11,8 +10,10 @@ class CustomTextOutputWidget extends StatelessWidget {
   final double? textBoxWidth;
   final Color? color;
   final Color? textColor;
+  final bool? border;
 
   const CustomTextOutputWidget({
+    this.border = true,
     this.textColor,
     this.color,
     this.labelBoxWidth = 60,
@@ -58,7 +59,7 @@ class CustomTextOutputWidget extends StatelessWidget {
 
           decoration: BoxDecoration(
             color: color ?? TABLE_COLOR,
-            border: Border.all(color:INPUT_BORDER_COLOR),
+            border: border == true ? Border.all(color:INPUT_BORDER_COLOR) : null,
             borderRadius: BorderRadius.circular(4),
           ),
           child: Center(child: Text(outputText,style: TextStyle(

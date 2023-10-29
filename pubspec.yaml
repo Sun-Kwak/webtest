@@ -36,7 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_svg: ^2.0.7
-  firebase_core: ^2.15.1
+  firebase_core: ^2.20.0
 #  firebase_auth: ^4.8.0
 #  cloud_firestore: ^4.9.0
   flutter_riverpod: ^2.0.2
@@ -63,11 +63,14 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   syncfusion_localizations: ^23.1.38
-  kakao_flutter_sdk_user: ^1.6.0
+  kakao_flutter_sdk_user: ^1.6.1
   dropdown_button2: ^2.3.9
   another_flushbar: ^1.12.30
   debounce_throttle: ^2.0.0
   syncfusion_flutter_charts: ^23.1.41
+  syncfusion_flutter_sliders: ^23.1.42
+  syncfusion_flutter_calendar: ^23.1.42
+  firebase_auth: ^4.12.0
 
 
 dev_dependencies:
@@ -103,6 +106,7 @@ flutter:
     - asset/btn_naver.svg
     - asset/LAVIDA_LOGO.svg
     - asset/LAVIDA_LOGO_ORIGIN.svg
+    - asset/excel_icon.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

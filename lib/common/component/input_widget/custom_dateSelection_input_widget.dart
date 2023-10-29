@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:form_validator/form_validators.dart';
 import 'package:web_test2/common/component/size_fade_switcher.dart';
 import 'package:web_test2/common/const/colors.dart';
-
-import '../../../screen/member/controller/member_input_controller.dart';
 
 class CustomDateSelectionInputWidget extends StatelessWidget {
   final double? height;
@@ -15,12 +11,14 @@ class CustomDateSelectionInputWidget extends StatelessWidget {
   final DateTime? selectedDate;
   final GestureTapCallback onTap;
   final String? errorText;
+  final Color? color;
 
   const CustomDateSelectionInputWidget({
     required this.errorText,
     required this.onTap,
     required this.selectedDate,
     required this.labelBoxWidth,
+    this.color,
     this.textBoxWidth,
     this.isRequired = false,
     required this.label,
@@ -53,7 +51,7 @@ class CustomDateSelectionInputWidget extends StatelessWidget {
               height: height,
               child: Center(
                 child: isRequired == true
-                    ? const Text('*', style: TextStyle(color: Colors.redAccent))
+                    ? const Text('*', style: TextStyle(color: CUSTOM_RED))
                     : null,
               ),
             ),
@@ -71,7 +69,7 @@ class CustomDateSelectionInputWidget extends StatelessWidget {
                     contentPadding: EdgeInsets.only(
                         left: height! * 0.1, top: height! * 0.1),
                     filled: true,
-                    fillColor: INPUT_BG_COLOR,
+                    fillColor: color ?? INPUT_BG_COLOR,
                     //errorText: errorText,
                     border: baseBorder,
                     enabledBorder: baseBorder,
@@ -83,7 +81,7 @@ class CustomDateSelectionInputWidget extends StatelessWidget {
                   ),
                   child: selectedDate != null
                       ? Text(
-                          '${selectedDate!.year}-${selectedDate!.month}-${selectedDate!.day}',
+                          '${selectedDate!.year}-${selectedDate!.month.toString().padLeft(2,'0')}-${selectedDate!.day.toString().padLeft(2,'0')}',
                         )
                       : const Text(
                           '날짜 선택',
@@ -100,7 +98,7 @@ class CustomDateSelectionInputWidget extends StatelessWidget {
         SizeFadeSwitcher(
           child: errorText != null
               ? Padding(
-            padding: EdgeInsets.fromLTRB(labelBoxWidth! + 15, 3, 0, 0),
+            padding: EdgeInsets.fromLTRB(labelBoxWidth + 15, 3, 0, 0),
             child: Text(
               errorText!,
               style: TextStyle(

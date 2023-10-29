@@ -28,10 +28,12 @@ class Member {
   final int? closeVOC;
   final int? unresolvedVOC;
   final String? contractStatus;
+  final String? branch;
 
   // final String? actions;
 
   Member({
+    this.branch,
     this.referralName,
     required this.docId,
     required this.id,
@@ -89,9 +91,11 @@ class Member {
     int? closeVOC,
     int? unresolvedVOC,
     String? contractStatus,
+    String? branch,
     // String? actions // 업데이트 시간
   }) {
     return Member(
+      memo: memo ?? this.memo,
       docId: docId ?? this.docId,
       id: id ?? this.id,
       displayName: displayName ?? this.displayName,
@@ -112,12 +116,13 @@ class Member {
       totalAttendanceDays: totalAttendanceDays ?? this.totalAttendanceDays,
       level: level ?? 5,
       updatedBy: updatedBy ?? displayName ?? this.updatedBy,
-      createdAt: createdAt ?? DateTime.now(),
+      createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
       openVOC: openVOC ?? this.openVOC,
       closeVOC: closeVOC ?? this.closeVOC,
       unresolvedVOC: unresolvedVOC ?? this.unresolvedVOC,
       contractStatus: contractStatus ?? this.contractStatus,
+      branch: branch ?? this.branch,
     );
   }
 
@@ -149,6 +154,7 @@ class Member {
       'closeVOC': closeVOC,
       'unresolvedVOC': unresolvedVOC,
       'contractStatus': contractStatus,
+      'branch': branch
       // 'actions': actions,
     };
   }
@@ -183,6 +189,7 @@ class Member {
       closeVOC: map['closeVOC'] ?? '',
       unresolvedVOC: map['unresolvedVOC'] ?? '',
       contractStatus: map['contractStatus'] ?? '',
+      branch: map['branch'] ?? '',
     );
   }
 
@@ -214,6 +221,7 @@ class Member {
         closeVOC: 0,
         unresolvedVOC: 0,
         contractStatus: '신규',
+        branch: '동천역'
         // actions: null,
       );
 }

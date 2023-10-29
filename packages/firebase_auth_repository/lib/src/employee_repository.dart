@@ -17,7 +17,7 @@ class EmployeeRepository {
 
       DocumentSnapshot userDoc = await userDocRef.get();
       if (!userDoc.exists) {
-        await _firestore.collection('employees').doc(user!.uid).set(employee.copyWith(
+        await _firestore.collection('employees').doc(user.uid).set(employee.copyWith(
           id: user.uid,
           email: email,
           displayName: displayName,
@@ -29,25 +29,51 @@ class EmployeeRepository {
     }
   }
 
-  Future<void> getEmployeeData({required DateTime startDate,
-      required DateTime endDate}) async {
-
+  Future<List<Employee>> getEmployeesData() async {
     List<Employee> employees = [];
     try {
       CollectionReference collection = FirebaseFirestore.instance.collection('employees');
 
-      QuerySnapshot querySnapshot = await collection
-          .where('createdAt', isGreaterThanOrEqualTo: startDate)
-          .where('createdAt', isLessThanOrEqualTo: endDate)
-          .get();
+      QuerySnapshot querySnapshot = await collection.get();
 
       for (var document in querySnapshot.docs) {
         Employee employee = Employee.fromFirestore(document);
         employees.add(employee);
       }
-    } catch (e) {
-      print(e);
-      throw Exception(e);
+    } on FirebaseException catch (e) {
+
+      throw EmployeeGetFailure(e.toString());
     }
+    return employees;
   }
+  //
+  // Future<void> getEmployeeData(
+  // // {// required DateTime startDate,
+  // //   //   required DateTime endDate}
+  //   ) async {
+  //
+  //   List<Employee> employees = [];
+  //   try {
+  //     CollectionReference collection = FirebaseFirestore.instance.collection('employees');
+  //
+  //     QuerySnapshot querySnapshot = await collection
+  //         // .where('createdAt', isGreaterThanOrEqualTo: startDate)
+  //         // .where('createdAt', isLessThanOrEqualTo: endDate)
+  //         .get();
+  //
+  //     for (var document in querySnapshot.docs) {
+  //       Employee employee = Employee.fromFirestore(document);
+  //       employees.add(employee);
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //     throw Exception(e);
+  //   }
+  // }
+}
+
+class EmployeeGetFailure implements Exception {
+  final String code;
+
+  const EmployeeGetFailure(this.code);
 }

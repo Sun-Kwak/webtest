@@ -1,3 +1,4 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +9,7 @@ import 'package:web_test2/firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'package:web_test2/screen/auth/authentication_view.dart';
-import 'package:web_test2/screen/auth/controller/authentication_controller.dart';
+import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,9 +31,9 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
       // 이 코드는 화면이 렌더링된 후에 실행됩니다.
-      // var screenSize = MediaQuery.of(context).size;
-      // print('화면 너비: ${screenSize.width}');
-      // print('화면 높이: ${screenSize.height}');
+      var screenSize = MediaQuery.of(context).size;
+      print('화면 너비: ${screenSize.width}');
+      print('화면 높이: ${screenSize.height}');
     });
     //
     // final signInUserState = ref.watch(signedInUserProvider);

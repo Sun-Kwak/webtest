@@ -8,4 +8,4 @@ dev_dependencies:
 
 dependencies:
   formz: ^0.4.1
-  cloud_firestore: ^4.9.2
+  cloud_firestore: ^4.12.0

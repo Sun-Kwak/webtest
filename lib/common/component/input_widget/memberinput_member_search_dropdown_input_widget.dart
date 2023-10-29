@@ -1,11 +1,9 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:web_test2/common/component/custom_text_fromfield.dart';
 import 'package:web_test2/common/const/colors.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 
-class CustomSearchDropdownWidget extends StatelessWidget {
+class MemberInputMemberSearchDropdownWidget extends StatelessWidget {
   final String? selectedValue;
   // final ValueChanged<String?>? onChanged;
 
@@ -16,7 +14,7 @@ class CustomSearchDropdownWidget extends StatelessWidget {
   final double? labelBoxWidth;
   final double? textBoxWidth;
 
-  const CustomSearchDropdownWidget({
+  const MemberInputMemberSearchDropdownWidget({
 
     this.labelBoxWidth = 50,
     this.textBoxWidth = 170,
@@ -51,7 +49,7 @@ class CustomSearchDropdownWidget extends StatelessWidget {
           height: height,
           child: Center(
             child: isRequired == true
-                ? const Text('*', style: TextStyle(color: Colors.redAccent))
+                ? const Text('*', style: TextStyle(color: CUSTOM_RED))
                 : null,
           ),
         ),
@@ -97,7 +95,7 @@ class CustomSearchDropdownFormField extends ConsumerStatefulWidget {
       _CustomSearchDropdownFormFieldState();
 }
 
-class _CustomSearchDropdownFormFieldState<T>
+class _CustomSearchDropdownFormFieldState
     extends ConsumerState<CustomSearchDropdownFormField> {
 
   late GlobalKey actionKey;
@@ -108,6 +106,8 @@ class _CustomSearchDropdownFormFieldState<T>
   final layerLink = LayerLink();
   late List<Member> members;
   late List<Member> displayedMembers;
+  late List<Member> filteredMembers;
+
 
   @override
   void initState() {
@@ -143,6 +143,7 @@ class _CustomSearchDropdownFormFieldState<T>
     final selectedMemberId = selectedMember.id;
     final selectedReferralId = ref.watch(selectedReferralIDProvider.notifier);
     displayedMembers = members.where((member) => member.id != selectedMemberId).toList();;
+    filteredMembers = displayedMembers;
 
     return OverlayEntry(builder: (context) {
       return GestureDetector(
@@ -181,9 +182,9 @@ class _CustomSearchDropdownFormFieldState<T>
                     separatorBuilder: (BuildContext context, int index){
                       return const Divider();
                     },
-                    itemCount: displayedMembers.length,
+                    itemCount: filteredMembers.length,
                       itemBuilder: (BuildContext context, int index){
-                        Member member = displayedMembers[index];
+                        Member member = filteredMembers[index];
                     return Material(
                       child: ListTile(
                         leading: Container(
@@ -260,7 +261,7 @@ class _CustomSearchDropdownFormFieldState<T>
               contentPadding: EdgeInsets.all(widget.height! * 0.1),
               border: baseBorder,
               enabledBorder: baseBorder,
-              suffixIcon: const Icon(Icons.search_outlined),
+              suffixIcon: const Icon(Icons.search_outlined,color: CONSTRAINT_PRIMARY_COLOR,),
               focusedBorder: baseBorder.copyWith(
                 borderSide: const BorderSide(
                   color: PRIMARY_COLOR,
@@ -276,14 +277,14 @@ class _CustomSearchDropdownFormFieldState<T>
 
   void searchMember(String query) {
 
-      List<Member> filteredMembers = members.where((member) {
+      List<Member> filteringMembers = displayedMembers.where((member) {
         return member.phoneNumber.contains(query) ||
             member.displayName.contains(query);
       }).toList();
-      print(query);
-      setState(() {
 
-        displayedMembers = filteredMembers;
+      setState(() {
+        filteredMembers = filteringMembers;
+        // displayedMembers = filteredMembers;
       });
   }
 }

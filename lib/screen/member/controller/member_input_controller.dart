@@ -1,24 +1,22 @@
+
 import 'package:form_validator/form_validators.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:web_test2/screen/member/controller/member_input_state.dart';
-import 'package:web_test2/screen/member/data/member_data_table.dart';
 import 'package:authentication_repository/src/members_repository.dart';
-import 'package:web_test2/screen/member/widget/member_search_form.dart';
 
 final memberInputProvider =
     StateNotifierProvider.autoDispose<MemberInputController, MemberInputState>(
-  (ref) => MemberInputController(ref.watch(memberRepositoryProvider), ref.watch(memberSearchFormStateProvider)),
+  (ref) => MemberInputController(ref.watch(memberRepositoryProvider), ref.watch(memberEditingProvider)),
 );
 
 class MemberInputController extends StateNotifier<MemberInputState> {
   final MemberRepository _memberRepository;
-  final MemberSearchFormState memberSearchFormState;
+  final MemberEditingProvider memberEditingProvider;
 
-  // final MembersTableState membersTableState;
-  
 
-  MemberInputController(this._memberRepository, this.memberSearchFormState)
+
+  MemberInputController(this._memberRepository, this.memberEditingProvider)
       : super(const MemberInputState());
 
   void onNameChange(String value) {
@@ -56,16 +54,8 @@ class MemberInputController extends StateNotifier<MemberInputState> {
         state.date,
       ]),
     );
-    // if (value.length == 13) {
-    //   bool isPhoneNumberDuplicate = await _memberRepository.checkPhoneNumber(value);
-    //   if (isPhoneNumberDuplicate) {
-    //     state = state.copyWith(
-    //       status: FormzStatus.submissionFailure,
-    //       errorMessage: '이미 등록된 전화번호입니다.',
-    //     );
-    //   }
-    // }
   }
+
 
   void resetAll() {
     const name = Name.pure();
@@ -83,12 +73,28 @@ class MemberInputController extends StateNotifier<MemberInputState> {
     );
   }
 
-  void addMember(Member member) async {
- 
+  void recall(Member member) {
+    var name = Name.dirty(member.displayName);
+    var phone = Phone.dirty(member.phoneNumber);
+    var date = Date.dirty(member.birthDay);
+    // final selectedMember = member;
+    state = state.copyWith(
+      name: name,
+      date: date,
+      phone: phone,
+      status: Formz.validate([
+        phone,
+        date,
+        name,
+      ]),
+    );
+
+  }
+
+  void addMember(Member member, MembersProvider membersProvider) async {
     if (!state.status.isValidated) return;
     state = state.copyWith(status: FormzStatus.submissionInProgress);
     try {
-      // Member member = Member.empty();
       Member newMember = member.copyWith(
         displayName: state.name.value,
         gender: member.gender,
@@ -99,17 +105,18 @@ class MemberInputController extends StateNotifier<MemberInputState> {
         referralID: member.referralID,
         accountLinkID: member.accountLinkID,
         memo: member.memo,
-        // status: member.status,
-        // referralCount: member.referralCount,
-        // firstDate: member.firstDate,
-        // expiryDate: member.expiryDate,
-        // totalFee: member.totalFee,
-        // totalAttendanceDays: member.totalAttendanceDays,
       );
       state = state.copyWith(status: FormzStatus.submissionSuccess);
-      await _memberRepository.addMember(newMember);
-      // await memberSearchFormState.fetchMembersData();
-      // await membersTableState.addMember(newMember);
+      resetAll();
+
+
+      if (memberEditingProvider.isEditing == true) {
+        await _memberRepository.updateMember(newMember);
+      } else {
+        await _memberRepository.addMember(newMember);
+      }
+      membersProvider.getMembers();
+
     } on MemberAddFailure catch (e) {
       state = state.copyWith(
           status: FormzStatus.submissionFailure, errorMessage: e.code);
