@@ -23,7 +23,7 @@ class _AppointmentInputFormState extends State<AppointmentInputForm> {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8), color: Colors.white),
-      width: 590,
+      width: 700,
       height: 800,
       child: Padding(
         padding: const EdgeInsets.only(right: 8, left: 8),

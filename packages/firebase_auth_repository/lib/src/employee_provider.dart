@@ -37,7 +37,7 @@ class EmployeeProvider extends StateNotifier<List<Employee>> {
 class SelectedPICIDProvider extends StateNotifier<String> {
   SelectedPICIDProvider(String initialValue) : super(initialValue);
 
-  void setSelectedRow(String newValue) {
+  void setSelectedPIC(String newValue) {
     state = newValue;
   }
 }

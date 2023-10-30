@@ -131,10 +131,10 @@ class CustomSearchDropdownFormField<T, U> extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<CustomSearchDropdownFormField<T, U>> createState() =>
-      _CustomSearchDropdownFormFieldState<T, U>();
+      CustomSearchDropdownFormFieldState<T, U>();
 }
 
-class _CustomSearchDropdownFormFieldState<T, U>
+class CustomSearchDropdownFormFieldState<T, U>
     extends ConsumerState<CustomSearchDropdownFormField<T, U>> {
 
   late GlobalKey actionKey;
@@ -178,20 +178,16 @@ class _CustomSearchDropdownFormFieldState<T, U>
   }
 
   OverlayEntry _showFloatingDropdown() {
-    // members = ref.watch(membersProvider);
-    // final selectedMember = ref.watch(selectedMemberProvider);
-    // final selectedMemberId = selectedMember.id;
-    // final selectedReferralId = ref.watch(selectedReferralIDProvider.notifier);
 
     _list = widget.list;
-    _displayedList = widget.idSelector == null ? _list :_list.where((e) => widget.idSelector!(e) != widget.exclusiveId).toList();
+    _displayedList = _list.where((e) => widget.idSelector!(e) != widget.exclusiveId).toList();
     _filteredList = _displayedList;
 
     return OverlayEntry(builder: (context) {
-      var setProvider = SelectedDropdownIDProvider(
-        initialId: widget.idSelector,
-        initialTitle: partTitle,
-      );
+      // var setProvider = SelectedDropdownIDProvider(
+      //   initialId: widget.idSelector,
+      //   initialTitle: partTitle,
+      // );
       final selectedDropdownData = ref.watch(selectedDropdownIDProvider.notifier);
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -231,7 +227,7 @@ class _CustomSearchDropdownFormFieldState<T, U>
                     },
                     itemCount: _filteredList.length,
                       itemBuilder: (BuildContext context, int index){
-                       var _part = _filteredList[index];
+                       var part = _filteredList[index];
                     return Material(
                       child: ListTile(
                         leading: Container(
@@ -249,28 +245,25 @@ class _CustomSearchDropdownFormFieldState<T, U>
                                 ),
                                 child: const Icon(Icons.person),
                               ),
-                              widget.showId == false ? SizedBox() : Center(child: Text(widget.idSelector!(_part).toString(),style: const TextStyle(color: PRIMARY_COLOR),)),
+                              widget.showId == false ? SizedBox() : Center(child: Text(widget.idSelector!(part).toString(),style: const TextStyle(color: PRIMARY_COLOR),)),
                             ],
                           ),
                         ),
-                        title: Text(widget.titleSelector(_part)),
-                        subtitle: Text(widget.subtitleSelector(_part),style: const TextStyle(fontSize: 9),),
+                        title: Text(widget.titleSelector(part)),
+                        subtitle: Text(widget.subtitleSelector(part),style: const TextStyle(fontSize: 9),),
                         onTap: (){
                           setState(() {
-                            selectedValue = widget.titleSelector(_part);
-                            print('??${selectedValue}');
-
-                            print('${widget.titleSelector(_part)}');
-                            selectedDropdownData.setValues(
-                              newId: widget.idSelector!(_part),
-                              newTitle: widget.titleSelector(_part),
+                            selectedValue = widget.titleSelector(part);
+                            print(widget.idSelector(part));
+                            selectedDropdownData.setModel(
+                              part, widget.idSelector(part)
                             );
-                            print(setProvider.title);
-                            floatingDropdown.remove();
-                            isDropdownOpened = false;
+                            print(selectedDropdownData.selectedId);
 
                           });
                           widget.onTap();
+                          floatingDropdown.remove();
+                          isDropdownOpened = false;
                         },
                       ),
                     );
@@ -349,40 +342,63 @@ class _CustomSearchDropdownFormFieldState<T, U>
   }
 }
 
-class DropdownData<T, U> {
-  final U? id;
-  final String title;
-
-  DropdownData({required this.id, required this.title});
-}
+// class DropdownData<T, U> {
+//   final U? id;
+//   final String title;
+//
+//   DropdownData({required this.id, required this.title});
+// }
 
 class SelectedDropdownIDProvider<T, U> extends ChangeNotifier {
-  U? id;
-  String title;
+  U selectedId;
+ T selectedModel;
 
-  SelectedDropdownIDProvider({U? initialId, required String initialTitle})
-      : id = initialId,
-        title = initialTitle;
+  SelectedDropdownIDProvider({required T initialModel, required U initialId})
+      :
+        selectedModel = initialModel,
+        selectedId = initialId;
 
-  DropdownData<T, U> getValues() {
-    return DropdownData<T, U>(
-      id: id,
-      title: title,
-    );
-  }
-
-  void setValues({U? newId, required String newTitle}) {
-    id = newId;
-    title = newTitle;
+  void setModel(T model, U id) {
+    selectedModel = model;
+    selectedId = id;
     notifyListeners(); // 상태가 변경됨을 알림
   }
 }
 
 final selectedDropdownIDProvider = ChangeNotifierProvider<SelectedDropdownIDProvider>((ref) {
   return SelectedDropdownIDProvider(
-    initialId: (T) => null , // 초기 ID 로직을 여기에 추가
-    initialTitle: '',
+    initialModel: (T) => null ,
+    initialId: (U) => null// 초기 ID 로직을 여기에 추가
   );
 });
+
+// class SelectedDropdownIDProvider<T, U> extends ChangeNotifier {
+//   U? id;
+//   String title;
+//
+//   SelectedDropdownIDProvider({U? initialId, required String initialTitle})
+//       : id = initialId,
+//         title = initialTitle;
+//
+//   DropdownData<T, U> getValues() {
+//     return DropdownData<T, U>(
+//       id: id,
+//       title: title,
+//     );
+//   }
+//
+//   void setValues({U? newId, required String newTitle}) {
+//     id = newId;
+//     title = newTitle;
+//     notifyListeners(); // 상태가 변경됨을 알림
+//   }
+// }
+//
+// final selectedDropdownIDProvider = ChangeNotifierProvider<SelectedDropdownIDProvider>((ref) {
+//   return SelectedDropdownIDProvider(
+//     initialId: (T) => null , // 초기 ID 로직을 여기에 추가
+//     initialTitle: '',
+//   );
+// });
 
 

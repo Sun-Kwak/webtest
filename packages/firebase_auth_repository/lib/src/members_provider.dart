@@ -75,6 +75,10 @@ class SelectedMemberIDProvider extends StateNotifier<int> {
   void setSelectedRow(int newValue) {
     state = newValue;
   }
+  notifyListeners() {
+    // TODO: implement notifyListeners
+    throw UnimplementedError();
+  }
 }
 
 final selectedMemberIdProvider =
@@ -165,3 +169,6 @@ final selectedReferralIDProvider =
   return SelectedReferralIDProvider(
       selectedReferralId: null, selectedReferralName: null);
 });
+//-----------------------------------------------------------------
+
+

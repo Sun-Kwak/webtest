@@ -42,16 +42,13 @@ class CustomTextOutputWidget extends StatelessWidget {
               ],
             )),
         SizedBox(
-          width: 3,
+          width: 10,
           height: height,
           child: Center(
             child: isRequired == true
                 ? const Text('*', style: TextStyle(color: Colors.redAccent))
                 : null,
           ),
-        ),
-        const SizedBox(
-          width: 8,
         ),
         Container(
           width:  textBoxWidth,
