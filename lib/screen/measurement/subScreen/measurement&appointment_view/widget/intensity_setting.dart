@@ -24,7 +24,7 @@ class IntensitySettingInputWidgetState extends State<IntensitySettingInputWidget
 
   @override
   Widget build(BuildContext context) {
-    double width = 100;
+    double width = 90;
     return Row(
       children: <Widget>[
         Row(
@@ -46,7 +46,7 @@ class IntensitySettingInputWidgetState extends State<IntensitySettingInputWidget
                 ],
               ),
             ),
-            SizedBox(width: 10),
+            // SizedBox(width: 10),
             SizedBox(
               width: width,
               child: Row(
@@ -64,7 +64,7 @@ class IntensitySettingInputWidgetState extends State<IntensitySettingInputWidget
                 ],
               ),
             ),
-            SizedBox(width: 10),
+            // SizedBox(width: 10),
             SizedBox(
               width: width,
               child: Row(

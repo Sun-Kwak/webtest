@@ -2,7 +2,8 @@ import 'package:custom_sliding_segmented_control/custom_sliding_segmented_contro
 import 'package:flutter/material.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/screen/empty_view.dart';
-import 'package:web_test2/screen/measurement/subScreen/appointment_test/appointment_test_viw.dart';
+import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/measurement&appointment_view.dart';
+import 'package:web_test2/screen/measurement/subScreen/report_view/report_view.dart';
 
 
 class MeasurementView extends StatefulWidget {
@@ -12,17 +13,29 @@ class MeasurementView extends StatefulWidget {
   State<MeasurementView> createState() => _MeasurementViewState();
 }
 
+
+
 class _MeasurementViewState extends State<MeasurementView> {
+  void _onPressed(){
+    setState(() {
+      groupValue =1;
+    });
+  }
   final ScrollController scrollController = ScrollController();
   int groupValue = 0;
-  final List<Widget> _subContents = [
-    const AppointmentTestForm(),
-    const EmptyView(),
-    const EmptyView(),
-  ];
+
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> subContents = [
+      MeasurementAndAppointmentView(
+        onPressed: (){
+          _onPressed();
+        },
+      ),
+      const ReportView(),
+      const EmptyView(),
+    ];
 
     return Scrollbar(
       thumbVisibility: true,
@@ -94,7 +107,7 @@ class _MeasurementViewState extends State<MeasurementView> {
                 ),
               ),
               SizedBox(height: 10,),
-              _subContents[groupValue],
+              subContents[groupValue],
             ],
           ),
         ),

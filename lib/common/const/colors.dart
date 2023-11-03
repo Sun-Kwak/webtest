@@ -23,3 +23,7 @@ const CUSTOM_RED = Color(0xFFFF8181);
 const CUSTOM_BLUE = Color(0xFF81B3FF);
 
 const CUSTOM_BLACK = Color(0xFF494747);
+
+const CUSTOM_YELLOW = Color(0xFFF7FCAC);
+
+const CUSTOM_GREEN = Color(0xFFB8FFAD);

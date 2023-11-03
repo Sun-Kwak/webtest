@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:lottie/lottie.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/common/view/root_tab.dart';
 import 'package:authentication_repository/src/signedIn_user_provider.dart';
@@ -14,7 +15,7 @@ class SplashScreen extends ConsumerWidget {
     final signInUserState = ref.watch(signedInUserProvider);
 
     return signInUserState.when(
-      loading: ()=> LoadingAnimationWidget.fallingDot(color: PRIMARY_COLOR, size: 50),
+      loading: ()=> Lottie.asset('asset/lottie/initial.json',height: 200,width: 200),
       error: (error, stackTrace) => Text(error.toString()),
       data:(value) {
         if(value != null && value.level < 5) {

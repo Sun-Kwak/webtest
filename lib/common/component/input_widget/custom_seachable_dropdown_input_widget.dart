@@ -1,6 +1,7 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:web_test2/common/component/size_fade_switcher.dart';
 import 'package:web_test2/common/const/colors.dart';
 
 class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
@@ -9,6 +10,7 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
   final U? exclusiveId;
   final Color? color;
   final bool? showId;
+  final String? errorText;
   // final ValueChanged<String?>? onChanged;
 
   final double? height;
@@ -23,6 +25,7 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
   final String Function(T) subtitleSelector;
 
   const CustomSearchDropdownWidget({
+    required this.errorText,
     this.showId = false,
     this.color,
     required this.titleSelector,
@@ -68,21 +71,37 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
                 : null,
           ),
         ),
-        SizedBox(
-          width: textBoxWidth,
-          height: height,
-          child: CustomSearchDropdownFormField(
-            selectedValue: selectedValue,
-            list: list,
-            hintText: hintText,
-            onTap: (){onTap();},
-            idSelector: idSelector,
-            titleSelector: titleSelector,
-            subtitleSelector: subtitleSelector,
-            color: color,
-            showId: showId,
-            // onChanged: onChanged,
-          ),
+        Column(
+          children: [
+            SizedBox(
+              width: textBoxWidth,
+              height: height,
+              child: CustomSearchDropdownFormField(
+                selectedValue: selectedValue,
+                list: list,
+                hintText: hintText,
+                onTap: (){onTap();},
+                idSelector: idSelector,
+                titleSelector: titleSelector,
+                subtitleSelector: subtitleSelector,
+                color: color,
+                showId: showId,
+                // onChanged: onChanged,
+              ),
+            ),
+            SizeFadeSwitcher(
+              child: errorText != null ? Padding(
+                padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
+                child: Text(
+                  errorText!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                  ),
+                ),
+              ): const SizedBox.shrink(),
+            )
+
+          ],
         ),
       ],
     );
@@ -91,7 +110,6 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
 
 class CustomSearchDropdownFormField<T, U> extends ConsumerStatefulWidget {
   final String? hintText;
-  final String? errorText;
   final Color? color;
   final bool? showId;
 
@@ -124,7 +142,6 @@ class CustomSearchDropdownFormField<T, U> extends ConsumerStatefulWidget {
     this.onFieldSubmitted,
     // required this.onChanged,
     this.hintText,
-    this.errorText,
     super.key,
   });
 
@@ -254,12 +271,9 @@ class CustomSearchDropdownFormFieldState<T, U>
                         onTap: (){
                           setState(() {
                             selectedValue = widget.titleSelector(part);
-                            print(widget.idSelector(part));
-                            selectedDropdownData.setModel(
-                              part, widget.idSelector(part)
+                            selectedDropdownData.setData(
+                              widget.titleSelector(part), widget.idSelector(part)
                             );
-                            print(selectedDropdownData.selectedId);
-
                           });
                           widget.onTap();
                           floatingDropdown.remove();
@@ -349,17 +363,17 @@ class CustomSearchDropdownFormFieldState<T, U>
 //   DropdownData({required this.id, required this.title});
 // }
 
-class SelectedDropdownIDProvider<T, U> extends ChangeNotifier {
+class SelectedDropdownIDProvider<U> extends ChangeNotifier {
   U selectedId;
- T selectedModel;
+ String? selectedTitle;
 
-  SelectedDropdownIDProvider({required T initialModel, required U initialId})
+  SelectedDropdownIDProvider({required String? initialTitle, required U initialId})
       :
-        selectedModel = initialModel,
+        selectedTitle = initialTitle,
         selectedId = initialId;
 
-  void setModel(T model, U id) {
-    selectedModel = model;
+  void setData(String? title, U id) {
+    selectedTitle = title;
     selectedId = id;
     notifyListeners(); // 상태가 변경됨을 알림
   }
@@ -367,7 +381,7 @@ class SelectedDropdownIDProvider<T, U> extends ChangeNotifier {
 
 final selectedDropdownIDProvider = ChangeNotifierProvider<SelectedDropdownIDProvider>((ref) {
   return SelectedDropdownIDProvider(
-    initialModel: (T) => null ,
+      initialTitle: null,
     initialId: (U) => null// 초기 ID 로직을 여기에 추가
   );
 });

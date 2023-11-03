@@ -5,20 +5,31 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_validator/form_validators.dart';
+import 'package:web_test2/common/component/custom_message_screen.dart';
 import 'package:web_test2/common/component/custom_refresh_icon.dart';
+import 'package:web_test2/common/component/error_dialog.dart';
 import 'package:web_test2/common/component/input_widget/custom_dateSelection_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_number_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_seachable_dropdown_input_widget.dart';
+import 'package:web_test2/common/component/input_widget/custom_text_input_widget.dart';
 import 'package:web_test2/common/component/output_widget/custom_text_output_widget.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/common/utils/time_utils.dart';
 import 'package:web_test2/common/utils/vo2_max_utils.dart';
-import 'package:web_test2/screen/measurement/subScreen/appointment_test/provider/appointment_provider.dart';
-import 'package:web_test2/screen/measurement/subScreen/appointment_test/widget/intensity_setting.dart';
+import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
+import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/measurement_input_controller.dart';
+import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/measurement_input_state.dart';
+import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/widget/intensity_setting.dart';
 import 'package:web_test2/screen/member/controller/member_input_controller.dart';
 
 class MeasurementInputForm extends ConsumerStatefulWidget {
+  final Measurement measurement;
+  final VoidCallback onSavePressed;
+  final VoidCallback onRefreshPressed;
   const MeasurementInputForm({
+    required this.onSavePressed,
+    required this.onRefreshPressed,
+    required this.measurement,
     super.key,
   });
 
@@ -28,17 +39,19 @@ class MeasurementInputForm extends ConsumerStatefulWidget {
 }
 
 class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
+  late Measurement updatingMeasurement;
+  TextEditingController nameController = TextEditingController();
   DateTime today = DateTime.now();
   DateTime? selectedDate;
-  late List<Employee> employees;
+  String formattedDate ="${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
   String? searchSelectedValue;
   String? selectedMember;
   String? selectedValue = 'Karvonen';
   double userHeight = 0;
   double userWeight = 0;
   double? bMI;
-  String exhaustionTime ='';
-  int? exhaustionSeconds =0;
+  String exhaustionTime = '';
+  int? exhaustionSeconds = 0;
   int? bpmMax = 0;
   int? bpm1m = 0;
   int? bpm2m = 0;
@@ -48,7 +61,12 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
   int? hrr3 = 0;
   double? Vo2Max = 0;
 
+  @override
+  void initState() {
 
+    super.initState();
+    updatingMeasurement = widget.measurement;
+  }
 
 
   Future<void> _selectDate(BuildContext context) async {
@@ -64,9 +82,10 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
     );
 
     if (pickedDate != null) {
-      // String formattedDate = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+
       setState(() {
         selectedDate = pickedDate;
+        formattedDate = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
       });
       //   // memberInputController.onDateChange(formattedDate);
       // }  else{
@@ -110,10 +129,6 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
       });
     }
   }
-
-
-
-
 
   void _onBpm1mChanged(String value) {
     try {
@@ -179,21 +194,25 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
       bMI = double.parse(bmi.toStringAsFixed(2));
     });
   }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    employees = [];
+  void resetFields() {
+    final selectedPICController = ref.watch(selectedPICIdProvider.notifier);
+    final String signedInUser = ref.watch(signedInUserProvider).value!.id;
+    selectedPICController.setSelectedPIC(signedInUser);
+    final selectedMemberIdController =
+    ref.watch(selectedMemberIdProvider.notifier);
+    selectedMemberIdController.setSelectedRow(0);
+    selectedDate = null;
   }
 
   @override
   Widget build(BuildContext context) {
+    final measurementInputController = ref.read(measurementInputProvider.notifier);
     final employees = ref.watch(employeeProvider);
     final members = ref.watch(membersProvider);
     final selectedPIC = ref.watch(selectedPICProvider);
     final memberFromInput = ref.watch(selectedMemberProvider);
-    final selectedMemberIdController = ref.watch(selectedMemberIdProvider.notifier);
+    final selectedMemberIdController =
+        ref.watch(selectedMemberIdProvider.notifier);
     final selectedMemberIDController =
         ref.watch(selectedMemberIdProvider.notifier);
     final selectedPICController = ref.watch(selectedPICIdProvider.notifier);
@@ -211,27 +230,27 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
       age--;
     }
     double? karMax = (220 - age) as double?;
-    double kar90 = karMax! * 0.9;
-    double tanMax = 208 - (0.7*age);
-    double tan90 = tanMax * 0.9;
-    double bpm =0;
+    double kar90 = double.parse((karMax! * 0.9).toStringAsFixed(2));
+    double tanMax = 208 - (0.7 * age);
+    double tan90 = double.parse((tanMax * 0.9).toStringAsFixed(2));
+    int bpm = 0;
     double intensityMax = 0;
-    // ref.listen<MemberInputState>(
-    //   memberInputProvider,
-    //       (previous, current) {
-    //     if (current.status.isSubmissionInProgress) {
-    //       LoadingSheet.show(context);
-    //     } else if (current.status.isSubmissionFailure) {
-    //       CustomMessageScreen.showMessage(context, '${current.errorMessage}',
-    //           Colors.red, Icons.dangerous_outlined);
-    //       // ErrorDialog.show(context, '${current.errorMessage}');
-    //     } else if (current.status.isSubmissionSuccess) {
-    //       Navigator.of(context).pop();
-    //       CustomMessageScreen.showMessage(
-    //           context, '저장', Colors.white, Icons.check);
-    //     }
-    //   },
-    // );
+    ref.listen<MeasurementInputState>(
+      measurementInputProvider,
+          (previous, current) {
+        if (current.status.isSubmissionInProgress) {
+          LoadingSheet.show(context);
+        } else if (current.status.isSubmissionFailure) {
+          CustomMessageScreen.showMessage(context, '${current.errorMessage}',
+              Colors.red, Icons.dangerous_outlined);
+          // ErrorDialog.show(context, '${current.errorMessage}');
+        } else if (current.status.isSubmissionSuccess) {
+          Navigator.of(context).pop();
+          CustomMessageScreen.showMessage(
+              context, '저장', Colors.white, Icons.check);
+        }
+      },
+    );
     final screenWidth = MediaQuery.of(context).size.width;
     final double widgetGap = screenWidth >= 650 ? 20 : 8;
     const double textBoxWidth = 170;
@@ -260,7 +279,8 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 ),
               ),
               CustomRefreshIcon(onPressed: () {
-                // widget.inputButtonsOnPressed();
+                resetFields();
+                widget.onRefreshPressed();
               }),
             ],
           ),
@@ -279,31 +299,27 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               // SizedBox(
               //   width: widgetGap,
               // ),
-
-              CustomSearchDropdownWidget(
-                showId: true,
-                labelBoxWidth: labelBoxWidth,
-                selectedValue: memberFromInput.displayName,
-                // selectedValue: selectedDropdownData.title,
-                idSelector: (member) => member.id,
-                label: '회원',
-                textBoxWidth: textBoxWidth,
+              _NameField(
+                controller: nameController,
                 list: members,
+                selectedValue: memberFromInput.displayName,
+                labelBoxWidth: labelBoxWidth,
+                textBoxWidth: textBoxWidth,
+                idSelector: (member) => member.id,
                 titleSelector: (member) => member.displayName,
                 subtitleSelector: (member) => member.phoneNumber,
                 onTap: () {
-                  selectedMemberIdController.setSelectedRow(selectedDropdownData.selectedId);
+                  selectedMemberIdController
+                      .setSelectedRow(selectedDropdownData.selectedId);
                   setState(() {
                     selectedValue = 'Karvonen';
-                      intensityMax = karMax;
-                    intensityController.setSelectedIntensityValue(intensityMax, bpm);
+                    intensityMax = karMax;
+                    intensityController.setSelectedIntensityValue(
+                        intensityMax, bpm);
+                    measurementInputController.onNameChange(selectedDropdownData.selectedTitle);
                   });
-
                 },
-                color: CUSTOM_BLUE.withOpacity(0.1),
-                // exclusiveId: 0,
               ),
-
               SizedBox(
                 width: labelBoxWidth + textBoxWidth + (widgetGap * 2) + 10,
               ),
@@ -317,9 +333,11 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 titleSelector: (employee) => employee.displayName,
                 subtitleSelector: (employee) => employee.email,
                 onTap: () {
-                  selectedPICController.setSelectedPIC(selectedDropdownData.selectedId);
+                  selectedPICController
+                      .setSelectedPIC(selectedDropdownData.selectedId);
                 },
                 color: CUSTOM_BLUE.withOpacity(0.1),
+                errorText: null,
                 // exclusiveId: 0,
               ),
               SizedBox(
@@ -429,8 +447,15 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                isDouble: true,
                 onChanged: (v) {
                   _onHeightChanged(v);
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                      userHeight: double.parse(v)
+                    );
+                  });
+                  print(updatingMeasurement.userHeight);
                 },
                 label: '신장',
                 textBoxWidth: textBoxWidth,
@@ -441,8 +466,16 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                isDouble: true,
                 onChanged: (v) {
                   _onWeightChanged(v);
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        userWeight: double.parse(v)
+                    );
+                  });
+                  print(updatingMeasurement.userHeight);
+                  print(updatingMeasurement.userWeight);
                 },
                 label: '체중',
                 textBoxWidth: textBoxWidth,
@@ -469,7 +502,14 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                isDouble: true,
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        smm: double.parse(v)
+                    );
+                  });
+                },
                 label: '골근격량',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -479,7 +519,14 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                isDouble: true,
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        bfm: double.parse(v)
+                    );
+                  });
+                },
                 label: '체지방량',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -489,7 +536,14 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                isDouble: true,
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        bfp: double.parse(v)
+                    );
+                  });
+                },
                 label: '체지방률',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -500,7 +554,12 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               ),
               CustomNumberInputWidget(
                 onChanged: (v) {
-                  bpm = double.parse(v);
+                  bpm = int.parse(v);
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        bpm: int.parse(v)
+                    );
+                  });
                 },
                 label: '안정시\n심박수',
                 textBoxWidth: textBoxWidth,
@@ -539,7 +598,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage0: int.parse(v)
+                    );
+                  });
+                },
                 label: '0 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -549,7 +614,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage1: int.parse(v)
+                    );
+                  });
+                },
                 label: '1 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -559,7 +630,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage2: int.parse(v)
+                    );
+                  });
+                },
                 label: '2 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -576,7 +653,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage3: int.parse(v)
+                    );
+                  });
+                },
                 label: '3 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -586,7 +669,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage4: int.parse(v)
+                    );
+                  });
+                },
                 label: '4 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -596,7 +685,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage5: int.parse(v)
+                    );
+                  });
+                },
                 label: '5 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -613,7 +708,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage6: int.parse(v)
+                    );
+                  });
+                },
                 label: '6 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -623,7 +724,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage7: int.parse(v)
+                    );
+                  });
+                },
                 label: '7 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -633,7 +740,13 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
-                onChanged: (v) {},
+                onChanged: (v) {
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        stage8: int.parse(v)
+                    );
+                  });
+                },
                 label: '8 Stage',
                 textBoxWidth: textBoxWidth,
                 labelBoxWidth: labelBoxWidth,
@@ -673,6 +786,11 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomNumberInputWidget(
                 onChanged: (v) {
                   _onBpmMaxChanged(v);
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        bpmMax: int.parse(v)
+                    );
+                  });
                 },
                 label: '최고\n심박수',
                 textBoxWidth: textBoxWidth,
@@ -685,6 +803,11 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomNumberInputWidget(
                 onChanged: (v) {
                   _onBpm1mChanged(v);
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        bpm1m: int.parse(v)
+                    );
+                  });
                 },
                 label: '1분후\n심박수',
                 textBoxWidth: textBoxWidth,
@@ -697,6 +820,11 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomNumberInputWidget(
                 onChanged: (v) {
                   _onBpm2mChanged(v);
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        bpm2m: int.parse(v)
+                    );
+                  });
                 },
                 label: '2분후\n심박수',
                 textBoxWidth: textBoxWidth,
@@ -709,6 +837,11 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomNumberInputWidget(
                 onChanged: (v) {
                   _onBpm3mChanged(v);
+                  setState(() {
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        bpm3m: int.parse(v)
+                    );
+                  });
                 },
                 label: '3분후\n심박수',
                 textBoxWidth: textBoxWidth,
@@ -795,7 +928,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id == 0 ? '' :kar90.toString(),
+                outputText: memberFromInput.id == 0 ? '' : kar90.toString(),
                 label: '카르보넨\90%',
               ),
               SizedBox(
@@ -804,7 +937,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id == 0 ? '' :tanMax.toString(),
+                outputText: memberFromInput.id == 0 ? '' : tanMax.toString(),
                 label: '다나카\n최대',
               ),
               SizedBox(
@@ -813,7 +946,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id == 0 ? '' :tan90.toString(),
+                outputText: memberFromInput.id == 0 ? '' : tan90.toString(),
                 label: '다나카\90%',
               ),
             ],
@@ -850,11 +983,15 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomNumberInputWidget(
                 onChanged: (v) {
                   String formattedTime = secondsToMinutes(v);
-                  double calculatedValue = calculateVo2Max(memberFromInput.gender, v);
+                  double calculatedValue =
+                      calculateVo2Max(memberFromInput.gender, v);
                   setState(() {
                     Vo2Max = calculatedValue;
                     exhaustionSeconds = int.parse(v);
                     exhaustionTime = formattedTime;
+                    updatingMeasurement = updatingMeasurement.copyWith(
+                        exhaustionSeconds: int.parse(v)
+                    );
                   });
                 },
                 label: '탈진시간',
@@ -903,14 +1040,15 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 onChanged: (v) {
                   setState(() {
                     selectedValue = v;
-                    if(v == 'Karvonen') {
+                    if (v == 'Karvonen') {
                       intensityMax = karMax;
-                    } else if(v == 'Tanaka') {
+                    } else if (v == 'Tanaka') {
                       intensityMax = tanMax;
                     } else {
                       intensityMax = bpmMax as double;
                     }
-                    intensityController.setSelectedIntensityValue(intensityMax, bpm);
+                    intensityController.setSelectedIntensityValue(
+                        intensityMax, bpm);
                   });
                 },
                 selectedValue: selectedValue,
@@ -931,7 +1069,9 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id ==0 ? '': intensityState.intensityState.percent40.toString(),
+                outputText: memberFromInput.id == 0
+                    ? ''
+                    : intensityState.intensityState.percent40.toString(),
                 label: '40%',
               ),
               SizedBox(
@@ -940,7 +1080,9 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id ==0 ? '': intensityState.intensityState.percent50.toString(),
+                outputText: memberFromInput.id == 0
+                    ? ''
+                    : intensityState.intensityState.percent50.toString(),
                 label: '50%',
               ),
               SizedBox(
@@ -949,7 +1091,9 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id ==0 ? '': intensityState.intensityState.percent60.toString(),
+                outputText: memberFromInput.id == 0
+                    ? ''
+                    : intensityState.intensityState.percent60.toString(),
                 label: '60%',
               ),
             ],
@@ -965,7 +1109,9 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id ==0 ? '': intensityState.intensityState.percent70.toString(),
+                outputText: memberFromInput.id == 0
+                    ? ''
+                    : intensityState.intensityState.percent70.toString(),
                 label: '70%',
               ),
               SizedBox(
@@ -974,7 +1120,9 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id ==0 ? '': intensityState.intensityState.percent80.toString(),
+                outputText: memberFromInput.id == 0
+                    ? ''
+                    : intensityState.intensityState.percent80.toString(),
                 label: '80%',
               ),
               SizedBox(
@@ -983,7 +1131,9 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id ==0 ? '': intensityState.intensityState.percent90.toString(),
+                outputText: memberFromInput.id == 0
+                    ? ''
+                    : intensityState.intensityState.percent90.toString(),
                 label: '90%',
               ),
               SizedBox(
@@ -992,7 +1142,9 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
-                outputText: memberFromInput.id ==0 ? '': intensityState.intensityState.percent100.toString(),
+                outputText: memberFromInput.id == 0
+                    ? ''
+                    : intensityState.intensityState.percent100.toString(),
                 label: '100%',
               ),
             ],
@@ -1002,11 +1154,14 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               child: SizedBox(
                 width: 100,
                 child: _AddMeasurementButton(
-                  onPressed: () {
-                    intensityController.setSelectedIntensityValue(100, 20);
-                    print(intensityState.intensityState.percent40);
+                  onPressed: (){
+                    // resetFields();
+                    widget.onSavePressed();
                   },
-                  // member: member,
+                  measurement: updatingMeasurement,
+                  memberId: memberFromInput.id,
+                  PICId: selectedPIC.id,
+                  date: formattedDate,
                 ),
               ),
             ),
@@ -1020,44 +1175,103 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
 //----------------------------------------------------------------------------
 class _AddMeasurementButton extends ConsumerWidget {
   final VoidCallback onPressed;
+  final Measurement measurement;
+  final int memberId;
+  final String PICId;
+  final String date;
 
-  // final Member member;
 
   const _AddMeasurementButton({
     required this.onPressed,
-    // required this.member,
+    required this.date,
+    required this.measurement,
+    required this.memberId,
+    required this.PICId,
+
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final memberInputState = ref.watch(memberInputProvider);
-    final bool isValidated = memberInputState.status.isValidated;
-    final memberInputController = ref.read(memberInputProvider.notifier);
-    final membersController = ref.read(membersProvider.notifier);
+
+    final measurementInputState = ref.watch(measurementInputProvider);
+    final bool isValidated = measurementInputState.status.isValidated;
+    final measurementInputController = ref.read(measurementInputProvider.notifier);
 
     return SizedBox(
       width: 100,
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: isValidated
+            ? () {
+
+          measurementInputController.addMeasurement(measurement, memberId, PICId,date);
           onPressed();
+        }
+            : () {
+          CustomMessageScreen.showMessage(
+              context, '필수값 확인', Colors.amber, Icons.info_outline);
         },
-        // isValidated
-        //     ? () {
-        //
-        //         // memberInputController.addMember(member, membersController);
-        //         onPressed();
-        //       }
-        //     : () {
-        //         CustomMessageScreen.showMessage(
-        //             context, '필수값 확인', Colors.amber, Icons.info_outline);
-        //       },
         style: ElevatedButton.styleFrom(
           backgroundColor: PRIMARY_COLOR,
           padding: EdgeInsets.zero,
         ),
         child: const Text('등록'),
       ),
+    );
+  }
+}
+
+class _NameField<T, U> extends ConsumerWidget {
+  // final FocusNode nameFieldFocusNode;
+  // final FocusNode onFieldSubmitted;
+  final double labelBoxWidth;
+  final double textBoxWidth;
+  final TextEditingController controller;
+  final GestureTapCallback onTap;
+  final String selectedValue;
+  final U Function(T) idSelector;
+  final String Function(T) titleSelector;
+  final String Function(T) subtitleSelector;
+  final List<T> list;
+
+  const _NameField({
+    required this.list,
+    required this.idSelector,
+    required this.titleSelector,
+    required this.subtitleSelector,
+    required this.selectedValue,
+    required this.onTap,
+    required this.labelBoxWidth,
+    required this.textBoxWidth,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final measurementInputState = ref.watch(measurementInputProvider);
+    final showError = measurementInputState.name.invalid;
+    final measurementInputController =
+        ref.read(measurementInputProvider.notifier);
+
+    return CustomSearchDropdownWidget(
+      showId: true,
+      labelBoxWidth: labelBoxWidth,
+      selectedValue: selectedValue,
+      idSelector: idSelector,
+      label: '회원',
+      textBoxWidth: textBoxWidth,
+      list: list,
+      titleSelector: titleSelector,
+      subtitleSelector: subtitleSelector,
+      onTap: () {
+        (name) => measurementInputController.onNameChange(name);
+        onTap();
+      },
+      color: CUSTOM_BLUE.withOpacity(0.1),
+      errorText: showError
+          ? Name.showNameErrorMessage(measurementInputState.name.error)
+          : null,
+      // exclusiveId: 0,
     );
   }
 }

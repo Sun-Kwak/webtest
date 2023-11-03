@@ -71,6 +71,10 @@ dependencies:
   syncfusion_flutter_sliders: ^23.1.42
   syncfusion_flutter_calendar: ^23.1.42
   firebase_auth: ^4.12.0
+  lottie: ^2.2.0
+  flutter_config: ^2.0.2
+  flutter_dotenv: ^5.1.0
+  syncfusion_flutter_gauges: ^23.1.43
 
 
 dev_dependencies:
@@ -107,6 +111,8 @@ flutter:
     - asset/LAVIDA_LOGO.svg
     - asset/LAVIDA_LOGO_ORIGIN.svg
     - asset/excel_icon.png
+    - asset/lottie/
+    - env
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

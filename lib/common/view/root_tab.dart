@@ -50,6 +50,7 @@ class _RootTabState extends ConsumerState<RootTab>
   // }
   final List<Widget> _mainContents = [
      const MembersView(),
+     // const MeasurementView(),
      const ContractView(),
      const CourseView(),
      const MeasurementView(),

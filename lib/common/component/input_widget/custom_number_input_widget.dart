@@ -14,8 +14,10 @@ class CustomNumberInputWidget extends StatelessWidget {
   final double? textBoxWidth;
   final TextEditingController? controller;
   final String? errorText;
+  final bool? isDouble;
 
   const CustomNumberInputWidget({
+    this.isDouble = false,
     this.errorText,
     this.controller,
     this.labelBoxWidth = 50,
@@ -66,8 +68,16 @@ class CustomNumberInputWidget extends StatelessWidget {
               onChanged: onChanged,
               errorText: errorText,
               keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+              inputFormatters: isDouble == true
+                  ? <TextInputFormatter>[
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'^\d+\.?\d{0,2}'),
+                ),
+              ]
+                  : <TextInputFormatter>[
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'[0-9]'),
+                ),
               ],
             ),
           ],
