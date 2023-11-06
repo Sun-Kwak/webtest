@@ -26,8 +26,6 @@ class _MeasurementAndAppointmentViewState
 
   @override
   Widget build(BuildContext context) {
-    final selectedMeasurementController =
-        ref.watch(selectedMeasurementIdProvider.notifier);
     final measurement = ref.watch(selectedMeasurementProvider);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,12 +34,10 @@ class _MeasurementAndAppointmentViewState
           key: _key,
           measurement: measurement,
           onSavePressed: () {
-            selectedMeasurementController.setSelectedRow(null);
             _onPressed();
             widget.onPressed();
           },
           onRefreshPressed: () {
-            selectedMeasurementController.setSelectedRow(null);
             _onPressed();
           },
         ),

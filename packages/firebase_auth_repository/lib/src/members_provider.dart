@@ -87,7 +87,7 @@ final selectedMemberIdProvider =
 });
 //------------------------------------------------------------------------------
 final selectedMemberProvider = Provider<Member>((ref) {
-  final membersState = ref.watch(membersProvider);
+  final membersState = ref.watch(filteredMembersProvider);
   final selectedID = ref.watch(selectedMemberIdProvider);
   Member selectedMember;
   if (selectedID == 0 || membersState.isEmpty) {
@@ -151,24 +151,24 @@ final monthlyCountProvider = Provider<List<MonthlyMemberModel>>(
 
 //---------------------------------------------------------------------------
 
-class SelectedReferralIDProvider extends ChangeNotifier {
-  int? selectedReferralId;
-  String? selectedReferralName;
-
-  SelectedReferralIDProvider(
-      {required this.selectedReferralId, required this.selectedReferralName});
-
-  void setSelectedReferralID(int? newId, String? newValue) {
-    selectedReferralId = newId;
-    selectedReferralName = newValue;
-  }
-}
-
-final selectedReferralIDProvider =
-    ChangeNotifierProvider<SelectedReferralIDProvider>((ref) {
-  return SelectedReferralIDProvider(
-      selectedReferralId: null, selectedReferralName: null);
-});
+// class SelectedReferralIDProvider extends ChangeNotifier {
+//   int? selectedReferralId;
+//   String? selectedReferralName;
+//
+//   SelectedReferralIDProvider(
+//       {required this.selectedReferralId, required this.selectedReferralName});
+//
+//   void setSelectedReferralID(int? newId, String? newValue) {
+//     selectedReferralId = newId;
+//     selectedReferralName = newValue;
+//   }
+// }
+//
+// final selectedReferralIDProvider =
+//     ChangeNotifierProvider<SelectedReferralIDProvider>((ref) {
+//   return SelectedReferralIDProvider(
+//       selectedReferralId: null, selectedReferralName: null);
+// });
 //-----------------------------------------------------------------
 
 

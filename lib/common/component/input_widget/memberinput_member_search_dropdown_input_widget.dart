@@ -141,7 +141,7 @@ class _CustomSearchDropdownFormFieldState
     members = ref.watch(membersProvider);
     final selectedMember = ref.watch(selectedMemberProvider);
     final selectedMemberId = selectedMember.id;
-    final selectedReferralId = ref.watch(selectedReferralIDProvider.notifier);
+    // final selectedReferralId = ref.watch(selectedReferralIDProvider.notifier);
     displayedMembers = members.where((member) => member.id != selectedMemberId).toList();;
     filteredMembers = displayedMembers;
 
@@ -210,7 +210,7 @@ class _CustomSearchDropdownFormFieldState
                         onTap: (){
                           setState(() {
                             selectedValue = member.displayName;
-                            selectedReferralId.setSelectedReferralID(member.id, member.displayName);
+                            // selectedReferralId.setSelectedReferralID(member.id, member.displayName);
                             floatingDropdown.remove();
                             isDropdownOpened = false;
                           });

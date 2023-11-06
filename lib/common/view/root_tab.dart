@@ -48,15 +48,16 @@ class _RootTabState extends ConsumerState<RootTab>
       });
     }
   // }
-  final List<Widget> _mainContents = [
-     const MembersView(),
-     // const MeasurementView(),
-     const ContractView(),
-     const CourseView(),
-     const MeasurementView(),
-     const AttendanceCheckView(),
-     const SettingsView(),
+  final List<Widget> mainContents = [
+    const MembersView(),
+    // const MeasurementView(),
+    const ContractView(),
+    const CourseView(),
+    const MeasurementView(),
+    const AttendanceCheckView(),
+    const SettingsView(),
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -265,7 +266,7 @@ class _RootTabState extends ConsumerState<RootTab>
                 Expanded(
                     child: Padding(
                   padding: screenWidth>640 ? const EdgeInsets.only(left: 10, top: 13,right: 10) : const EdgeInsets.only(left: 10, top: 3,right: 10) ,
-                  child: _mainContents[selectedIndex],
+                  child: mainContents[selectedIndex],
                 )),
               ],
             ),

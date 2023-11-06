@@ -6,6 +6,13 @@ class CourseView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EmptyView();
+    return Column(
+      children: [
+        Container(
+          width: 100,
+          height: 100,
+        ),
+      ],
+    );
   }
 }

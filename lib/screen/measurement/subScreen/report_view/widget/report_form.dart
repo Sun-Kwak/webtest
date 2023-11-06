@@ -6,6 +6,7 @@ import 'package:lottie/lottie.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:web_test2/common/const/colors.dart';
+import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
 
 class ReportForm extends ConsumerStatefulWidget {
   const ReportForm({super.key});
@@ -17,8 +18,7 @@ class ReportForm extends ConsumerStatefulWidget {
 class _ReportFormState extends ConsumerState<ReportForm> {
   @override
   Widget build(BuildContext context) {
-    final selectedMemberIdController =
-        ref.watch(selectedMemberIdProvider.notifier);
+
     final selectedMemberId = ref.watch(selectedMemberIdProvider);
     return Container(
         decoration: BoxDecoration(
@@ -29,7 +29,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         height: 800,
         child: selectedMemberId == 0
             ? Center(
-                child: Text('선택 된 측정데이터가 없습니다.'),
+                child: Text('선택 된 고객이 없습니다.'),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -48,16 +48,33 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   }
 
   Widget leftSide() {
-    DateTime today = DateTime.now();
+    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
+    final measurementCalculateState = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
     final selectedMember = ref.watch(selectedMemberProvider);
-    DateTime birthDate = selectedMember.id != 0
-        ? DateFormat('yyyy-MM-dd').parse(selectedMember.birthDay)
-        : DateTime.now();
-    int age = today.year - birthDate.year;
-    if (today.month < birthDate.month ||
-        (today.month == birthDate.month && today.day < birthDate.day)) {
-      age--;
-    }
+    double? userHeight = selectedMeasurementState.userHeight ?? 0;
+    double? userWeight = selectedMeasurementState.userWeight ?? 0;
+    // double? heightInMeter = userHeight != 0 ? userHeight/ 100 : 0;
+    // double? bmi = heightInMeter != 0 ? userWeight / (heightInMeter * heightInMeter) : null;
+    String?  bMI = measurementCalculateState.bmi.toString();
+    String? age = measurementCalculateState.age.toString();
+    // DateTime today = DateTime.now();
+
+    // DateTime birthDate = selectedMember.id != 0
+    //     ? DateFormat('yyyy-MM-dd').parse(selectedMember.birthDay)
+    //     : DateTime.now();
+    // int age = today.year - birthDate.year;
+    // if (today.month < birthDate.month ||
+    //     (today.month == birthDate.month && today.day < birthDate.day)) {
+    //   age--;
+    // }
+    final intensityMax = ref.watch(intensitySelectionProvider).intensityState.intensityMax;
+    String zone5 = '${(intensityMax * 0.9).toStringAsFixed(0)}-${(intensityMax).toStringAsFixed(0)}';
+    String zone4 = '${(intensityMax * 0.8).toStringAsFixed(0)}-${(intensityMax * 0.9).toStringAsFixed(0)}';
+    String zone3 = '${(intensityMax * 0.7).toStringAsFixed(0)}-${(intensityMax * 0.8).toStringAsFixed(0)}';
+    String zone2 = '${(intensityMax * 0.6).toStringAsFixed(0)}-${(intensityMax * 0.7).toStringAsFixed(0)}';
+    String zone1 = '${(intensityMax * 0.5).toStringAsFixed(0)}-${(intensityMax * 0.6).toStringAsFixed(0)}';
+
+
     return SizedBox(
       width: 690,
       child: Column(
@@ -85,9 +102,9 @@ class _ReportFormState extends ConsumerState<ReportForm> {
               const SizedBox(
                 width: 10,
               ),
-              const Text('키 변수cm,'),
-              const Text(' 몸무게 변수kg : ,'),
-              const Text(' BMI 변수'),
+              Text('${userHeight}cm,'),
+              Text('${userWeight}kg,'),
+              Text(' BMI : $bMI'),
               const Spacer(),
             ],
           ),
@@ -100,15 +117,15 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 children: [
                   customContainer(null, '심박수 영역', null, null),
                   customContainer(
-                      CUSTOM_RED.withOpacity(0.3), '145-161.1', null, null),
+                      CUSTOM_RED.withOpacity(0.3), zone5, null, null),
                   customContainer(
-                      CUSTOM_YELLOW.withOpacity(0.3), '129-144', null, null),
+                      CUSTOM_YELLOW.withOpacity(0.3), zone4, null, null),
                   customContainer(
-                      CUSTOM_GREEN.withOpacity(0.3), '113-128', null, null),
+                      CUSTOM_GREEN.withOpacity(0.3), zone3, null, null),
                   customContainer(
-                      CUSTOM_BLUE.withOpacity(0.3), '97-112', null, null),
+                      CUSTOM_BLUE.withOpacity(0.3), zone2, null, null),
                   customContainer(
-                      CUSTOM_BLACK.withOpacity(0.3), '81-96', null, null),
+                      CUSTOM_BLACK.withOpacity(0.3), zone1, null, null),
                 ],
               ),
               Column(
@@ -139,7 +156,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 ],
               ),
               SizedBox(
-                width: 45,
+                width: 65,
               ),
               SizedBox(
                   height: 250,
@@ -240,66 +257,66 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   Widget rightSide() {
     return SizedBox(
       width: 690,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                barChart(),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        '탈진시간 상승률',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.arrow_drop_up,
-                            color: CUSTOM_RED,
-                          ),
-                          Text(
-                            '20.69%',
-                            style: TextStyle(color: CUSTOM_RED),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-            columnChart(),
-            Center(child: Text('대사증후군 발병률 지표',style: TextStyle(fontSize: 16),)),
-            animatedPointRanges(),
-            Row(
-              children: [
-                multipleBarChart(),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        children: [
+          SizedBox(
+            height: 30,
+          ),
+          Row(
+            children: [
+              barChart(),
+              Expanded(
+                child: Column(
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  // crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("매우좋음"),
-                    _buildThermometer(context),
-                    Text('당뇨 위험률 48% 감소'),
+                    Text(
+                      '탈진시간 상승률',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.arrow_drop_up,
+                          color: CUSTOM_RED,
+                        ),
+                        Text(
+                          '20.69%',
+                          style: TextStyle(color: CUSTOM_RED),
+                        )
+                      ],
+                    )
                   ],
                 ),
+              )
+            ],
+          ),
+          columnChart(),
+          Center(child: Text('대사증후군 발병률 지표',style: TextStyle(fontSize: 16),)),
+          animatedPointRanges(),
+          Row(
+            children: [
+              multipleBarChart(),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("매우좋음"),
+                  _buildThermometer(context),
+                  Text('당뇨 위험률 48% 감소'),
+                ],
+              ),
 
-              ],
-            ),
-            SizedBox(height: 30,),
-            Center(child: noticeText2()),
-          ],
-        ),
+            ],
+          ),
+          SizedBox(height: 30,),
+          Center(child: noticeText2()),
+        ],
       ),
     );
   }
@@ -404,12 +421,26 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   }
 
   Widget noticeText() {
+    // final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
+    // final selectedMemberState = ref.watch(selectedMemberProvider);
+    final measurementCalculatedState = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
+    // double genderFactor = (selectedMemberState.gender == "남성") ? 2 : (selectedMemberState.gender == "여성") ? 1 : 0;
+    // int? exhaustionSeconds = selectedMeasurementState.exhaustionSeconds ?? 0;
+    double vo2Max = measurementCalculatedState.Vo2Max;
+    int percentage = measurementCalculatedState.percentage;
+    String healthStatus = measurementCalculatedState.healthStatus;
+    String grade = percentage > 50 ? '상위' : '하위';
+    int convertedPercentage = percentage > 50 ? 100 - percentage : percentage;
+
+    // String bmi = measurementCalculatedState.bmi.toString();
+    // String tanMax = measurementCalculatedState.tanMax.toString();
+
     return Container(
       width: 385,
       child: Column(
         children: [
           Text(
-            '테스트님의 최대산소섭취량은 43.08 ml/kg/min 이며 같은 나이대에서 상위 1%에 해당됩니다. 유산소성 운동능력의 중요한 지표로써 신체가 소모한 산소량을 의미하며 더 많은 산소를 들이 마실수록 몸에서 더 많은 에너지를 사용할 수 있습니다.',
+            '테스트님의 최대산소섭취량은 ${vo2Max} ml/kg/min 이며 같은 나이대에서 ${grade} ${convertedPercentage}%에 해당됩니다. 유산소성 운동능력의 중요한 지표로써 신체가 소모한 산소량을 의미하며 더 많은 산소를 들이 마실수록 몸에서 더 많은 에너지를 사용할 수 있습니다.',
             softWrap: true,
             style: TextStyle(
               height: 3, // 줄 간격을 조절합니다. 1.5는 기본 높이의 1.5배입니다.
@@ -420,8 +451,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
             children: [
               Text('건강상태 : '),
               Container(
-                color: CUSTOM_GREEN,
-                child: Text('Optimal Health'),
+                color: getColorForHealthStatus(healthStatus),
+                child: Text(healthStatus),
               )
             ],
           )
@@ -474,7 +505,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         ),
         SizedBox(
             height: 120,
-            width: 636,
+            width: 665,
             child: SfLinearGauge(
               // animateAxis: true,
               // animateRange: true,
@@ -742,5 +773,39 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                         //     ))
                       ],
                     )))));
+  }
+}
+
+enum HealthStatus {
+  OptimalHealth,
+  GoodHealth,
+  Neutral,
+  PoorHealth,
+  Disease,
+}
+
+Map<HealthStatus, Color> healthStatusColors = {
+  HealthStatus.OptimalHealth: CUSTOM_GREEN.withOpacity(0.3),
+  HealthStatus.GoodHealth: CUSTOM_BLUE.withOpacity(0.3),
+  HealthStatus.Neutral: CUSTOM_YELLOW.withOpacity(0.3),
+  HealthStatus.PoorHealth: CUSTOM_RED.withOpacity(0.3),
+  HealthStatus.Disease: CUSTOM_RED,
+};
+
+Color getColorForHealthStatus(String status) {
+  switch (status) {
+    case 'Optimal Health':
+      return healthStatusColors[HealthStatus.OptimalHealth]!;
+    case 'Good Health':
+      return healthStatusColors[HealthStatus.GoodHealth]!;
+    case 'Neutral':
+      return healthStatusColors[HealthStatus.Neutral]!;
+    case 'Poor Health':
+      return healthStatusColors[HealthStatus.PoorHealth]!;
+    case 'Disease':
+      return healthStatusColors[HealthStatus.Disease]!;
+    default:
+    // 기본값으로 회색 반환 또는 예외 처리
+      return healthStatusColors[HealthStatus.Neutral]!;
   }
 }

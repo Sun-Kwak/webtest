@@ -7,13 +7,14 @@ import 'package:web_test2/screen/member/controller/member_input_state.dart';
 import 'package:authentication_repository/src/members_repository.dart';
 
 final measurementInputProvider =
-StateNotifierProvider.autoDispose<MeasurementInputController, MeasurementInputState>(
+StateNotifierProvider<MeasurementInputController, MeasurementInputState>(
       (ref) => MeasurementInputController(ref.watch(measurementRepositoryProvider), ref.watch(measurementEditingProvider)),
 );
 
 class MeasurementInputController extends StateNotifier<MeasurementInputState> {
   final MeasurementRepository _measurementRepository;
   final MeasurementEditingProvider _measurementEditingProvider;
+
 
   MeasurementInputController(this._measurementRepository, this._measurementEditingProvider)
       : super(const MeasurementInputState());
@@ -65,7 +66,7 @@ class MeasurementInputController extends StateNotifier<MeasurementInputState> {
 
 
       if (_measurementEditingProvider.isEditing == true) {
-        await _measurementRepository.updateMember(newMeasurement);
+        await _measurementRepository.updateMeasurement(newMeasurement);
       } else {
         await _measurementRepository.addMeasurement(newMeasurement);
       }

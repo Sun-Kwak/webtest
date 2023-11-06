@@ -86,6 +86,7 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
                 subtitleSelector: subtitleSelector,
                 color: color,
                 showId: showId,
+                exclusiveId: exclusiveId,
                 // onChanged: onChanged,
               ),
             ),
@@ -197,7 +198,7 @@ class CustomSearchDropdownFormFieldState<T, U>
   OverlayEntry _showFloatingDropdown() {
 
     _list = widget.list;
-    _displayedList = _list.where((e) => widget.idSelector!(e) != widget.exclusiveId).toList();
+    _displayedList = _list.where((e) => widget.idSelector(e) != widget.exclusiveId).toList();
     _filteredList = _displayedList;
 
     return OverlayEntry(builder: (context) {

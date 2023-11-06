@@ -103,7 +103,8 @@ class MemberInputController extends StateNotifier<MemberInputState> {
         address: member.address,
         signUpPath: member.signUpPath,
         referralID: member.referralID,
-        accountLinkID: member.accountLinkID,
+        referralName: member.referralName,
+        // accountLinkID: member.accountLinkID,
         memo: member.memo,
       );
       state = state.copyWith(status: FormzStatus.submissionSuccess);

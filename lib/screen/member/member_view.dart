@@ -14,31 +14,43 @@ class MembersView extends ConsumerStatefulWidget {
 }
 
 class MembersViewState extends ConsumerState<MembersView> {
+  UniqueKey _key = UniqueKey();
+  UniqueKey _key2 = UniqueKey();
+  late Member selectedMember;
+
+  void _onPressed() {
+    final member = ref.watch(selectedMemberProvider);
+    setState(() {
+      selectedMember = member;
+      _key = UniqueKey(); // 키를 변경하여 하위 위젯을 재빌드합니다.
+      _key2 = UniqueKey(); // 키를 변경하여 하위 위젯을 재빌드합니다.
+    });
+  }
   final ScrollController controller = ScrollController();
 
-  bool isEditing = false;
-  Member member = Member.empty();
-  late List<Member> members;
+  // bool isEditing = false;
+  // Member member = Member.empty();
+  // late List<Member> members;
 
-
-  void onEditButtonClicked() {
-    final isEditingControl = ref.watch(memberEditingProvider);
-    final selectedMember = ref.watch(selectedMemberProvider);
-    setState(() {
-      if (isEditingControl.isEditing == true) {
-        member = selectedMember;
-      }
-    });
-  }
   //
-  void inputButtonsClicked() async {
-    setState(() {
-      final selectedMember = ref.watch(selectedMemberProvider);
-
-      member = selectedMember;
-
-    });
-  }
+  // void onEditButtonClicked() {
+  //   final isEditingControl = ref.watch(memberEditingProvider);
+  //   final selectedMember = ref.watch(selectedMemberProvider);
+  //   setState(() {
+  //     if (isEditingControl.isEditing == true) {
+  //       member = selectedMember;
+  //     }
+  //   });
+  // }
+  // //
+  // void inputButtonsClicked() async {
+  //   setState(() {
+  //     final selectedMember = ref.watch(selectedMemberProvider);
+  //
+  //     member = selectedMember;
+  //
+  //   });
+  // }
 
 //   void filterMember() {
 //     final filteredMembers = ref.watch(filteredMembersProvider);
@@ -50,14 +62,17 @@ class MembersViewState extends ConsumerState<MembersView> {
 
   @override
   void initState() {
-
     super.initState();
+    selectedMember = Member.empty();
   }
 
   @override
   Widget build(BuildContext context) {
     final members = ref.watch(filteredMembersProvider);
     final isEditingControl = ref.watch(memberEditingProvider);
+    final selectedMemberController =
+    ref.watch(selectedMemberIdProvider.notifier);
+    selectedMember = ref.watch(selectedMemberProvider);
     final double screenWidth = MediaQuery.of(context).size.width;
     return Scrollbar(
       thumbVisibility: true,
@@ -76,17 +91,24 @@ class MembersViewState extends ConsumerState<MembersView> {
                       children: [
 
                         MemberInputForm(
-                          inputButtonsOnPressed: () {
-                            inputButtonsClicked();
+                          key: _key,
+                          onRefreshPressed: (){
+                            _onPressed();
+                            selectedMemberController.setSelectedRow(0);
+                          } ,
+                          onSavePressed: (){
+                            _onPressed();
+                            selectedMemberController.setSelectedRow(0);
                           },
                           isEditing: isEditingControl.isEditing,
-                          member: member,
+                          member: selectedMember,
                         ),
                         SizedBox(
                           height: 20,
                         ),
                         MemberInforForm(
-                          member: member,
+                          key: _key2,
+                          member: selectedMember,
                         ),
                         if (screenWidth < 640) ...[
                           const SizedBox(
@@ -98,7 +120,7 @@ class MembersViewState extends ConsumerState<MembersView> {
                             // },
                             members: members,
                             onPressed: () {
-                              onEditButtonClicked();
+                              _onPressed();
                             },
                           ),
                           const SizedBox(
@@ -120,7 +142,7 @@ class MembersViewState extends ConsumerState<MembersView> {
                     // },
                     members: members,
                     onPressed: () {
-                      onEditButtonClicked();
+                      _onPressed();
                     },
                   ),
                   const SizedBox(

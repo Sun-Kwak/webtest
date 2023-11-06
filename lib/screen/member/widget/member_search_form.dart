@@ -11,8 +11,11 @@ import 'package:web_test2/common/component/output_widget/custom_text_output_widg
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/common/provider/selected_screen_index_provider.dart';
 import 'package:authentication_repository/src/authentication_controller.dart';
+import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
 import 'package:web_test2/screen/member/controller/member_input_controller.dart';
 import 'package:web_test2/screen/member/data/member_data_table.dart';
+
+import '../../measurement/subScreen/measurement&appointment_view/controller/measurement_input_controller.dart';
 
 // final memberSearchFormStateProvider =
 //     StateProvider<MemberSearchFormState>((ref) {
@@ -39,15 +42,15 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
   // bool isRotated = false;
   bool showMore = false;
 
-  @override
-  void didUpdateWidget(MemberSearchForm oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.members != oldWidget.members) {
-      setState(() {
-        widget.members;
-      });
-    }
-  }
+  // @override
+  // void didUpdateWidget(MemberSearchForm oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   if (widget.members != oldWidget.members) {
+  //     setState(() {
+  //       widget.members;
+  //     });
+  //   }
+  // }
 
   void _showConfirmationDialog(BuildContext context) {
     final memberRepository = ref.watch(memberRepositoryProvider);
@@ -65,8 +68,11 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
             color: Colors.amber,
             size: 50,
           ),
-          content: const Text(
+          content: selectedMember.status == '활성' ? Text(
             '선택 회원 사용중단 하시겠습니까?',
+            style: TextStyle(color: PRIMARY_COLOR),
+          ) : Text(
+            '선택 회원 재사용 하시겠습니까?',
             style: TextStyle(color: PRIMARY_COLOR),
           ),
           actions: <Widget>[
@@ -153,6 +159,8 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
     final selectedMember = ref.watch(selectedMemberProvider);
     final selectedRow = ref.watch(selectedMemberIdProvider);
     final memberInputController = ref.read(memberInputProvider.notifier);
+    final measurementInputController = ref.read(measurementInputProvider.notifier);
+    final measurementCalculatedStateController = ref.watch(measurementCalculatedStateProvider.notifier);
     final userme = ref.watch(userMeProvider);
 
     return SizedBox(
@@ -206,9 +214,9 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
               ),
               IconButton(
                 onPressed: () {
-
                   selectedScreenIndexController.setSelectedIndex(3);
-
+                  measurementInputController.recall(selectedMember);
+                  measurementCalculatedStateController.selectedMeasurement(measurement: Measurement.empty(), member: selectedMember);
                 },
                 icon: const Icon(Icons.monitor_heart),
                 tooltip: '건강',
@@ -263,6 +271,7 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
 
   Widget renderMiddleTapRight(double formWidth) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final selectedMemberController = ref.watch(selectedMemberIdProvider.notifier);
     final controller = ref.watch(membersProvider.notifier);
     return Container(
       width: screenWidth <= 640 ? screenWidth : formWidth * 0.4,
@@ -272,6 +281,7 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
           screenWidth <= 640  ? Spacer() : SizedBox(),
           IconButton(
             onPressed: () {
+              selectedMemberController.setSelectedRow(0);
               controller.getDisabledMembers();
             },
             icon: const Icon(Icons.search_off),

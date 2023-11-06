@@ -24,7 +24,7 @@ class _AppointmentInputFormState extends State<AppointmentInputForm> {
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8), color: Colors.white),
       width: 700,
-      height: 800,
+      height: 1350,
       child: Padding(
         padding: const EdgeInsets.only(right: 8, left: 8),
         child: Column(

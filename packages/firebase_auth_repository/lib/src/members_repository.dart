@@ -23,13 +23,13 @@ class MemberCheckPhoneNumberFailure implements Exception {
 }
 
 final memberRepositoryProvider = Provider<MemberRepository>(
-  (ref) => MemberRepository(ref.watch(selectedReferralIDProvider)),
+  (ref) => MemberRepository(),
 );
 
 class MemberRepository {
-  SelectedReferralIDProvider selectedReferralIDProvider;
+  // SelectedReferralIDProvider selectedReferralIDProvider;
 
-  MemberRepository(this.selectedReferralIDProvider);
+  MemberRepository();
 
   Future<void> addMember(Member member) async {
     try {
@@ -49,12 +49,12 @@ class MemberRepository {
         int newId = maxId + 1;
         memberData['id'] = newId;
         memberData['updatedBy'] = user?.displayName;
-        memberData['referralID'] =
-            selectedReferralIDProvider.selectedReferralId;
-        memberData['referralName'] =
-            selectedReferralIDProvider.selectedReferralName;
+        // memberData['referralID'] =
+        //     selectedReferralIDProvider.selectedReferralId;
+        // memberData['referralName'] =
+        //     selectedReferralIDProvider.selectedReferralName;
         await members.add(memberData).then((_) {
-          selectedReferralIDProvider.setSelectedReferralID(null, null);
+          // selectedReferralIDProvider.setSelectedReferralID(null, null);
         });
       });
     } on FirebaseException catch (e) {
@@ -75,13 +75,13 @@ class MemberRepository {
       // 해당 ID를 가진 멤버를 찾아 업데이트
       DocumentReference memberRef = members.doc(memberId);
       memberData['updatedBy'] = user?.displayName;
-      memberData['referralID'] = selectedReferralIDProvider.selectedReferralId;
-      memberData['referralName'] =
-          selectedReferralIDProvider.selectedReferralName;
+      // memberData['referralID'] = selectedReferralIDProvider.selectedReferralId;
+      // memberData['referralName'] =
+      //     selectedReferralIDProvider.selectedReferralName;
 
       // 멤버 데이터 업데이트
       await memberRef.update(memberData).then((_) {
-        selectedReferralIDProvider.setSelectedReferralID(null, null);
+        // selectedReferralIDProvider.setSelectedReferralID(null, null);
       });
     } on FirebaseException catch (e) {
 

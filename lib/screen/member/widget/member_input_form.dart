@@ -13,6 +13,7 @@ import 'package:web_test2/common/component/custom_boxRadius_form.dart';
 import 'package:web_test2/common/component/input_widget/custom_dropdown_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_genderSelection_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_phone_input_widget.dart';
+import 'package:web_test2/common/component/input_widget/custom_seachable_dropdown_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/memberinput_member_search_dropdown_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_search_text_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_text_input_widget.dart';
@@ -28,12 +29,12 @@ import 'package:authentication_repository/src/members_repository.dart';
 class MemberInputForm extends ConsumerStatefulWidget {
   final Member member;
   final bool isEditing;
-  final VoidCallback inputButtonsOnPressed;
-
+  final VoidCallback onSavePressed;
+  final VoidCallback onRefreshPressed;
 
   const MemberInputForm({
-
-    required this.inputButtonsOnPressed,
+    required this.onSavePressed,
+    required this.onRefreshPressed,
     required this.isEditing,
     required this.member,
     super.key,
@@ -44,14 +45,14 @@ class MemberInputForm extends ConsumerStatefulWidget {
 }
 
 class MemberInputFormState extends ConsumerState<MemberInputForm> {
+  late Member updatingMember;
   String? errorText;
   final double height = 40;
   DateTime? selectedDate;
   String selectedValue = '기타';
   String? selectedGender;
   String? searchSelectedValue;
-  Member? selectedMember;
-  String? formattedDateString;
+  String formattedDate ="${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController addressController = TextEditingController();
@@ -64,34 +65,19 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
     '배너',
     'SNS',
   ];
-  Member member = Member.empty();
-
   @override
   void initState() {
-    member = widget.member;
-    selectedGender = member.gender;
+    // member = widget.member;
+    // selectedGender = member.gender;
     super.initState();
-  }
-
-  @override
-  void didUpdateWidget(MemberInputForm oldWidget) {
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
-    if (widget.member != oldWidget.member && widget.isEditing == true) {
-      setState(() {
-        member = widget.member;
-        DateTime dateTime =
-            DateFormat('yyyy-MM-dd').parse(widget.member.birthDay);
-        selectedValue = widget.member.signUpPath;
-        selectedDate = dateTime;
-        selectedGender = widget.member.gender;
-        nameController.text = widget.member.displayName;
-        phoneNumberController.text = widget.member.phoneNumber;
-        addressController.text = widget.member.address ?? '';
-        memoController.text = widget.member.memo ?? '';
-        searchSelectedValue = widget.member.referralName;
-      });
-    }
+    updatingMember = widget.member;
+    nameController.text = widget.member.displayName;
+    phoneNumberController.text = widget.member.phoneNumber;
+    addressController.text = widget.member.address ?? '';
+    memoController.text = widget.member.memo ?? '';
+    selectedDate = widget.member.birthDay != '' ? DateFormat('yyyy-MM-dd').parse(widget.member.birthDay) : null;
+    selectedValue = widget.member.signUpPath;
+    searchSelectedValue = widget.member.referralName;
   }
 
   final List<String> referralDropdownItems = [];
@@ -100,21 +86,13 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
     final selectedRowController = ref.watch(selectedMemberIdProvider.notifier);
     final isEditingController = ref.watch(memberEditingProvider.notifier);
     final memberInputController = ref.watch(memberInputProvider.notifier);
-    // final updatingMemberController = ref.watch(updatingMemberProvider.notifier);
+    // final selectedReferralController =
+    //     ref.watch(selectedReferralIDProvider.notifier);
 
     setState(() {
-      member = Member.empty();
-      selectedValue = '기타';
-      selectedDate = null;
-      selectedGender = '여성';
-      nameController.text = '';
-      phoneNumberController.text = '';
-      addressController.text = '';
-      memoController.text = '';
       selectedRowController.setSelectedRow(0);
-      searchSelectedValue = null;
+      // selectedReferralController.setSelectedReferralID(null, null);
       isEditingController.toggleStatus(false);
-      // updatingMemberController.updateSelectedMember(Member.empty());
       memberInputController.resetAll();
     });
   }
@@ -122,8 +100,9 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
   Future<void> _selectDate(BuildContext context) async {
     final selectedMember = ref.watch(selectedMemberProvider);
     final selectedRow = ref.watch(selectedMemberIdProvider);
-    DateTime birthDay =
-    selectedRow != 0 ? DateFormat('yyyy-MM-dd').parse(selectedMember.birthDay) : DateTime.now();
+    DateTime birthDay = selectedRow != 0
+        ? DateFormat('yyyy-MM-dd').parse(selectedMember.birthDay)
+        : DateTime.now();
     final memberInputController = ref.read(memberInputProvider.notifier);
     DateTime now = DateTime.now();
     DateTime threeYearsLater =
@@ -137,21 +116,25 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
     );
 
     if (pickedDate != null) {
-      String formattedDate = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
       setState(() {
-        selectedDate = pickedDate;
+        setState(() {
+          selectedDate = pickedDate;
+          formattedDate = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+        });
       });
       memberInputController.onDateChange(formattedDate);
-    }  else{
+    } else {
       memberInputController.onDateChange('날짜 선택');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // selectedGender = updatingMember.gender;
-    // selectedDate = updatingMember.id == 0 ? null : DateFormat('yyyy-MM-dd').parse(updatingMember.birthDay);
-
+    final members = ref.watch(membersProvider);
+    // final selectedReferral = ref.watch(selectedReferralIDProvider);
+    // final selectedReferralController =
+    //     ref.watch(selectedReferralIDProvider.notifier);
+    final selectedDropdownData = ref.watch(selectedDropdownIDProvider);
     ref.listen<MemberInputState>(
       memberInputProvider,
       (previous, current) {
@@ -200,9 +183,8 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 ),
               ),
               CustomRefreshIcon(onPressed: () {
-
                 resetFields();
-                widget.inputButtonsOnPressed();
+                widget.onRefreshPressed();
               }),
             ],
           ),
@@ -227,16 +209,10 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 labelBoxWidth: labelBoxWidth,
                 onChanged: (String? value) {
                   setState(() {
-                    selectedGender = value;
-                    // updatingMemberController.setUpdatingMember(updatingMember.copyWith(
-                    //   gender: value.toString(),
-                    // ));
-                    member = member.copyWith(
-                      gender: value.toString(),
-                    );
+                    updatingMember = updatingMember.copyWith(gender: value);
                   });
                 },
-                selectedGender: selectedGender,
+                selectedGender: updatingMember.gender,
               ),
             ],
           ),
@@ -301,7 +277,9 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 hintText: '자유기입',
                 onChanged: (v) {
                   setState(() {
-                    member = member.copyWith(address: v);
+                    updatingMember = updatingMember.copyWith(
+                      address: v,
+                    );
                   });
                 },
                 textBoxWidth: textBoxWidth,
@@ -314,7 +292,7 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 onChanged: (String? value) {
                   setState(() {
                     selectedValue = value!;
-                    member = member.copyWith(
+                    updatingMember = updatingMember.copyWith(
                       signUpPath: value,
                     );
                   });
@@ -334,20 +312,31 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
               const SizedBox(
                 width: 20,
               ),
-              MemberInputMemberSearchDropdownWidget(
+              CustomSearchDropdownWidget(
+                idSelector: (member) => member.id,
                 labelBoxWidth: labelBoxWidth,
                 selectedValue: searchSelectedValue,
-                // onChanged: (v) {
-                //   member = member.copyWith(
-                //     referralID: selectedReferralID.selectedReferralId,
-                //   );
-                //   // setState(() {
-                //   //   searchSelectedValue = selectedReferralID;
-                //   //   print(v);
-                //   // });
-                // },
                 label: '추천인',
                 textBoxWidth: textBoxWidth,
+                list: members,
+                titleSelector: (member) => member.displayName,
+                subtitleSelector: (member) => member.phoneNumber,
+                onTap: () {
+                  searchSelectedValue = selectedDropdownData.selectedTitle!;
+                  setState(() {
+                    updatingMember = updatingMember.copyWith(
+                      referralID: selectedDropdownData.selectedId,
+                      referralName: selectedDropdownData.selectedTitle,
+                    );
+                  });
+                  // selectedReferralController.setSelectedReferralID(
+                  //     selectedDropdownData.selectedId,
+                  //     selectedDropdownData.selectedTitle);
+                },
+                // color: CUSTOM_BLUE.withOpacity(0.1),
+                errorText: null,
+                exclusiveId: updatingMember.id,
+                // exclusiveId: 0,
               ),
               SizedBox(
                 width: widgetGap,
@@ -359,7 +348,7 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 selectedValue: '',
                 onChanged: (v) {
                   setState(() {
-                    member = member.copyWith(
+                    updatingMember = updatingMember.copyWith(
                       accountLinkID: v,
                     );
                   });
@@ -383,9 +372,8 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 label: '메모',
                 hintText: '덮어쓰기',
                 onChanged: (v) {
-                  print(v);
                   setState(() {
-                    member = member.copyWith(
+                    updatingMember = updatingMember.copyWith(
                       memo: v,
                     );
                   });
@@ -404,10 +392,10 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 width: 100,
                 child: _AddMemberButton(
                   onPressed: () {
-                    resetFields();
-                    widget.inputButtonsOnPressed();
+                    // resetFields();
+                    widget.onSavePressed();
                   },
-                  member: member,
+                  member: updatingMember,
                 ),
               ),
             ),
@@ -441,7 +429,6 @@ class _AddMemberButton extends ConsumerWidget {
       child: ElevatedButton(
         onPressed: isValidated
             ? () {
-
                 memberInputController.addMember(member, membersController);
                 onPressed();
               }
@@ -465,6 +452,7 @@ class _NameField extends ConsumerWidget {
   // final FocusNode onFieldSubmitted;
   final double labelBoxWidth;
   final double textBoxWidth;
+
   final TextEditingController controller;
 
   const _NameField({
@@ -546,9 +534,10 @@ class _PhoneField extends ConsumerStatefulWidget {
 
 class _PhoneFieldState extends ConsumerState<_PhoneField> {
   Stream<bool> _verifyPhoneNumber(String phone) async* {
-    final memberRepository = ref.watch(memberRepositoryProvider);
+
 
     if (phone.length == 13) {
+      final memberRepository = ref.read(memberRepositoryProvider);
       bool isPhoneNumberDuplicate =
           await memberRepository.checkPhoneNumber(phone);
       yield !isPhoneNumberDuplicate;

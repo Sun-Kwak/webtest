@@ -1,21 +1,26 @@
+import 'package:authentication_repository/authentication_repository.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/screen/empty_view.dart';
+import 'package:web_test2/screen/measurement/subScreen/conditions/conditions_View.dart';
+import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/measurement&appointment_view.dart';
 import 'package:web_test2/screen/measurement/subScreen/report_view/report_view.dart';
 
 
-class MeasurementView extends StatefulWidget {
+class MeasurementView extends ConsumerStatefulWidget {
+
   const MeasurementView({super.key});
 
   @override
-  State<MeasurementView> createState() => _MeasurementViewState();
+  ConsumerState<MeasurementView> createState() => _MeasurementViewState();
 }
 
 
 
-class _MeasurementViewState extends State<MeasurementView> {
+class _MeasurementViewState extends ConsumerState<MeasurementView> {
   void _onPressed(){
     setState(() {
       groupValue =1;
@@ -27,6 +32,13 @@ class _MeasurementViewState extends State<MeasurementView> {
 
   @override
   Widget build(BuildContext context) {
+    final measurementController = ref.watch(measurementProvider.notifier);
+
+    final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
+    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
+    final selectedMember = ref.watch(selectedMemberProvider);
+    final intensitySelectionController = ref.watch(intensitySelectionProvider.notifier);
+    final measurementCalculatedStateController = ref.watch(measurementCalculatedStateProvider.notifier);
     final List<Widget> subContents = [
       MeasurementAndAppointmentView(
         onPressed: (){
@@ -34,7 +46,7 @@ class _MeasurementViewState extends State<MeasurementView> {
         },
       ),
       const ReportView(),
-      const EmptyView(),
+      const ConditionsView(),
     ];
 
     return Scrollbar(
@@ -71,6 +83,23 @@ class _MeasurementViewState extends State<MeasurementView> {
                       onValueChanged: (v) {
                         setState(() {
                           groupValue = v;
+                          if(v == 1){
+                            // selectedMeasurementController.getLatestMeasurement(selectedMember.id);
+                            // print(selectedMeasurementState.userWeight);
+                            if(selectedMember.id !=0) {
+                              measurementCalculatedStateController
+                                  .selectedMeasurement(
+                                  measurement: selectedMeasurementState,
+                                  member: selectedMember);
+                            }
+                            print(selectedMeasurementState.createdAt);
+                            // selectedMeasurementController.setSelectedRow(lastedSavedMeasurement.docId);
+                          }
+                          if(v == 0){
+                            // intensitySelectionController.setSelectedIntensityValue(0, 0);
+                            // selectedMeasurementController.removeState();
+                          }
+
                         });
                       },
                       initialValue: groupValue,
