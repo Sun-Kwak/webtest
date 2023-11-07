@@ -92,7 +92,7 @@ class _MeasurementViewState extends ConsumerState<MeasurementView> {
                                   measurement: selectedMeasurementState,
                                   member: selectedMember);
                             }
-                            print(selectedMeasurementState.createdAt);
+
                             // selectedMeasurementController.setSelectedRow(lastedSavedMeasurement.docId);
                           }
                           if(v == 0){

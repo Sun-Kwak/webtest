@@ -117,26 +117,26 @@ class MeasurementRepository {
     return measurements;
   }
 
-  Future<Measurement> getLatestMeasurement(int memberId) async {
-    Measurement latestMeasurement = Measurement.empty();
-    try {
-      CollectionReference collection =
-      FirebaseFirestore.instance.collection('measurements');
-
-      QuerySnapshot querySnapshot = await collection
-          .where('memberId', isEqualTo: memberId)
-          .orderBy('createdAt', descending: true)
-          .limit(1)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        latestMeasurement = Measurement.fromFirestore(querySnapshot.docs.first);
-      }
-    } on FirebaseException catch (e) {
-      throw MeasurementGetFailure(e.toString());
-    }
-    return latestMeasurement;
-  }
+  // Future<Measurement> getLatestMeasurement(int memberId) async {
+  //   Measurement latestMeasurement = Measurement.empty();
+  //   try {
+  //     CollectionReference collection =
+  //     FirebaseFirestore.instance.collection('measurements');
+  //
+  //     QuerySnapshot querySnapshot = await collection
+  //         .where('memberId', isEqualTo: memberId)
+  //         .orderBy('createdAt', descending: true)
+  //         .limit(1)
+  //         .get();
+  //
+  //     if (querySnapshot.docs.isNotEmpty) {
+  //       latestMeasurement = Measurement.fromFirestore(querySnapshot.docs.first);
+  //     }
+  //   } on FirebaseException catch (e) {
+  //     throw MeasurementGetFailure(e.toString());
+  //   }
+  //   return latestMeasurement;
+  // }
 
 //
 //   Future<List<Member>> getDisabledMembersData() async {

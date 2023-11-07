@@ -22,11 +22,17 @@ class _ReportFilterFormState extends ConsumerState<ReportFilterForm> {
   @override
   Widget build(BuildContext context) {
     final intensityController = ref.watch(intensitySelectionProvider.notifier);
+    final measurementState = ref.watch(measurementProvider);
     final filteredMeasurement = ref.watch(filteredMeasurementProvider);
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     final selectedDropdownData = ref.watch(selectedDropdownIDProvider);
     final selectedMemberState = ref.watch(selectedMemberProvider);
     final selectedMemberIDController = ref.watch(selectedMemberIdProvider.notifier);
+    final members = ref.watch(membersProvider);
+    final selectedMember = ref.watch(selectedMemberProvider);
+    final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
+    final measurementCalculatedController = ref.watch(measurementCalculatedStateProvider.notifier);
+    final measurementCalculatedState = ref.watch(measurementCalculatedStateProvider);
     DateTime today = DateTime.now();
     DateTime birthDate = selectedMemberState.id != 0
         ? DateFormat('yyyy-MM-dd').parse(selectedMemberState.birthDay)
@@ -40,15 +46,14 @@ class _ReportFilterFormState extends ConsumerState<ReportFilterForm> {
     int bpm = selectedMeasurementState.bpm ?? 0;
     double karMax = (220 - age) as double;
     double tanMax = 208 - (0.7 * age);
-    String? zone5 = '${intensityMax * 0.9}-$intensityMax';
+    // String? zone5 = '${intensityMax * 0.9}-$intensityMax';
+    Member member = Member.empty();
+    Measurement measurement = Measurement.empty();
     // int bpm = 0;
 
 
     // final selectedMeasurementId = ref.watch(selectedMeasurementIdProvider);
-    final members = ref.watch(membersProvider);
-    final selectedMember = ref.watch(selectedMemberProvider);
-    final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
-    final measurementCalculatedController = ref.watch(measurementCalculatedStateProvider.notifier);
+
     return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
@@ -113,12 +118,18 @@ class _ReportFilterFormState extends ConsumerState<ReportFilterForm> {
                     labelBoxWidth: 50,
                     selectedValue: selectedMember.displayName,
                     label: '회원선택',
-                    textBoxWidth: 150,
+                    textBoxWidth: 200,
                     list: members,
                     titleSelector: (member) => member.displayName,
                     subtitleSelector: (member) => member.phoneNumber,
                     onTap: () {
                       selectedMemberIDController.setSelectedRow(selectedDropdownData.selectedId);
+                      member = ref.watch(selectedMemberProvider);
+                      selectedMeasurementController.getLatestMeasurement(member.id, measurementState);
+                      measurement = ref.watch(selectedMeasurementProvider);
+                      measurementCalculatedController.selectedMeasurement(measurement: measurement, member: member);
+                      intensityController.setSelectedIntensityValue(
+                          measurementCalculatedState.measurementCalculatedState.karMax, bpm);
 
                     },
                     color: CUSTOM_BLUE.withOpacity(0.1),
@@ -197,6 +208,7 @@ class _MeasurementBaselineCardState extends ConsumerState<MeasurementBaselineCar
 
     final filteredMeasurements = ref.watch(filteredMeasurementProvider);
     final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
+    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     final measurementCalculatedStateController = ref.watch(measurementCalculatedStateProvider.notifier);
     final selectedMemberState = ref.watch(selectedMemberProvider);
     return Container(
@@ -216,13 +228,18 @@ class _MeasurementBaselineCardState extends ConsumerState<MeasurementBaselineCar
           return Material(
             child: ListTile(
               tileColor: filteredMeasurements.indexOf(filteredMeasurement) == selectedIndex ? TABLE_SELECTION_COLOR : null,
-              title: Text('${filteredMeasurement.createdAt}', style: TextStyle(fontSize: 12),),
+              title: Text('${filteredMeasurement.docId}', style: TextStyle(fontSize: 12),),
               subtitle: Container(color: CUSTOM_GREEN.withOpacity(0.3), child: Text('Optimal Health', style: const TextStyle(fontSize: 9),)),
               onTap: () {
+                measurementCalculatedStateController.selectedMeasurement(measurement: filteredMeasurement, member: selectedMemberState);
                 setState(() {
                   selectedIndex = filteredMeasurements.indexOf(filteredMeasurement);
                   selectedMeasurementController.onSelectionChanged(filteredMeasurement);
-                  measurementCalculatedStateController.selectedMeasurement(measurement: filteredMeasurement, member: selectedMemberState);
+                  print(filteredMeasurement.docId);
+                  print(filteredMeasurement.bpmMax);
+                  print(filteredMeasurement.bpm3m);
+                  print(filteredMeasurement.stage0);
+
                 });
                 // Do something when ListTile is tapped
               },
@@ -247,6 +264,8 @@ class _MeasurementReferenceCardState extends ConsumerState<MeasurementReferenceC
   Widget build(BuildContext context) {
 
     final referenceMeasurementState = ref.watch(baselineFilteredMeasurementProvider);
+    final selectedReferenceMeasurementController = ref.watch(selectedReferenceMeasurementProvider.notifier);
+    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     return Container(
       height: 630,
       width: 150,
@@ -269,6 +288,8 @@ class _MeasurementReferenceCardState extends ConsumerState<MeasurementReferenceC
               onTap: () {
                 setState(() {
                   selectedIndex = referenceMeasurementState.indexOf(filteredMeasurement);
+                  selectedReferenceMeasurementController.onSelectionChanged(filteredMeasurement);
+
                 });
                 // Do something when ListTile is tapped
               },

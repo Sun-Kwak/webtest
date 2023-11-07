@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/screen/measurement/subScreen/conditions/data_table/aerobic_power_table.dart';
+import 'package:web_test2/screen/measurement/subScreen/conditions/data_table/bmi_table.dart';
+import 'package:web_test2/screen/measurement/subScreen/conditions/data_table/diabetes_table.dart';
 
 
 class ConditionsView extends ConsumerStatefulWidget {
@@ -24,6 +26,10 @@ class _ConditionsViewState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AerobicPowerTable(),
+        SizedBox(width: 20,),
+        BmiTable(),
+        SizedBox(width: 20,),
+        DiabetesTable(),
       ],
     );
   }

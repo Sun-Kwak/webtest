@@ -161,7 +161,15 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
     final memberInputController = ref.read(memberInputProvider.notifier);
     final measurementInputController = ref.read(measurementInputProvider.notifier);
     final measurementCalculatedStateController = ref.watch(measurementCalculatedStateProvider.notifier);
+    final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
     final userme = ref.watch(userMeProvider);
+    final measurementState = ref.watch(measurementProvider);
+    final intensityController = ref.watch(intensitySelectionProvider.notifier);
+
+
+    // Member member = Member.empty();
+    Measurement measurement = Measurement.empty();
+    MeasurementCalculatedState measurementCalculatedState = MeasurementCalculatedState.empty();
 
     return SizedBox(
       width: formWidth,
@@ -217,6 +225,13 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
                   selectedScreenIndexController.setSelectedIndex(3);
                   measurementInputController.recall(selectedMember);
                   measurementCalculatedStateController.selectedMeasurement(measurement: Measurement.empty(), member: selectedMember);
+
+                  selectedMeasurementController.getLatestMeasurement(selectedMember.id,measurementState);
+                  measurement = ref.watch(selectedMeasurementProvider);
+                  measurementCalculatedStateController.selectedMeasurement(measurement: measurement, member: selectedMember);
+                  measurementCalculatedState = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
+                  intensityController.setSelectedIntensityValue(
+                      measurementCalculatedState.karMax, 0);
                 },
                 icon: const Icon(Icons.monitor_heart),
                 tooltip: '건강',

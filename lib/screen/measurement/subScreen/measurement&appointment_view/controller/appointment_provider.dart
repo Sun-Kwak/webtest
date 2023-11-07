@@ -79,6 +79,12 @@ class MeasurementCalculatedState {
   final String conditionField;
   final int percentage;
   final String healthStatus;
+  final double minimumGauge;
+  final double diseaseGauge;
+  final double poorHealthGauge;
+  final double neutralGauge;
+  final double goodHealthGauge;
+  final double optimalHealthGauge;
 
   MeasurementCalculatedState({
     required this.percentage,
@@ -91,6 +97,12 @@ class MeasurementCalculatedState {
     required this.Vo2Max,
     required this.conditionField,
     required this.healthStatus,
+    required this.minimumGauge,
+    required this.diseaseGauge,
+    required this.poorHealthGauge,
+    required this.neutralGauge,
+    required this.goodHealthGauge,
+    required this.optimalHealthGauge,
   });
 
   MeasurementCalculatedState copyWith({
@@ -104,6 +116,12 @@ class MeasurementCalculatedState {
     String? conditionField,
     int? percentage,
     String? healthStatus,
+    double? minimumGauge,
+    double? diseaseGauge,
+    double? poorHealthGauge,
+    double? neutralGauge,
+    double? goodHealthGauge,
+    double? optimalHealthGauge,
   }) {
     return MeasurementCalculatedState(
       bmi: bmi ?? this.bmi,
@@ -116,6 +134,12 @@ class MeasurementCalculatedState {
       conditionField: conditionField ?? this.conditionField,
       percentage: percentage ?? this.percentage,
       healthStatus: healthStatus ?? this.healthStatus,
+      minimumGauge: minimumGauge ?? this.minimumGauge,
+      poorHealthGauge: poorHealthGauge ?? this.poorHealthGauge,
+      diseaseGauge: diseaseGauge ?? this.diseaseGauge,
+      goodHealthGauge: goodHealthGauge ?? this.goodHealthGauge,
+      neutralGauge: neutralGauge ?? this.neutralGauge,
+      optimalHealthGauge: optimalHealthGauge ?? this.optimalHealthGauge,
     );
   }
 
@@ -130,6 +154,12 @@ class MeasurementCalculatedState {
         conditionField: '',
         percentage: 0,
     healthStatus: '',
+    minimumGauge: 0,
+    optimalHealthGauge: 0,
+    neutralGauge: 0,
+    goodHealthGauge: 0,
+    diseaseGauge: 0,
+    poorHealthGauge: 0,
       );
 }
 
@@ -206,8 +236,6 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
         w70: 0,
         w80: 0);
     double maxComparisonPoint = 0;
-    print(fieldName);
-    print(point);
 
     for (int i = 0; i < data.length; i++) {
       double comparisonPoint = 0;
@@ -262,6 +290,64 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
     return aerobicPowerModel;
   }
 
+  void gaugeValue(
+      List<AerobicPowerModel> data, String fieldName) {
+ List<double> boundaryList = [];
+    for (int i = 0; i < data.length; i++) {
+      double value = 0;
+      switch (fieldName) {
+        case 'm30':
+          value = data[i].m30;
+          break;
+        case 'm40':
+          value = data[i].m40;
+          break;
+        case 'm50':
+          value = data[i].m50;
+          break;
+        case 'm60':
+          value = data[i].m60;
+          break;
+        case 'm70':
+          value = data[i].m70;
+          break;
+        case 'm80':
+          value = data[i].m80;
+          break;
+        case 'w30':
+          value = data[i].w30;
+          break;
+        case 'w40':
+          value = data[i].w40;
+          break;
+        case 'w50':
+          value = data[i].w50;
+          break;
+        case 'w60':
+          value = data[i].w60;
+          break;
+        case 'w70':
+          value = data[i].w70;
+          break;
+        case 'w80':
+          value = data[i].w80;
+          break;
+        default:
+        // 예외 처리 혹은 기본값 설정
+          break;
+      }
+      boundaryList.add(value);
+    }
+ measurementCalculatedState = measurementCalculatedState.copyWith(
+   optimalHealthGauge: boundaryList[0],
+   goodHealthGauge: boundaryList[1],
+   neutralGauge: boundaryList[2],
+   poorHealthGauge: boundaryList[3],
+   diseaseGauge: boundaryList[4],
+   minimumGauge: boundaryList[5],
+ );
+  }
+
   // void setVo2Max(String gender, String exhaustionSecond) {
   //   double genderFactor = (gender == "남성") ? 2 : (gender == "여성") ? 1 : 0;
   //   double vo2Max =
@@ -289,6 +375,7 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
         getEqualCondition(aerobicPowerData, conditionField, Vo2Max).percentage;
     String healthStatus =
         getEqualCondition(aerobicPowerData, conditionField, Vo2Max).healthStatus;
+    gaugeValue(aerobicPowerBoundary,conditionField);
     measurementCalculatedState = measurementCalculatedState.copyWith(
       bmi: bmi,
       age: age,

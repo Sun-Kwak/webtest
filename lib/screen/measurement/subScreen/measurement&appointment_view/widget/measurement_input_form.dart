@@ -14,12 +14,12 @@ import 'package:web_test2/common/component/input_widget/custom_seachable_dropdow
 import 'package:web_test2/common/component/input_widget/custom_text_input_widget.dart';
 import 'package:web_test2/common/component/output_widget/custom_text_output_widget.dart';
 import 'package:web_test2/common/const/colors.dart';
-import 'package:web_test2/common/utils/time_utils.dart';
-import 'package:web_test2/common/utils/vo2_max_utils.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/measurement_input_controller.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/measurement_input_state.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/widget/intensity_setting.dart';
+import 'package:web_test2/screen/measurement/utils/time_utils.dart';
+import 'package:web_test2/screen/measurement/utils/vo2_max_utils.dart';
 import 'package:web_test2/screen/member/controller/member_input_controller.dart';
 
 
@@ -210,6 +210,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
 
   void _showConfirmationDialog(BuildContext context) {
     final measurementController = ref.watch(measurementProvider.notifier);
+    final measurementState = ref.watch(measurementProvider);
     final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     final intensitySelectionController = ref.watch(intensitySelectionProvider.notifier);
@@ -251,7 +252,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               onPressed: () {
                 widget.onSavePressed();
                 measurementController.getMeasurements();
-                selectedMeasurementController.getLatestMeasurement(selectedMember.id);
+                selectedMeasurementController.getLatestMeasurement(selectedMember.id,measurementState);
                 measurementCalculateController.selectedMeasurement(measurement: updatingMeasurement, member: selectedMember);
                 // selectedRow.setSelectedRow(0);
                 // memberRepository.disableMember(member, controller);
@@ -279,8 +280,8 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
     final selectedDropdownData = ref.watch(selectedDropdownIDProvider);
     final intensityController = ref.watch(intensitySelectionProvider.notifier);
     final intensityState = ref.watch(intensitySelectionProvider);
-    final measurementCalculatedStateController = ref.watch(measurementCalculatedStateProvider.notifier);
-    final measurementCalculatedState = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
+    final measurementState = ref.watch(measurementProvider);
+    final measurementCalculated = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
 
     DateTime today = DateTime.now();
     DateTime birthDate = selectedMember.id != 0
@@ -319,6 +320,12 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
     const double textBoxWidth = 170;
     const double labelBoxWidth = 50;
     final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
+    final measurementCalculatedController = ref.watch(measurementCalculatedStateProvider.notifier);
+
+    Member member = Member.empty();
+    Measurement measurement = Measurement.empty();
+    MeasurementCalculatedState measurementCalculatedState = MeasurementCalculatedState.empty();
+
 
 
     return Container(
@@ -344,6 +351,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 ),
               ),
               CustomRefreshIcon(onPressed: () {
+                // print(exhaustionSeconds);
                 resetFields();
                 widget.onRefreshPressed();
               }),
@@ -376,15 +384,18 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 onTap: () {
                   selectedMemberIdController
                       .setSelectedRow(selectedDropdownData.selectedId);
-                  selectedMeasurementController.getLatestMeasurement(selectedDropdownData.selectedId);
+                  member = ref.watch(selectedMemberProvider);
+                  selectedMeasurementController.getLatestMeasurement(selectedDropdownData.selectedId,measurementState);
+                  measurement = ref.watch(selectedMeasurementProvider);
+                  measurementCalculatedController.selectedMeasurement(measurement: measurement, member: member);
+                  measurementCalculatedState = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
+                  intensityController.setSelectedIntensityValue(
+                      measurementCalculatedState.karMax, bpm);
                   // measurementCalculatedStateController.selectedMeasurement(measurement: updatingMeasurement, member: selectedMember);
                   setState(() {
                     selectedValue = 'Karvonen';
-                    intensityMax = karMax;
-                    intensityController.setSelectedIntensityValue(
-                        intensityMax, bpm);
-                    measurementInputController.onNameChange(selectedDropdownData.selectedTitle);
                   });
+                  measurementInputController.onNameChange(selectedDropdownData.selectedTitle);
                 },
               ),
               SizedBox(
@@ -1221,6 +1232,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 100,
                 child: _AddMeasurementButton(
                   onPressed: (){
+                    // print(exhaustionSeconds);
                     // resetFields();
                     // widget.onSavePressed();
                   },

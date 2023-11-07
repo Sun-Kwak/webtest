@@ -1,5 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
-import 'package:easy_localization/easy_localization.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
@@ -18,7 +18,6 @@ class ReportForm extends ConsumerStatefulWidget {
 class _ReportFormState extends ConsumerState<ReportForm> {
   @override
   Widget build(BuildContext context) {
-
     final selectedMemberId = ref.watch(selectedMemberIdProvider);
     return Container(
         decoration: BoxDecoration(
@@ -49,13 +48,15 @@ class _ReportFormState extends ConsumerState<ReportForm> {
 
   Widget leftSide() {
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
-    final measurementCalculateState = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
+    final measurementCalculateState = ref
+        .watch(measurementCalculatedStateProvider)
+        .measurementCalculatedState;
     final selectedMember = ref.watch(selectedMemberProvider);
     double? userHeight = selectedMeasurementState.userHeight ?? 0;
     double? userWeight = selectedMeasurementState.userWeight ?? 0;
     // double? heightInMeter = userHeight != 0 ? userHeight/ 100 : 0;
     // double? bmi = heightInMeter != 0 ? userWeight / (heightInMeter * heightInMeter) : null;
-    String?  bMI = measurementCalculateState.bmi.toString();
+    String? bMI = measurementCalculateState.bmi.toString();
     String? age = measurementCalculateState.age.toString();
     // DateTime today = DateTime.now();
 
@@ -67,13 +68,18 @@ class _ReportFormState extends ConsumerState<ReportForm> {
     //     (today.month == birthDate.month && today.day < birthDate.day)) {
     //   age--;
     // }
-    final intensityMax = ref.watch(intensitySelectionProvider).intensityState.intensityMax;
-    String zone5 = '${(intensityMax * 0.9).toStringAsFixed(0)}-${(intensityMax).toStringAsFixed(0)}';
-    String zone4 = '${(intensityMax * 0.8).toStringAsFixed(0)}-${(intensityMax * 0.9).toStringAsFixed(0)}';
-    String zone3 = '${(intensityMax * 0.7).toStringAsFixed(0)}-${(intensityMax * 0.8).toStringAsFixed(0)}';
-    String zone2 = '${(intensityMax * 0.6).toStringAsFixed(0)}-${(intensityMax * 0.7).toStringAsFixed(0)}';
-    String zone1 = '${(intensityMax * 0.5).toStringAsFixed(0)}-${(intensityMax * 0.6).toStringAsFixed(0)}';
-
+    final intensityMax =
+        ref.watch(intensitySelectionProvider).intensityState.intensityMax;
+    String zone5 =
+        '${(intensityMax * 0.9).toStringAsFixed(0)}-${(intensityMax).toStringAsFixed(0)}';
+    String zone4 =
+        '${(intensityMax * 0.8).toStringAsFixed(0)}-${(intensityMax * 0.9).toStringAsFixed(0)}';
+    String zone3 =
+        '${(intensityMax * 0.7).toStringAsFixed(0)}-${(intensityMax * 0.8).toStringAsFixed(0)}';
+    String zone2 =
+        '${(intensityMax * 0.6).toStringAsFixed(0)}-${(intensityMax * 0.7).toStringAsFixed(0)}';
+    String zone1 =
+        '${(intensityMax * 0.5).toStringAsFixed(0)}-${(intensityMax * 0.6).toStringAsFixed(0)}';
 
     return SizedBox(
       width: 690,
@@ -98,7 +104,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 width: 10,
               ),
               Text(selectedMember.birthDay),
-              Text(' ,${age}세'),
+              Text(' ,$age세'),
               const SizedBox(
                 width: 10,
               ),
@@ -168,7 +174,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                           fit: BoxFit.fill))),
             ],
           ),
-          const Center(
+          Center(
               child: Text(
             '나의 심폐능력 수준은?',
             style: TextStyle(fontSize: 20),
@@ -187,39 +193,77 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                     enableLoadingAnimation: true,
                     animationDuration: 2000,
                     axes: <RadialAxis>[
-                      RadialAxis(minimum: 0, maximum: 150, ranges: <GaugeRange>[
-                        GaugeRange(
-                            startValue: 0,
-                            endValue: 50,
-                            color: CUSTOM_GREEN,
-                            startWidth: 10,
-                            endWidth: 10),
-                        GaugeRange(
-                            startValue: 50,
-                            endValue: 100,
-                            color: CUSTOM_YELLOW,
-                            startWidth: 10,
-                            endWidth: 10),
-                        GaugeRange(
-                            startValue: 100,
-                            endValue: 150,
-                            color: CUSTOM_RED,
-                            startWidth: 10,
-                            endWidth: 10)
-                      ], pointers: <GaugePointer>[
-                        NeedlePointer(
-                          value: 90,
-                        )
-                      ], annotations: <GaugeAnnotation>[
-                        GaugeAnnotation(
-                            widget: Container(
-                                child: Text('90.0',
-                                    style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold))),
-                            angle: 90,
-                            positionFactor: 0.5)
-                      ])
+                      RadialAxis(
+                          minimum: measurementCalculateState.minimumGauge,
+                          maximum:
+                              measurementCalculateState.optimalHealthGauge == 0
+                                  ? 100
+                                  : measurementCalculateState
+                                      .optimalHealthGauge,
+                          ranges: <GaugeRange>[
+                            GaugeRange(
+                              startValue:
+                                  measurementCalculateState.minimumGauge,
+                              endValue: measurementCalculateState.diseaseGauge,
+                              color: CUSTOM_RED,
+                            ),
+                            // startWidth: (measurementCalculateState.diseaseGauge - measurementCalculateState.minimumGauge)/2,
+                            // endWidth: (measurementCalculateState.diseaseGauge - measurementCalculateState.minimumGauge)/2),
+                            GaugeRange(
+                              startValue:
+                                  measurementCalculateState.diseaseGauge,
+                              endValue:
+                                  measurementCalculateState.poorHealthGauge,
+                              color: CUSTOM_RED.withOpacity(0.3),
+                            ),
+                            // startWidth: 10,
+                            // endWidth: 10),
+                            GaugeRange(
+                              startValue:
+                                  measurementCalculateState.poorHealthGauge,
+                              endValue: measurementCalculateState.neutralGauge,
+                              color: CUSTOM_YELLOW.withOpacity(0.3),
+                            ),
+                            // startWidth: 10,
+                            // endWidth: 10),
+                            GaugeRange(
+                              startValue:
+                                  measurementCalculateState.neutralGauge,
+                              endValue:
+                                  measurementCalculateState.goodHealthGauge,
+                              color: CUSTOM_BLUE.withOpacity(0.3),
+                            ),
+                            // startWidth: 10,
+                            // endWidth: 10),
+                            GaugeRange(
+                              startValue:
+                                  measurementCalculateState.goodHealthGauge,
+                              endValue:
+                                  measurementCalculateState.optimalHealthGauge,
+                              color: CUSTOM_GREEN.withOpacity(0.3),
+                            ),
+                            // startWidth: 10,
+                            // endWidth: 10),
+                          ],
+                          pointers: <GaugePointer>[
+                            NeedlePointer(
+                              enableAnimation: true,
+                              value: measurementCalculateState.Vo2Max,
+                              // needleColor: CUSTOM_BLACK,
+                            )
+                          ],
+                          annotations: <GaugeAnnotation>[
+                            GaugeAnnotation(
+                                widget: Container(
+                                    child: Text(
+                                        '${measurementCalculateState.Vo2Max}',
+                                        style: TextStyle(
+                                            color: CUSTOM_BLACK,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold))),
+                                angle: 90,
+                                positionFactor: 0.5)
+                          ])
                     ]),
               ),
             ],
@@ -255,9 +299,22 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   }
 
   Widget rightSide() {
+    final selectedMeasurementState =
+        ref.watch(selectedMeasurementProvider).exhaustionSeconds;
+    final selectedReferenceMeasurementState =
+        ref.watch(selectedReferenceMeasurementProvider).exhaustionSeconds;
+    int referenceSeconds = selectedReferenceMeasurementState ?? 0;
+    int exhaustionSecondsDifference = selectedMeasurementState == null
+        ? 0
+        : (selectedMeasurementState - referenceSeconds);
+    String growRate = selectedReferenceMeasurementState == null
+        ? '0'
+        : (exhaustionSecondsDifference / selectedReferenceMeasurementState)
+            .toStringAsFixed(2);
     return SizedBox(
       width: 690,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             height: 30,
@@ -282,12 +339,19 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.arrow_drop_up,
-                          color: CUSTOM_RED,
+                          exhaustionSecondsDifference >= 0
+                              ? Icons.arrow_drop_up
+                              : Icons.arrow_drop_down,
+                          color: exhaustionSecondsDifference >= 0
+                              ? CUSTOM_RED
+                              : CUSTOM_BLUE,
                         ),
                         Text(
-                          '20.69%',
-                          style: TextStyle(color: CUSTOM_RED),
+                          '$growRate%',
+                          style: TextStyle(
+                              color: exhaustionSecondsDifference >= 0
+                                  ? CUSTOM_RED
+                                  : CUSTOM_BLUE),
                         )
                       ],
                     )
@@ -297,7 +361,17 @@ class _ReportFormState extends ConsumerState<ReportForm> {
             ],
           ),
           columnChart(),
-          Center(child: Text('대사증후군 발병률 지표',style: TextStyle(fontSize: 16),)),
+          Row(
+            children: [
+              SizedBox(
+                width: 10,
+              ),
+              Text(
+                '대사증후군 발병률 지표',
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
           animatedPointRanges(),
           Row(
             children: [
@@ -311,10 +385,11 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                   Text('당뇨 위험률 48% 감소'),
                 ],
               ),
-
             ],
           ),
-          SizedBox(height: 30,),
+          SizedBox(
+            height: 30,
+          ),
           Center(child: noticeText2()),
         ],
       ),
@@ -322,20 +397,31 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   }
 
   Widget barChart() {
+    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
+    final selectedReferenceMeasurementState =
+        ref.watch(selectedReferenceMeasurementProvider);
     final List<ExhaustionModel> chartData = [
       ExhaustionModel(
-          month: '최근 (2023-04-03)', seconds: 700, color: CUSTOM_BLUE),
+          month: '기준 (${selectedMeasurementState.testDate})',
+          seconds: selectedMeasurementState.exhaustionSeconds ?? 0,
+          color: CUSTOM_BLUE),
       ExhaustionModel(
-          month: '이전 (2023-03-31)', seconds: 500, color: CUSTOM_RED),
+          month: '비교 (${selectedReferenceMeasurementState.testDate})',
+          seconds: selectedReferenceMeasurementState.exhaustionSeconds ?? 0,
+          color: CUSTOM_RED),
     ];
     return SizedBox(
       width: 400,
       height: 150,
       child: SfCartesianChart(
+          tooltipBehavior: TooltipBehavior(enable: true),
           title: ChartTitle(text: '탈진시간', alignment: ChartAlignment.near),
           primaryXAxis: CategoryAxis(),
           series: <CartesianSeries>[
             BarSeries<ExhaustionModel, String>(
+                enableTooltip: true,
+
+                // selectionBehavior: SelectionBehavior(),
                 dataSource: chartData,
                 xValueMapper: (ExhaustionModel data, _) => data.month,
                 yValueMapper: (ExhaustionModel data, _) => data.seconds,
@@ -350,60 +436,157 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   }
 
   Widget columnChart() {
-    final List<StageModel> chartData = [
-      StageModel(stage: '0Stage', previousValue: 100, currentValue: 100),
-      StageModel(stage: '0.5Stage', previousValue: 200, currentValue: 120),
-      StageModel(stage: '1Stage', previousValue: 300, currentValue: 130),
-      StageModel(stage: '2Stage', previousValue: 400, currentValue: 140),
-      StageModel(stage: '3Stage', previousValue: 500, currentValue: 150),
-      StageModel(stage: '4Stage', previousValue: 600, currentValue: 0),
+    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
+    final selectedReferenceMeasurementState =
+        ref.watch(selectedReferenceMeasurementProvider);
+    int current0Stage = selectedMeasurementState.stage0 ?? 0;
+    int current1Stage = selectedMeasurementState.stage1 ?? 0;
+    int current2Stage = selectedMeasurementState.stage2 ?? 0;
+    int current3Stage = selectedMeasurementState.stage3 ?? 0;
+    int current4Stage = selectedMeasurementState.stage4 ?? 0;
+    int current5Stage = selectedMeasurementState.stage5 ?? 0;
+    int current6Stage = selectedMeasurementState.stage6 ?? 0;
+    int current7Stage = selectedMeasurementState.stage7 ?? 0;
+    int previous0Stage = selectedReferenceMeasurementState.stage0 ?? 0;
+    int previous1Stage = selectedReferenceMeasurementState.stage1 ?? 0;
+    int previous2Stage = selectedReferenceMeasurementState.stage2 ?? 0;
+    int previous3Stage = selectedReferenceMeasurementState.stage3 ?? 0;
+    int previous4Stage = selectedReferenceMeasurementState.stage4 ?? 0;
+    int previous5Stage = selectedReferenceMeasurementState.stage5 ?? 0;
+    int previous6Stage = selectedReferenceMeasurementState.stage6 ?? 0;
+    int previous7Stage = selectedReferenceMeasurementState.stage7 ?? 0;
+    final List<StageModel> list = [
+      StageModel(
+          stage: '0Stage',
+          previousValue: previous0Stage,
+          currentValue: current0Stage),
+      StageModel(
+          stage: '1Stage',
+          previousValue: previous1Stage,
+          currentValue: current1Stage),
+      StageModel(
+          stage: '2Stage',
+          previousValue: previous2Stage,
+          currentValue: current2Stage),
+      StageModel(
+          stage: '3Stage',
+          previousValue: previous3Stage,
+          currentValue: current3Stage),
+      StageModel(
+          stage: '4Stage',
+          previousValue: previous4Stage,
+          currentValue: current4Stage),
+      StageModel(
+          stage: '5Stage',
+          previousValue: previous5Stage,
+          currentValue: current5Stage),
+      StageModel(
+          stage: '6Stage',
+          previousValue: previous6Stage,
+          currentValue: current6Stage),
+      StageModel(
+          stage: '7Stage',
+          previousValue: previous7Stage,
+          currentValue: current7Stage),
     ];
+    final List<StageModel> chartData = [];
+    for (int i = 0; i <= 7; i++) {
+      int previousValue = list[i].previousValue;
+      int currentValue = list[i].currentValue;
+      String stage = list[i].stage;
+      if (previousValue != 0 || currentValue != 0) {
+        chartData.add(StageModel(
+            stage: stage,
+            previousValue: previousValue,
+            currentValue: currentValue));
+      }
+    }
+
     return SizedBox(
       width: 690,
       height: 200,
-      child: SfCartesianChart(primaryXAxis: CategoryAxis(), palette: <Color>[
-        Colors.teal,
-        Colors.orange,
-      ], series: <CartesianSeries>[
-        ColumnSeries<StageModel, String>(
-          dataSource: chartData,
-          xValueMapper: (StageModel data, _) => data.stage,
-          yValueMapper: (StageModel data, _) => data.previousValue,
-        ),
-        ColumnSeries<StageModel, String>(
-          dataSource: chartData,
-          xValueMapper: (StageModel data, _) => data.stage,
-          yValueMapper: (StageModel data, _) => data.currentValue,
-        ),
-      ]),
+      child: SfCartesianChart(
+          tooltipBehavior: TooltipBehavior(enable: true),
+          primaryXAxis: CategoryAxis(),
+          palette: <Color>[
+            Colors.teal,
+            Colors.orange,
+          ],
+          legend: Legend(
+              isVisible: true,
+              alignment: ChartAlignment.center,
+              position: LegendPosition.bottom),
+          series: <CartesianSeries>[
+            ColumnSeries<StageModel, String>(
+              name: '비교 ${selectedReferenceMeasurementState.testDate}',
+              dataSource: chartData,
+              xValueMapper: (StageModel data, _) => data.stage,
+              yValueMapper: (StageModel data, _) => data.previousValue,
+            ),
+            ColumnSeries<StageModel, String>(
+              name: '기준 ${selectedMeasurementState.testDate}',
+              dataSource: chartData,
+              xValueMapper: (StageModel data, _) => data.stage,
+              yValueMapper: (StageModel data, _) => data.currentValue,
+            ),
+          ]),
     );
   }
 
   Widget multipleBarChart() {
+    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
+    final selectedReferenceMeasurementState =
+        ref.watch(selectedReferenceMeasurementProvider);
+    int currentMax = selectedMeasurementState.bpmMax ?? 0;
+    int currentBpm1m = selectedMeasurementState.bpm1m ?? 0;
+    int currentBpm2m = selectedMeasurementState.bpm2m ?? 0;
+    int currentBpm3m = selectedMeasurementState.bpm3m ?? 0;
+    int previousMax = selectedReferenceMeasurementState.bpmMax ?? 0;
+    int previousBpm1m = selectedReferenceMeasurementState.bpm1m ?? 0;
+    int previousBpm2m = selectedReferenceMeasurementState.bpm2m ?? 0;
+    int previousBpm3m = selectedReferenceMeasurementState.bpm3m ?? 0;
+
     final List<HrrModel> chartData = [
-      HrrModel(hrr: 'HRR1', previousValue: 30, currentValue: 30),
-      HrrModel(hrr: 'HRR2', previousValue: 40, currentValue: 30),
-      HrrModel(hrr: 'HRR3', previousValue: 70, currentValue: 80),
-      HrrModel(hrr: '최고심박수', previousValue: 180, currentValue: 180),
+      HrrModel(
+          hrr: 'HRR1',
+          previousValue: previousMax - previousBpm1m,
+          currentValue: currentMax - currentBpm1m),
+      HrrModel(
+          hrr: 'HRR2',
+          previousValue: previousMax - previousBpm2m,
+          currentValue: currentMax - currentBpm2m),
+      HrrModel(
+          hrr: 'HRR3',
+          previousValue: previousMax - previousBpm3m,
+          currentValue: currentMax - currentBpm3m),
+      HrrModel(
+          hrr: '최고심박수', previousValue: previousMax, currentValue: currentMax),
     ];
     return SizedBox(
       width: 490,
       height: 200,
-      child: SfCartesianChart(primaryXAxis: CategoryAxis(), palette: <Color>[
-        Colors.teal,
-        Colors.orange,
-      ], series: <CartesianSeries>[
-        BarSeries<HrrModel, String>(
-          dataSource: chartData,
-          xValueMapper: (HrrModel data, _) => data.hrr,
-          yValueMapper: (HrrModel data, _) => data.previousValue,
-        ),
-        BarSeries<HrrModel, String>(
-          dataSource: chartData,
-          xValueMapper: (HrrModel data, _) => data.hrr,
-          yValueMapper: (HrrModel data, _) => data.currentValue,
-        ),
-      ]),
+      child: SfCartesianChart(
+          tooltipBehavior: TooltipBehavior(enable: true),
+          legend: Legend(isVisible: true),
+          primaryXAxis: CategoryAxis(),
+          palette: <Color>[
+            Colors.teal,
+            Colors.orange,
+          ],
+          series: <CartesianSeries>[
+            BarSeries<HrrModel, String>(
+              name: '기준 ${selectedMeasurementState.testDate}',
+              dataSource: chartData,
+              xValueMapper: (HrrModel data, _) => data.hrr,
+              yValueMapper: (HrrModel data, _) => data.previousValue,
+            ),
+            BarSeries<HrrModel, String>(
+              name: '비교 ${selectedReferenceMeasurementState.testDate}',
+              dataSource: chartData,
+              xValueMapper: (HrrModel data, _) => data.hrr,
+              yValueMapper: (HrrModel data, _) => data.currentValue,
+            ),
+          ]),
     );
   }
 
@@ -423,7 +606,9 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   Widget noticeText() {
     // final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     // final selectedMemberState = ref.watch(selectedMemberProvider);
-    final measurementCalculatedState = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
+    final measurementCalculatedState = ref
+        .watch(measurementCalculatedStateProvider)
+        .measurementCalculatedState;
     // double genderFactor = (selectedMemberState.gender == "남성") ? 2 : (selectedMemberState.gender == "여성") ? 1 : 0;
     // int? exhaustionSeconds = selectedMeasurementState.exhaustionSeconds ?? 0;
     double vo2Max = measurementCalculatedState.Vo2Max;
@@ -439,20 +624,47 @@ class _ReportFormState extends ConsumerState<ReportForm> {
       width: 385,
       child: Column(
         children: [
-          Text(
-            '테스트님의 최대산소섭취량은 ${vo2Max} ml/kg/min 이며 같은 나이대에서 ${grade} ${convertedPercentage}%에 해당됩니다. 유산소성 운동능력의 중요한 지표로써 신체가 소모한 산소량을 의미하며 더 많은 산소를 들이 마실수록 몸에서 더 많은 에너지를 사용할 수 있습니다.',
-            softWrap: true,
-            style: TextStyle(
-              height: 3, // 줄 간격을 조절합니다. 1.5는 기본 높이의 1.5배입니다.
+          RichText(
+              text: TextSpan(children: [
+            const TextSpan(
+              text: '테스트님의 최대산소섭취량은 ',
+              style: TextStyle(fontFamily: 'SebangGothic'),
             ),
+            TextSpan(
+              text: '$vo2Max ml/kg/min ',
+              style: const TextStyle(
+                  fontFamily: 'SebangGothic', fontWeight: FontWeight.bold),
+            ),
+            const TextSpan(
+                text: '이며 같은 나이대에서 ',
+                style: TextStyle(fontFamily: 'SebangGothic')),
+            TextSpan(
+              text: '$grade $convertedPercentage%',
+              style: TextStyle(
+                  color: grade == '상위' ? CUSTOM_BLUE : CUSTOM_RED,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'SebangGothic'),
+            ),
+            const TextSpan(
+              text:
+                  '에 해당됩니다. 유산소성 운동능력의 중요한 지표로써 신체가 소모한 산소량을 의미하며 더 많은 산소를 들이 마실수록 몸에서 더 많은 에너지를 사용할 수 있습니다.',
+              style: TextStyle(fontFamily: 'SebangGothic'),
+            ),
+          ])),
+          SizedBox(
+            height: 20,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('건강상태 : '),
+              Text(
+                '건강상태 : ',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               Container(
                 color: getColorForHealthStatus(healthStatus),
-                child: Text(healthStatus),
+                child: Text(healthStatus,
+                    style: TextStyle(fontWeight: FontWeight.bold)),
               )
             ],
           )
@@ -475,28 +687,42 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   }
 
   Widget animatedPointRanges() {
+    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
+    int bpmMax = selectedMeasurementState.bpmMax ?? 0;
+    int bpm3m = selectedMeasurementState.bpm3m ?? 0;
+    int indicator = bpmMax - bpm3m;
     return SfLinearGauge(
       maximum: 90,
       interval: 45,
+      // showLabels: true,
       barPointers: [
-        LinearBarPointer(value: 60,color: CUSTOM_BLUE,),
-        LinearBarPointer(value: 45,color: CUSTOM_RED,),
+        LinearBarPointer(
+          value: indicator.toDouble(),
+          color: CUSTOM_BLUE,
+        ),
+        LinearBarPointer(
+          value: 45,
+          color: CUSTOM_RED,
+        ),
       ],
       markerPointers: [
         LinearWidgetPointer(
-          position: LinearElementPosition.outside,
-            value: 60,
+            position: LinearElementPosition.outside,
+            value: indicator.toDouble(),
             animationDuration: 2000,
             animationType: LinearAnimationType.bounceOut,
             child: Icon(
-              Icons.thumb_up_alt,
-              color: CUSTOM_BLUE,
+              indicator >= 45 ? Icons.thumb_up_alt : Icons.thumb_down_alt,
+              color: indicator >= 45 ? CUSTOM_BLUE : CUSTOM_RED,
             ))
       ],
     );
   }
 
   Widget _buildMultipleRanges(BuildContext context) {
+    final measurementCalculateState = ref
+        .watch(measurementCalculatedStateProvider)
+        .measurementCalculatedState;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -506,85 +732,148 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         SizedBox(
             height: 120,
             width: 665,
-            child: SfLinearGauge(
-              // animateAxis: true,
-              // animateRange: true,
-              // animationDuration: 3000,
-              orientation: LinearGaugeOrientation.horizontal,
-              ranges: <LinearGaugeRange>[
-                LinearGaugeRange(
-                    endValue: 30,
-                    startWidth: 40,
-                    midWidth: 40,
-                    endWidth: 40,
-                    child: Container(
-                      color: CUSTOM_RED,
-                    )),
-                LinearGaugeRange(
-                    startValue: 30.0,
-                    endValue: 65,
-                    startWidth: 40,
-                    midWidth: 40,
-                    endWidth: 40,
-                    child: Container(color: CUSTOM_YELLOW)),
-                LinearGaugeRange(
-                    startValue: 65.0,
-                    startWidth: 40,
-                    midWidth: 40,
-                    endWidth: 40,
-                    child: Container(color: CUSTOM_GREEN)),
-                LinearGaugeRange(
-                    endValue: 30,
-                    startWidth: 40,
-                    endWidth: 40,
-                    color: Colors.transparent,
-                    child: const Center(
-                        child: Text(
-                      'Bad',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xff191A1B)),
-                    ))),
-                LinearGaugeRange(
-                  startValue: 30,
-                  endValue: 65,
-                  startWidth: 40,
-                  endWidth: 40,
-                  color: Colors.transparent,
-                  child: const SizedBox(
-                      height: 20,
-                      child: Center(
-                          child: Text(
-                        'Good',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xff191A1B)),
-                      ))),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      color: CUSTOM_RED.withOpacity(0.3),
+                      height: 15,
+                      width: 665 / 3,
+                      child: Text('Pre-mature Death'),
+                    ),
+                    Container(
+                      color: CUSTOM_YELLOW.withOpacity(0.3),
+                      height: 15,
+                      width: 665 / 3,
+                      child: Center(child: Text('Comfort Zone')),
+                    ),
+                    Container(
+                      color: CUSTOM_GREEN.withOpacity(0.3),
+                      height: 15,
+                      width: 665 / 3,
+                      child: Text(
+                        'High-level Wellness',
+                        textAlign: TextAlign.end,
+                      ),
+                    ),
+                  ],
                 ),
-                LinearGaugeRange(
-                  startValue: 65,
-                  startWidth: 40,
-                  endWidth: 40,
-                  color: Colors.transparent,
-                  child: const SizedBox(
-                      height: 20,
-                      child: Center(
-                          child: Text(
-                        'Excellent',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xff191A1B)),
-                      ))),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(measurementCalculateState.diseaseGauge.toString()),
+                    Text(measurementCalculateState.poorHealthGauge.toString()),
+                    Text(measurementCalculateState.neutralGauge.toString()),
+                    Text(measurementCalculateState.goodHealthGauge.toString()),
+                    Text(measurementCalculateState.optimalHealthGauge
+                        .toString()),
+                  ],
                 )
               ],
-            )),
+            )
+            // SfLinearGauge(
+            //   // animateAxis: true,
+            //   // animateRange: true,
+            //   // animationDuration: 3000,
+            //   orientation: LinearGaugeOrientation.horizontal,
+            //   interval: measurementCalculateState.optimalHealthGauge == 0 ? 10 : (measurementCalculateState.optimalHealthGauge - measurementCalculateState.diseaseGauge)/5,
+            //   minimum: measurementCalculateState.diseaseGauge == 0 ? 0 : measurementCalculateState.diseaseGauge ,
+            //   maximum: measurementCalculateState.optimalHealthGauge == 0 ? 100 : measurementCalculateState.optimalHealthGauge,
+            //   ranges: <LinearGaugeRange>[
+            //     LinearGaugeRange(
+            //         startValue: measurementCalculateState.diseaseGauge,
+            //         endValue: measurementCalculateState.poorHealthGauge,
+            //         // midWidth: 40,
+            //         // endWidth: 40,
+            //         child: Container(
+            //           color: CUSTOM_RED,
+            //         )),
+            //     LinearGaugeRange(
+            //         startValue: measurementCalculateState.poorHealthGauge,
+            //         endValue: measurementCalculateState.neutralGauge,
+            //         // startWidth: 40,
+            //         // midWidth: 40,
+            //         // endWidth: 40,
+            //         child: Container(color: CUSTOM_YELLOW)),
+            //     LinearGaugeRange(
+            //         startValue: measurementCalculateState.neutralGauge,
+            //         endValue: measurementCalculateState.goodHealthGauge,
+            //         // startWidth: 40,
+            //         // midWidth: 40,
+            //         // endWidth: 40,
+            //         child: Container(color: CUSTOM_GREEN)),
+            //     // LinearGaugeRange(
+            //     //     startValue: measurementCalculateState.diseaseGauge,
+            //     //     endValue: (measurementCalculateState.optimalHealthGauge -
+            //     //             measurementCalculateState.diseaseGauge) /
+            //     //         5 *
+            //     //         1,
+            //     //     // startWidth: 40,
+            //     //     // endWidth: 40,
+            //     //     color: Colors.transparent,
+            //     //     child: const Center(
+            //     //         child: Text(
+            //     //       'Pre-mature Death',
+            //     //       style: TextStyle(
+            //     //           fontWeight: FontWeight.w500,
+            //     //           color: Color(0xff191A1B)),
+            //     //     ))),
+            //     // LinearGaugeRange(
+            //     //   startValue: (measurementCalculateState.optimalHealthGauge -
+            //     //           measurementCalculateState.diseaseGauge) /
+            //     //       5 *
+            //     //       1,
+            //     //   endValue: measurementCalculateState.optimalHealthGauge -
+            //     //       ((measurementCalculateState.optimalHealthGauge -
+            //     //               measurementCalculateState.diseaseGauge) /
+            //     //           5 *
+            //     //           1),
+            //     //   // startWidth: 40,
+            //     //   // endWidth: 40,
+            //     //   color: Colors.transparent,
+            //     //   child: const SizedBox(
+            //     //       height: 20,
+            //     //       child: Center(
+            //     //           child: Text(
+            //     //         'Comfort Zone',
+            //     //         style: TextStyle(
+            //     //             fontWeight: FontWeight.w500,
+            //     //             color: Color(0xff191A1B)),
+            //     //       ))),
+            //     // ),
+            //     // LinearGaugeRange(
+            //     //   startValue: measurementCalculateState.optimalHealthGauge -
+            //     //       ((measurementCalculateState.optimalHealthGauge -
+            //     //               measurementCalculateState.diseaseGauge) /
+            //     //           5 *
+            //     //           1),
+            //     //   endValue: measurementCalculateState.optimalHealthGauge,
+            //     //   // startWidth: 40,
+            //     //   // endWidth: 40,
+            //     //   color: Colors.transparent,
+            //     //   child: const SizedBox(
+            //     //       height: 20,
+            //     //       child: Center(
+            //     //           child: Text(
+            //     //         'High-level Wellness',
+            //     //         style: TextStyle(
+            //     //             fontWeight: FontWeight.w500,
+            //     //             color: Color(0xff191A1B)),
+            //     //       ))),
+            //     // )
+            //   ],
+            // ),
+            ),
       ],
     );
   }
-  Widget _buildThermometer(BuildContext context) {
-    final Orientation orientation = MediaQuery.of(context).orientation;
-    final Brightness brightness = Theme.of(context).brightness;
 
+  Widget _buildThermometer(BuildContext context) {
     return Center(
         child: SizedBox(
             height: 150,
@@ -605,7 +894,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                             minorTicksPerInterval: 0,
                             axisTrackExtent: 23,
                             axisTrackStyle: LinearAxisTrackStyle(
-                              color: CUSTOM_BLACK,
+                                color: CUSTOM_BLACK,
                                 thickness: 12,
                                 borderWidth: 1,
                                 edgeStyle: LinearEdgeStyle.bothCurve),
@@ -637,49 +926,24 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                                 width: 30,
                                 height: 30,
                               ),
-                              // LinearShapePointer(
-                              //   value: -20,
-                              //   markerAlignment: LinearMarkerAlignment.start,
-                              //   shapeType: LinearShapePointerType.circle,
-                              //   // borderWidth: 0.5,
-                              //   // borderColor:
-                              //   // ,
-                              //   color: CUSTOM_BLUE,
-                              //   position: LinearElementPosition.cross,
-                              //   width: 30,
-                              //   height: 30,
-                              // ),
+
                               LinearWidgetPointer(
-                                  value: -20,
-                                  markerAlignment: LinearMarkerAlignment.start,
-                                  child: Container(
-                                    width: 10,
-                                    height: 4,
-                                    decoration: BoxDecoration(
+                                value: -20,
+                                markerAlignment: LinearMarkerAlignment.start,
+                                child: Container(
+                                  width: 10,
+                                  height: 4,
+                                  decoration: BoxDecoration(
                                       border: Border(
                                         left: BorderSide(
-                                            width: 2.0,
-                                            color: CUSTOM_BLACK),
+                                            width: 2.0, color: CUSTOM_BLACK),
                                         right: BorderSide(
-                                            width: 2.0,
-                                            color: CUSTOM_BLACK),
+                                            width: 2.0, color: CUSTOM_BLACK),
                                       ),
                                       color: CUSTOM_BLUE),
-                                    ),
-                                  ),
-                              // LinearWidgetPointer(
-                              //     value: 60,
-                              //     enableAnimation: false,
-                              //     position: LinearElementPosition.outside,
-                              //     child: Container(
-                              //         width: 16,
-                              //         height: 12,
-                              //         transform:
-                              //         Matrix4.translationValues(4, 0, 0.0),
-                              //         child: Image.asset(
-                              //           'images/triangle_pointer.png',
-                              //           color: CUSTOM_BLUE,
-                              //         ))),
+                                ),
+                              ),
+
                               LinearShapePointer(
                                 value: 60,
                                 width: 10,
@@ -687,9 +951,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                                 enableAnimation: true,
                                 color: CUSTOM_RED,
                                 position: LinearElementPosition.outside,
-                                onChanged: (dynamic value) {
-                                },
-                              )// 게이지바늘
+                                onChanged: (dynamic value) {},
+                              ) // 게이지바늘
                             ],
                             barPointers: <LinearBarPointer>[
                               LinearBarPointer(
@@ -698,79 +961,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                                 thickness: 6,
                                 edgeStyle: LinearEdgeStyle.endCurve,
                                 color: CUSTOM_BLUE,
-                              )// 게이지
+                              ) // 게이지
                             ]),
-
-                        /// Linear gauge to display Fahrenheit  scale.
-                        // Container(
-                        //     transform: Matrix4.translationValues(-6, 0, 0.0),
-                        //     child: SfLinearGauge(
-                        //       maximum: 120,
-                        //       showAxisTrack: false,
-                        //       interval: 40,
-                        //       minorTicksPerInterval: 0,
-                        //       axisTrackExtent: 24,
-                        //       axisTrackStyle:
-                        //       const LinearAxisTrackStyle(thickness: 0),
-                        //       orientation: LinearGaugeOrientation.vertical,
-                        //           // barPointers: <LinearBarPointer>[
-                        //           //   LinearBarPointer(
-                        //           //     value: 60,
-                        //           //     enableAnimation: false,
-                        //           //     thickness: 6,
-                        //           //     edgeStyle: LinearEdgeStyle.endCurve,
-                        //           //     color: CUSTOM_BLUE,
-                        //           //   ),
-                        //           //
-                        //           // ],
-                        //       markerPointers: <LinearMarkerPointer>[
-                        //
-                        //         //       LinearShapePointer(
-                        //         //         value: 60,
-                        //         //         width: 10,
-                        //         //         height: 10,
-                        //         //         enableAnimation: false,
-                        //         //         color: Colors.transparent,
-                        //         //         position: LinearElementPosition.cross,
-                        //         //         onChanged: (dynamic value) {
-                        //         //         },
-                        //         //       )
-                        //         //     ],
-                        //         //     barPointers: <LinearBarPointer>[
-                        //         //       LinearBarPointer(
-                        //         //         value: 60,
-                        //         //         enableAnimation: false,
-                        //         //         thickness: 6,
-                        //         //         edgeStyle: LinearEdgeStyle.endCurve,
-                        //         //         color: CUSTOM_BLUE,
-                        //         //       )
-                        //               // LinearWidgetPointer(
-                        //               //     value: 60,
-                        //               //     enableAnimation: false,
-                        //               //     position: LinearElementPosition.outside,
-                        //               //     child: Container(
-                        //               //         width: 16,
-                        //               //         height: 12,
-                        //               //         // transform:
-                        //               //         // Matrix4.translationValues(4, 0, 0.0),
-                        //               //         child: Image.asset(
-                        //               //           'images/triangle_pointer.png',
-                        //               //           color: CUSTOM_BLUE,
-                        //               //         ))),
-                        //         LinearWidgetPointer(
-                        //             markerAlignment: LinearMarkerAlignment.end,
-                        //             value: 120,
-                        //             position: LinearElementPosition.inside,
-                        //             offset: 6,
-                        //             enableAnimation: false,
-                        //             child: SizedBox(
-                        //               height: 30,
-                        //               child: Text(
-                        //                 '%',
-                        //               ),
-                        //             )),
-                        //       ],
-                        //     ))
                       ],
                     )))));
   }
@@ -805,7 +997,7 @@ Color getColorForHealthStatus(String status) {
     case 'Disease':
       return healthStatusColors[HealthStatus.Disease]!;
     default:
-    // 기본값으로 회색 반환 또는 예외 처리
+      // 기본값으로 회색 반환 또는 예외 처리
       return healthStatusColors[HealthStatus.Neutral]!;
   }
 }

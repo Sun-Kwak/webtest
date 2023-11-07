@@ -134,7 +134,7 @@ class SelectedMeasurementProvider extends StateNotifier<Measurement> {
     required this.repository,
 
   }) : super(Measurement.empty()) {
-    getLatestMeasurement(0);
+    getLatestMeasurement(0,[]);
   }
 
   void onSelectionChanged(Measurement measurement) {
@@ -144,11 +144,49 @@ class SelectedMeasurementProvider extends StateNotifier<Measurement> {
   void removeState() {
     state = Measurement.empty();
   }
-  Future<void> getLatestMeasurement(int memberId) async {
+  // Future<void> getLatestMeasurement(int memberId) async {
+  //
+  //     Measurement measurement = await repository.getLatestMeasurement(memberId);
+  //     state = measurement;
+  // }
 
-      Measurement measurement = await repository.getLatestMeasurement(memberId);
-      state = measurement;
+  void getLatestMeasurement(int memberId, List<Measurement> measurements) {
+
+    List<Measurement> matchingMeasurements = measurements
+        .where((element) => element.memberId == memberId)
+        .toList();
+
+    if (matchingMeasurements.isNotEmpty) {
+
+      matchingMeasurements.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      Measurement latestMeasurement = matchingMeasurements.first;
+
+      state = latestMeasurement;
+    } else {
+      state = Measurement.empty();
+    }
   }
+
+
+}
+
+final selectedReferenceMeasurementProvider =
+StateNotifierProvider.autoDispose<SelectedReferenceMeasurementProvider, Measurement>((ref) {
+
+  return SelectedReferenceMeasurementProvider();
+});
+
+class SelectedReferenceMeasurementProvider extends StateNotifier<Measurement> {
+
+  SelectedReferenceMeasurementProvider() : super(Measurement.empty()) {
+    onSelectionChanged(Measurement.empty());
+  }
+
+  void onSelectionChanged(Measurement measurement) {
+    state = measurement;
+  }
+
+
 }
 
 
