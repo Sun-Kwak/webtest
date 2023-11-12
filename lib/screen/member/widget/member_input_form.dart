@@ -94,6 +94,7 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
       // selectedReferralController.setSelectedReferralID(null, null);
       isEditingController.toggleStatus(false);
       memberInputController.resetAll();
+      updatingMember = Member.empty();
     });
   }
 
@@ -392,8 +393,10 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 width: 100,
                 child: _AddMemberButton(
                   onPressed: () {
-                    // resetFields();
+
                     widget.onSavePressed();
+                    // resetFields();
+                    // updatingMember = Member.empty();
                   },
                   member: updatingMember,
                 ),
@@ -423,6 +426,7 @@ class _AddMemberButton extends ConsumerWidget {
     final bool isValidated = memberInputState.status.isValidated;
     final memberInputController = ref.read(memberInputProvider.notifier);
     final membersController = ref.read(membersProvider.notifier);
+    final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
 
     return SizedBox(
       width: 100,
@@ -430,6 +434,7 @@ class _AddMemberButton extends ConsumerWidget {
         onPressed: isValidated
             ? () {
                 memberInputController.addMember(member, membersController);
+                selectedMeasurementController.removeState();
                 onPressed();
               }
             : () {

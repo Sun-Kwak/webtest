@@ -19,14 +19,14 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import "package:universal_html/html.dart";
 
-class ReportForm extends ConsumerStatefulWidget {
-  const ReportForm({super.key});
+class ReportPdfForm extends ConsumerStatefulWidget {
+  const ReportPdfForm({super.key});
 
   @override
-  ConsumerState<ReportForm> createState() => _ReportFormState();
+  ConsumerState<ReportPdfForm> createState() => _ReportPdfFormState();
 }
 
-class _ReportFormState extends ConsumerState<ReportForm> {
+class _ReportPdfFormState extends ConsumerState<ReportPdfForm> {
   // final GlobalKey key = GlobalKey();
   //
   // Future<void> handlePrint() async {
@@ -64,32 +64,33 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   @override
   Widget build(BuildContext context) {
     final selectedMemberId = ref.watch(selectedMemberIdProvider);
-    final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
-    return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: Colors.white,
-        ),
-        width: 1390,
-        height: 800,
-        child: selectedMeasurementState.docId == ''
-            ? Center(
-                child: Text('선택 된 측정이 없습니다.'),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  leftSide(),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 5, bottom: 5),
-                    child: Container(
-                      width: 0.5,
-                      color: Colors.grey.withOpacity(0.5),
-                    ),
-                  ),
-                  rightSide(),
-                ],
-              ));
+    return Scaffold(
+      body: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.white,
+          ),
+          width: 1040,
+          height: 720,
+          child: selectedMemberId == 0
+              ? Center(
+            child: Text('선택 된 고객이 없습니다.'),
+          )
+              : Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              leftSide(),
+              Padding(
+                padding: const EdgeInsets.only(top: 5, bottom: 5),
+                child: Container(
+                  width: 0.5,
+                  color: Colors.grey.withOpacity(0.5),
+                ),
+              ),
+              rightSide(),
+            ],
+          )),
+    );
   }
 
   Widget leftSide() {
@@ -116,7 +117,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         '${(intensityMax * 0.5).toStringAsFixed(0)}-${(intensityMax * 0.6).toStringAsFixed(0)}';
 
     return SizedBox(
-      width: 690,
+      width: 518,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -128,19 +129,19 @@ class _ReportFormState extends ConsumerState<ReportForm> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(
-                width: 10,
+                width: 7,
               ),
               Text(
                 '${selectedMember.displayName}님',
-                style: const TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(
-                width: 10,
+                width: 7,
               ),
               Text(selectedMember.birthDay),
               Text(' ,$age세'),
               const SizedBox(
-                width: 10,
+                width: 7,
               ),
               Text('${userHeight}cm,'),
               Text('${userWeight}kg,'),
@@ -149,13 +150,13 @@ class _ReportFormState extends ConsumerState<ReportForm> {
             ],
           ),
           SizedBox(
-            height: 25,
+            height: 22,
           ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: 10,
+                width: 7,
               ),
               Column(
                 children: [
@@ -183,7 +184,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                   customContainer(
                       null,
                       '안정시 심박수 : ${selectedMeasurementState.bpm} BPM, 상위 ${measurementCalculateState.bpmLevel}',
-                      240,
+                      180,
                       null),
                   Row(
                     children: [
@@ -210,56 +211,56 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 ],
               ),
               SizedBox(
-                width: 65,
+                width: 48,
               ),
               SizedBox(
-                  height: 150,
-                  width: 250,
+                  height: 135,
+                  width: 188,
                   child: OverflowBox(
-                      maxHeight: 350,
-                      maxWidth: 350,
+                      maxHeight: 260,
+                      maxWidth: 260,
                       child: Lottie.asset('asset/lottie/heartbeat.json',
                           fit: BoxFit.fill))),
             ],
           ),
           SizedBox(
-            height: 25,
+            height: 22,
           ),
           Center(
               child: Text(
-            '나의 심폐능력 수준은?',
-            style: TextStyle(fontSize: 20),
-          )),
+                '나의 심폐능력 수준은?',
+                style: TextStyle(fontSize: 18),
+              )),
           SizedBox(
-            height: 25,
+            height: 22,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                width: 20,
+                width: 15,
               ),
               noticeText(),
-              SizedBox(width: 50),
+              SizedBox(width: 37),
               Container(
-                width: 200,
-                height: 200,
+                width: 150,
+                height: 150,
                 child: SfRadialGauge(
-                    enableLoadingAnimation: true,
+                    enableLoadingAnimation: false,
                     animationDuration: 2000,
                     axes: <RadialAxis>[
                       RadialAxis(
                           minimum: measurementCalculateState.minimumGauge,
                           maximum:
-                              measurementCalculateState.optimalHealthGauge == 0
-                                  ? 100
-                                  : measurementCalculateState
-                                      .optimalHealthGauge,
+                          measurementCalculateState.optimalHealthGauge == 0
+                              ? 100
+                              : measurementCalculateState
+                              .optimalHealthGauge,
                           ranges: <GaugeRange>[
                             GaugeRange(
                               startValue:
-                                  measurementCalculateState.minimumGauge,
+                              measurementCalculateState.minimumGauge,
                               endValue: measurementCalculateState.diseaseGauge,
                               color: CUSTOM_RED,
                             ),
@@ -267,35 +268,35 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                             // endWidth: (measurementCalculateState.diseaseGauge - measurementCalculateState.minimumGauge)/2),
                             GaugeRange(
                               startValue:
-                                  measurementCalculateState.diseaseGauge,
+                              measurementCalculateState.diseaseGauge,
                               endValue:
-                                  measurementCalculateState.poorHealthGauge,
+                              measurementCalculateState.poorHealthGauge,
                               color: CUSTOM_RED.withOpacity(0.3),
                             ),
                             GaugeRange(
                               startValue:
-                                  measurementCalculateState.poorHealthGauge,
+                              measurementCalculateState.poorHealthGauge,
                               endValue: measurementCalculateState.neutralGauge,
                               color: CUSTOM_YELLOW.withOpacity(0.3),
                             ),
                             GaugeRange(
                               startValue:
-                                  measurementCalculateState.neutralGauge,
+                              measurementCalculateState.neutralGauge,
                               endValue:
-                                  measurementCalculateState.goodHealthGauge,
+                              measurementCalculateState.goodHealthGauge,
                               color: CUSTOM_BLUE.withOpacity(0.3),
                             ),
                             GaugeRange(
                               startValue:
-                                  measurementCalculateState.goodHealthGauge,
+                              measurementCalculateState.goodHealthGauge,
                               endValue:
-                                  measurementCalculateState.optimalHealthGauge,
+                              measurementCalculateState.optimalHealthGauge,
                               color: CUSTOM_GREEN.withOpacity(0.3),
                             ),
                           ],
                           pointers: <GaugePointer>[
                             NeedlePointer(
-                              enableAnimation: true,
+                              enableAnimation: false,
                               value: measurementCalculateState.Vo2Max,
                             )
                           ],
@@ -306,7 +307,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                                         '${measurementCalculateState.Vo2Max}',
                                         style: TextStyle(
                                             color: CUSTOM_BLACK,
-                                            fontSize: 15,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.bold))),
                                 angle: 90,
                                 positionFactor: 0.5)
@@ -316,34 +317,34 @@ class _ReportFormState extends ConsumerState<ReportForm> {
             ],
           ),
           SizedBox(
-            height: 25,
+            height: 22,
           ),
           Center(child: _buildMultipleRanges(context)),
           SizedBox(
-            height: 25,
+            height: 22,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              customContainer(CUSTOM_RED, 'Disease', 130, null),
+              customContainer(Colors.red, 'Disease', 98, null),
               customContainer(
-                  CUSTOM_RED.withOpacity(0.3), 'Poor Health', 130, null),
+                  CUSTOM_RED.withOpacity(0.3), 'Poor Health', 98, null),
               customContainer(
-                  CUSTOM_YELLOW.withOpacity(0.3), 'Neutral', 130, null),
+                  CUSTOM_YELLOW.withOpacity(0.3), 'Neutral', 98, null),
               customContainer(
-                  CUSTOM_BLUE.withOpacity(0.3), 'Good Health', 130, null),
+                  CUSTOM_BLUE.withOpacity(0.3), 'Good Health', 98, null),
               customContainer(
-                  CUSTOM_GREEN.withOpacity(0.3), 'Optimal Health', 130, null),
+                  CUSTOM_GREEN.withOpacity(0.3), 'Optimal Health', 98, null),
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              customContainer(null, '대사질환, 심혈관계\n질환 발병률 증가', 130, 75),
-              customContainer(null, '수축기 혈압\n암 발생률 증가', 130, 75),
-              customContainer(null, '유지 및 개선 권장', 130, 75),
-              customContainer(null, '산소 공급률 증가', 130, 75),
-              customContainer(null, '모세혈관 밀도\n미토콘드리아 밀집능력', 130, 75),
+              customContainer(null, '대사질환, 심혈관계\n질환 발병률 증가', 98, 68),
+              customContainer(null, '수축기 혈압\n암 발생률 증가', 98, 68),
+              customContainer(null, '유지 및 개선 권장', 98, 68),
+              customContainer(null, '산소 공급률 증가', 98, 68),
+              customContainer(null, '모세혈관 밀도\n미토콘드리아 밀집능력', 98, 68),
             ],
           ),
         ],
@@ -354,17 +355,17 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   Widget rightSide() {
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     final selectedReferenceMeasurementState =
-        ref.watch(selectedReferenceMeasurementProvider);
+    ref.watch(selectedReferenceMeasurementProvider);
     int baselineSeconds = selectedMeasurementState.exhaustionSeconds ?? 0;
     int referenceSeconds =
         selectedReferenceMeasurementState.exhaustionSeconds ?? 0;
     int exhaustionSecondsDifference =
-        selectedMeasurementState.exhaustionSeconds == null
-            ? 0
-            : (baselineSeconds - referenceSeconds);
+    selectedMeasurementState.exhaustionSeconds == null
+        ? 0
+        : (baselineSeconds - referenceSeconds);
     String growRate = selectedReferenceMeasurementState.exhaustionSeconds ==
-                0 ||
-            selectedReferenceMeasurementState.exhaustionSeconds == 0
+        0 ||
+        selectedReferenceMeasurementState.exhaustionSeconds == 0
         ? '0'
         : (exhaustionSecondsDifference / referenceSeconds).toStringAsFixed(2);
     final measurementCalculateState = ref
@@ -376,20 +377,20 @@ class _ReportFormState extends ConsumerState<ReportForm> {
     String diabetesNotice = measurementCalculateState.diabetesLevel == ''
         ? ''
         : measurementCalculateState.diabetesLevel == 'T1'
-            ? '당뇨병 적색경보'
-            : measurementCalculateState.diabetesLevel == 'T2'
-                ? '당뇨병 위험률 24% 감소'
-                : '당뇨병 위험률 48% 감소';
+        ? '당뇨병 적색경보'
+        : measurementCalculateState.diabetesLevel == 'T2'
+        ? '당뇨병 위험률 24% 감소'
+        : '당뇨병 위험률 48% 감소';
     String diabetesStatus = measurementCalculateState.diabetesLevel == ''
         ? ''
         : measurementCalculateState.diabetesLevel == 'T1'
-            ? '보통 이하'
-            : measurementCalculateState.diabetesLevel == 'T2'
-                ? '좋음'
-                : '매우 좋음';
+        ? '보통 이하'
+        : measurementCalculateState.diabetesLevel == 'T2'
+        ? '좋음'
+        : '매우 좋음';
 
     return SizedBox(
-      width: 690,
+      width: 518,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -409,10 +410,10 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                   children: [
                     Text(
                       '탈진시간 상승률',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(fontSize: 18),
                     ),
                     SizedBox(
-                      height: 30,
+                      height: 27,
                     ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -444,11 +445,11 @@ class _ReportFormState extends ConsumerState<ReportForm> {
           Row(
             children: [
               SizedBox(
-                width: 10,
+                width: 7,
               ),
               Text(
                 '대사증후군 발병률 지표 : ${indicator}',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 15),
               ),
             ],
           ),
@@ -461,16 +462,16 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                      width: 180, child: Center(child: Text(diabetesStatus))),
+                      width: 135, child: Center(child: Text(diabetesStatus))),
                   _buildThermometer(context),
                   Container(
-                      width: 180, child: Center(child: Text(diabetesNotice))),
+                      width: 135, child: Center(child: Text(diabetesNotice))),
                 ],
               ),
             ],
           ),
           SizedBox(
-            height: 30,
+            height: 27,
           ),
           Center(child: noticeText2()),
         ],
@@ -481,7 +482,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   Widget barChart() {
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     final selectedReferenceMeasurementState =
-        ref.watch(selectedReferenceMeasurementProvider);
+    ref.watch(selectedReferenceMeasurementProvider);
     String startMonth = selectedMeasurementState.docId == ''
         ? ''
         : '${selectedMeasurementState.startDate!.year}-${selectedMeasurementState.startDate!.month}-${selectedMeasurementState.startDate!.day}';
@@ -499,8 +500,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
           color: CUSTOM_RED),
     ];
     return SizedBox(
-      width: 400,
-      height: 150,
+      width: 300,
+      height: 135,
       child: SfCartesianChart(
           tooltipBehavior: TooltipBehavior(enable: true),
           title: ChartTitle(text: '탈진시간', alignment: ChartAlignment.near),
@@ -516,9 +517,9 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 sortingOrder: SortingOrder.descending,
                 pointColorMapper: (ExhaustionModel data, _) => data.color,
                 name: '탈진시간'
-                // Sorting based on the specified field
-                // sortFieldValueMapper: (ExhaustionModel data, _) => data.x
-                )
+              // Sorting based on the specified field
+              // sortFieldValueMapper: (ExhaustionModel data, _) => data.x
+            )
           ]),
     );
   }
@@ -526,7 +527,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   Widget columnChart() {
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     final selectedReferenceMeasurementState =
-        ref.watch(selectedReferenceMeasurementProvider);
+    ref.watch(selectedReferenceMeasurementProvider);
     int current0Stage = selectedMeasurementState.stage0 ?? 0;
     int current1Stage = selectedMeasurementState.stage1 ?? 0;
     int current2Stage = selectedMeasurementState.stage2 ?? 0;
@@ -598,8 +599,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         : '${selectedReferenceMeasurementState.startDate!.year}-${selectedReferenceMeasurementState.startDate!.month}-${selectedReferenceMeasurementState.startDate!.day}';
 
     return SizedBox(
-      width: 690,
-      height: 200,
+      width: 518,
+      height: 180,
       child: SfCartesianChart(
           tooltipBehavior: TooltipBehavior(enable: true),
           primaryXAxis: CategoryAxis(),
@@ -631,7 +632,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   Widget multipleBarChart() {
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     final selectedReferenceMeasurementState =
-        ref.watch(selectedReferenceMeasurementProvider);
+    ref.watch(selectedReferenceMeasurementProvider);
     int currentMax = selectedMeasurementState.bpmMax ?? 0;
     int currentBpm1m = selectedMeasurementState.bpm1m ?? 0;
     int currentBpm2m = selectedMeasurementState.bpm2m ?? 0;
@@ -666,8 +667,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         : '${selectedReferenceMeasurementState.startDate!.year}-${selectedReferenceMeasurementState.startDate!.month}-${selectedReferenceMeasurementState.startDate!.day}';
 
     return SizedBox(
-      width: 490,
-      height: 200,
+      width: 368,
+      height: 180,
       child: SfCartesianChart(
           tooltipBehavior: TooltipBehavior(enable: true),
           legend: Legend(isVisible: true),
@@ -696,8 +697,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
   Widget customContainer(
       Color? color, String text, double? width, double? height) {
     return Container(
-      width: width ?? 120,
-      height: height ?? 25,
+      width: width ?? 90,
+      height: height ?? 22,
       decoration: BoxDecoration(
         color: color ?? Colors.transparent,
         border: Border.all(width: 0.5, color: CUSTOM_BLACK.withOpacity(0.3)),
@@ -724,46 +725,46 @@ class _ReportFormState extends ConsumerState<ReportForm> {
     // String tanMax = measurementCalculatedState.tanMax.toString();
 
     return Container(
-      width: 385,
+      width: 288,
       child: Column(
         // mainAxisAlignment: MainAxisAlignment.center,
         // crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            height: 130,
+            height: 117,
             child: RichText(
                 text: TextSpan(children: [
-              const TextSpan(
-                text: '테스트님의 최대산소섭취량은 ',
-                style: TextStyle(fontFamily: 'SebangGothic', height: 2),
-              ),
-              TextSpan(
-                text: '$vo2Max ml/kg/min ',
-                style: const TextStyle(
-                    fontFamily: 'SebangGothic',
-                    fontWeight: FontWeight.bold,
-                    height: 2),
-              ),
-              const TextSpan(
-                  text: '이며 같은 나이대에서 ',
-                  style: TextStyle(fontFamily: 'SebangGothic', height: 2)),
-              TextSpan(
-                text: '$grade $convertedPercentage%',
-                style: TextStyle(
-                    color: grade == '상위' ? CUSTOM_BLUE : CUSTOM_RED,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'SebangGothic',
-                    height: 2),
-              ),
-              const TextSpan(
-                text:
+                  const TextSpan(
+                    text: '테스트님의 최대산소섭취량은 ',
+                    style: TextStyle(fontFamily: 'SebangGothic', height: 2),
+                  ),
+                  TextSpan(
+                    text: '$vo2Max ml/kg/min ',
+                    style: const TextStyle(
+                        fontFamily: 'SebangGothic',
+                        fontWeight: FontWeight.bold,
+                        height: 2),
+                  ),
+                  const TextSpan(
+                      text: '이며 같은 나이대에서 ',
+                      style: TextStyle(fontFamily: 'SebangGothic', height: 2)),
+                  TextSpan(
+                    text: '$grade $convertedPercentage%',
+                    style: TextStyle(
+                        color: grade == '상위' ? CUSTOM_BLUE : CUSTOM_RED,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'SebangGothic',
+                        height: 2),
+                  ),
+                  const TextSpan(
+                    text:
                     '에 해당됩니다. 유산소성 운동능력의 중요한 지표로써 신체가 소모한 산소량을 의미하며 더 많은 산소를 들이 마실수록 몸에서 더 많은 에너지를 사용할 수 있습니다.',
-                style: TextStyle(fontFamily: 'SebangGothic', height: 2),
-              ),
-            ])),
+                    style: TextStyle(fontFamily: 'SebangGothic', height: 2),
+                  ),
+                ])),
           ),
           SizedBox(
-            height: 20,
+            height: 18,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -786,7 +787,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
 
   Widget noticeText2() {
     return Container(
-      width: 650,
+      width: 488,
       child: Text(
         '심박수 회복은 당뇨병, 대사증후군, 심혈관 사망 위험 증가와 관련이 있습니다. 일반적으로 운동 중단 후 부교감 신경 활성 증가와 교감 신경 활성의 감소로 심박수는 빠르게 감소합니다. 그러나 자율신경계의 기능장애는 심박수 회복을 지연합니다. HRR1 자연 회복은 인슐린 분비 기능장애와 당불내증을 반영합니다. 이러한 기능장애는 결국 대사증후군으로 이어질 수 있습니다.',
         softWrap: true,
@@ -820,8 +821,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         LinearWidgetPointer(
             position: LinearElementPosition.outside,
             value: indicator.toDouble(),
-            animationDuration: 2000,
-            animationType: LinearAnimationType.bounceOut,
+            // animationDuration: 2000,
+            // animationType: LinearAnimationType.bounceOut,
             child: Icon(
               indicator >= 45 ? Icons.thumb_up_alt : Icons.thumb_down_alt,
               color: indicator >= 45 ? CUSTOM_BLUE : CUSTOM_RED,
@@ -841,32 +842,32 @@ class _ReportFormState extends ConsumerState<ReportForm> {
           width: 7,
         ),
         SizedBox(
-            height: 120,
-            width: 665,
+            height: 108,
+            width: 498,
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(
-                      height: 20,
+                      height: 18,
                     ),
                     Container(
                       color: CUSTOM_RED.withOpacity(0.3),
-                      height: 40,
-                      width: 665 / 3,
+                      height: 36,
+                      width: 498 / 3,
                       child: Center(child: Text('Pre-mature Death')),
                     ),
                     Container(
                       color: CUSTOM_YELLOW.withOpacity(0.3),
-                      height: 40,
-                      width: 665 / 3,
+                      height: 36,
+                      width: 498 / 3,
                       child: Center(child: Text('Comfort Zone')),
                     ),
                     Container(
                       color: CUSTOM_GREEN.withOpacity(0.3),
-                      height: 40,
-                      width: 665 / 3,
+                      height: 36,
+                      width: 498 / 3,
                       child: Center(
                         child: Text(
                           'High-level Wellness',
@@ -892,99 +893,99 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 )
               ],
             )
-            // SfLinearGauge(
-            //   // animateAxis: true,
-            //   // animateRange: true,
-            //   // animationDuration: 3000,
-            //   orientation: LinearGaugeOrientation.horizontal,
-            //   interval: measurementCalculateState.optimalHealthGauge == 0 ? 10 : (measurementCalculateState.optimalHealthGauge - measurementCalculateState.diseaseGauge)/5,
-            //   minimum: measurementCalculateState.diseaseGauge == 0 ? 0 : measurementCalculateState.diseaseGauge ,
-            //   maximum: measurementCalculateState.optimalHealthGauge == 0 ? 100 : measurementCalculateState.optimalHealthGauge,
-            //   ranges: <LinearGaugeRange>[
-            //     LinearGaugeRange(
-            //         startValue: measurementCalculateState.diseaseGauge,
-            //         endValue: measurementCalculateState.poorHealthGauge,
-            //         // midWidth: 40,
-            //         // endWidth: 40,
-            //         child: Container(
-            //           color: CUSTOM_RED,
-            //         )),
-            //     LinearGaugeRange(
-            //         startValue: measurementCalculateState.poorHealthGauge,
-            //         endValue: measurementCalculateState.neutralGauge,
-            //         // startWidth: 40,
-            //         // midWidth: 40,
-            //         // endWidth: 40,
-            //         child: Container(color: CUSTOM_YELLOW)),
-            //     LinearGaugeRange(
-            //         startValue: measurementCalculateState.neutralGauge,
-            //         endValue: measurementCalculateState.goodHealthGauge,
-            //         // startWidth: 40,
-            //         // midWidth: 40,
-            //         // endWidth: 40,
-            //         child: Container(color: CUSTOM_GREEN)),
-            //     // LinearGaugeRange(
-            //     //     startValue: measurementCalculateState.diseaseGauge,
-            //     //     endValue: (measurementCalculateState.optimalHealthGauge -
-            //     //             measurementCalculateState.diseaseGauge) /
-            //     //         5 *
-            //     //         1,
-            //     //     // startWidth: 40,
-            //     //     // endWidth: 40,
-            //     //     color: Colors.transparent,
-            //     //     child: const Center(
-            //     //         child: Text(
-            //     //       'Pre-mature Death',
-            //     //       style: TextStyle(
-            //     //           fontWeight: FontWeight.w500,
-            //     //           color: Color(0xff191A1B)),
-            //     //     ))),
-            //     // LinearGaugeRange(
-            //     //   startValue: (measurementCalculateState.optimalHealthGauge -
-            //     //           measurementCalculateState.diseaseGauge) /
-            //     //       5 *
-            //     //       1,
-            //     //   endValue: measurementCalculateState.optimalHealthGauge -
-            //     //       ((measurementCalculateState.optimalHealthGauge -
-            //     //               measurementCalculateState.diseaseGauge) /
-            //     //           5 *
-            //     //           1),
-            //     //   // startWidth: 40,
-            //     //   // endWidth: 40,
-            //     //   color: Colors.transparent,
-            //     //   child: const SizedBox(
-            //     //       height: 20,
-            //     //       child: Center(
-            //     //           child: Text(
-            //     //         'Comfort Zone',
-            //     //         style: TextStyle(
-            //     //             fontWeight: FontWeight.w500,
-            //     //             color: Color(0xff191A1B)),
-            //     //       ))),
-            //     // ),
-            //     // LinearGaugeRange(
-            //     //   startValue: measurementCalculateState.optimalHealthGauge -
-            //     //       ((measurementCalculateState.optimalHealthGauge -
-            //     //               measurementCalculateState.diseaseGauge) /
-            //     //           5 *
-            //     //           1),
-            //     //   endValue: measurementCalculateState.optimalHealthGauge,
-            //     //   // startWidth: 40,
-            //     //   // endWidth: 40,
-            //     //   color: Colors.transparent,
-            //     //   child: const SizedBox(
-            //     //       height: 20,
-            //     //       child: Center(
-            //     //           child: Text(
-            //     //         'High-level Wellness',
-            //     //         style: TextStyle(
-            //     //             fontWeight: FontWeight.w500,
-            //     //             color: Color(0xff191A1B)),
-            //     //       ))),
-            //     // )
-            //   ],
-            // ),
-            ),
+          // SfLinearGauge(
+          //   // animateAxis: true,
+          //   // animateRange: true,
+          //   // animationDuration: 3000,
+          //   orientation: LinearGaugeOrientation.horizontal,
+          //   interval: measurementCalculateState.optimalHealthGauge == 0 ? 10 : (measurementCalculateState.optimalHealthGauge - measurementCalculateState.diseaseGauge)/5,
+          //   minimum: measurementCalculateState.diseaseGauge == 0 ? 0 : measurementCalculateState.diseaseGauge ,
+          //   maximum: measurementCalculateState.optimalHealthGauge == 0 ? 100 : measurementCalculateState.optimalHealthGauge,
+          //   ranges: <LinearGaugeRange>[
+          //     LinearGaugeRange(
+          //         startValue: measurementCalculateState.diseaseGauge,
+          //         endValue: measurementCalculateState.poorHealthGauge,
+          //         // midWidth: 40,
+          //         // endWidth: 40,
+          //         child: Container(
+          //           color: CUSTOM_RED,
+          //         )),
+          //     LinearGaugeRange(
+          //         startValue: measurementCalculateState.poorHealthGauge,
+          //         endValue: measurementCalculateState.neutralGauge,
+          //         // startWidth: 40,
+          //         // midWidth: 40,
+          //         // endWidth: 40,
+          //         child: Container(color: CUSTOM_YELLOW)),
+          //     LinearGaugeRange(
+          //         startValue: measurementCalculateState.neutralGauge,
+          //         endValue: measurementCalculateState.goodHealthGauge,
+          //         // startWidth: 40,
+          //         // midWidth: 40,
+          //         // endWidth: 40,
+          //         child: Container(color: CUSTOM_GREEN)),
+          //     // LinearGaugeRange(
+          //     //     startValue: measurementCalculateState.diseaseGauge,
+          //     //     endValue: (measurementCalculateState.optimalHealthGauge -
+          //     //             measurementCalculateState.diseaseGauge) /
+          //     //         5 *
+          //     //         1,
+          //     //     // startWidth: 40,
+          //     //     // endWidth: 40,
+          //     //     color: Colors.transparent,
+          //     //     child: const Center(
+          //     //         child: Text(
+          //     //       'Pre-mature Death',
+          //     //       style: TextStyle(
+          //     //           fontWeight: FontWeight.w500,
+          //     //           color: Color(0xff191A1B)),
+          //     //     ))),
+          //     // LinearGaugeRange(
+          //     //   startValue: (measurementCalculateState.optimalHealthGauge -
+          //     //           measurementCalculateState.diseaseGauge) /
+          //     //       5 *
+          //     //       1,
+          //     //   endValue: measurementCalculateState.optimalHealthGauge -
+          //     //       ((measurementCalculateState.optimalHealthGauge -
+          //     //               measurementCalculateState.diseaseGauge) /
+          //     //           5 *
+          //     //           1),
+          //     //   // startWidth: 40,
+          //     //   // endWidth: 40,
+          //     //   color: Colors.transparent,
+          //     //   child: const SizedBox(
+          //     //       height: 20,
+          //     //       child: Center(
+          //     //           child: Text(
+          //     //         'Comfort Zone',
+          //     //         style: TextStyle(
+          //     //             fontWeight: FontWeight.w500,
+          //     //             color: Color(0xff191A1B)),
+          //     //       ))),
+          //     // ),
+          //     // LinearGaugeRange(
+          //     //   startValue: measurementCalculateState.optimalHealthGauge -
+          //     //       ((measurementCalculateState.optimalHealthGauge -
+          //     //               measurementCalculateState.diseaseGauge) /
+          //     //           5 *
+          //     //           1),
+          //     //   endValue: measurementCalculateState.optimalHealthGauge,
+          //     //   // startWidth: 40,
+          //     //   // endWidth: 40,
+          //     //   color: Colors.transparent,
+          //     //   child: const SizedBox(
+          //     //       height: 20,
+          //     //       child: Center(
+          //     //           child: Text(
+          //     //         'High-level Wellness',
+          //     //         style: TextStyle(
+          //     //             fontWeight: FontWeight.w500,
+          //     //             color: Color(0xff191A1B)),
+          //     //       ))),
+          //     // )
+          //   ],
+          // ),
+        ),
       ],
     );
   }
@@ -997,21 +998,21 @@ class _ReportFormState extends ConsumerState<ReportForm> {
     Color color = measurementCalculateState.diabetesLevel == ''
         ? CUSTOM_BLACK
         : measurementCalculateState.diabetesLevel == 'T1'
-            ? CUSTOM_RED
-            : measurementCalculateState.diabetesLevel == 'T2'
-                ? CUSTOM_YELLOW
-                : CUSTOM_GREEN;
+        ? CUSTOM_RED
+        : measurementCalculateState.diabetesLevel == 'T2'
+        ? CUSTOM_YELLOW
+        : CUSTOM_GREEN;
     double value = measurementCalculateState.diabetesLevel == ''
         ? 120
         : measurementCalculateState.diabetesLevel == 'T1'
-            ? 19
-            : measurementCalculateState.diabetesLevel == 'T2'
-                ? 26
-                : 34;
+        ? 19
+        : measurementCalculateState.diabetesLevel == 'T2'
+        ? 26
+        : 34;
     return Center(
         child: SizedBox(
-            height: 150,
-            width: 180,
+            height: 135,
+            width: 135,
             child: Padding(
                 padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                 child: Padding(
@@ -1039,7 +1040,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                               LinearWidgetPointer(
                                   markerAlignment: LinearMarkerAlignment.end,
                                   value: 33,
-                                  enableAnimation: true,
+                                  enableAnimation: false,
                                   position: LinearElementPosition.outside,
                                   offset: 8,
                                   child: SizedBox(
@@ -1070,9 +1071,9 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                                   decoration: BoxDecoration(
                                       border: Border(
                                         left:
-                                            BorderSide(width: 2, color: color),
+                                        BorderSide(width: 2, color: color),
                                         right:
-                                            BorderSide(width: 2, color: color),
+                                        BorderSide(width: 2, color: color),
                                       ),
                                       color: color),
                                 ),
@@ -1082,7 +1083,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                                 value: value,
                                 width: 10,
                                 height: 10,
-                                enableAnimation: true,
+                                enableAnimation: false,
                                 color: color,
                                 position: LinearElementPosition.outside,
                                 borderWidth: 0.5,
@@ -1093,7 +1094,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                             barPointers: <LinearBarPointer>[
                               LinearBarPointer(
                                 value: value,
-                                enableAnimation: true,
+                                enableAnimation: false,
                                 thickness: 6,
                                 edgeStyle: LinearEdgeStyle.endCurve,
                                 color: color,
@@ -1133,7 +1134,7 @@ Color getColorForHealthStatus(String status) {
     case 'Disease':
       return healthStatusColors[HealthStatus.Disease]!;
     default:
-      // 기본값으로 회색 반환 또는 예외 처리
+    // 기본값으로 회색 반환 또는 예외 처리
       return healthStatusColors[HealthStatus.Neutral]!;
   }
 }

@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class FirebaseAuthRemoteDataSource {
   final String url =
@@ -83,7 +85,13 @@ class AuthenticationRepository {
       await FirebaseAuth.instance.signInWithCustomToken(token);
       _employeeRepository.signUpSetUserData(
           user.kakaoAccount!.email!, user.kakaoAccount!.profile!.nickname!);
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // prefs.remove('flutter.com.kakao.token.version');
+      // _kakaoSignIn.logout();
+
       kakao.UserApi.instance.logout();
+
+
     } catch (e) {
       throw SignInWithKakaoFailure(e.toString());
     }

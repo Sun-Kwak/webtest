@@ -10,20 +10,23 @@ import 'package:web_test2/firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:syncfusion_localizations/syncfusion_localizations.dart';
 import 'package:web_test2/screen/auth/authentication_view.dart';
+import 'package:web_test2/screen/measurement/subScreen/report_view/widget/report_pdf.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "env");
 
+
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   KakaoSdk.init(
     nativeAppKey: dotenv.env['NATIVEAPPKEY'],
     javaScriptAppKey: dotenv.env['JAVASCRIPTAPPKEY'],
   );
-
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     const ProviderScope(child: MyApp()),
   );
+
 }
 
 class MyApp extends ConsumerWidget {
@@ -52,6 +55,11 @@ class MyApp extends ConsumerWidget {
     }
 
     return MaterialApp(
+      initialRoute: "/",
+      routes: {
+        "/report":(context)=>ReportPdfForm()
+        //add more pages here
+      },
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

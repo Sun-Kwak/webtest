@@ -16,7 +16,7 @@ class BmiTable extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-                '#2. BMI'),
+                '#3. BMI'),
             SizedBox(
               height: 10,
             ),

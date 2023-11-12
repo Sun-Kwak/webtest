@@ -3,7 +3,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/screen/measurement/subScreen/conditions/data_table/aerobic_power_table.dart';
+import 'package:web_test2/screen/measurement/subScreen/conditions/model/HR_percentiles.dart';
 import 'package:web_test2/screen/measurement/subScreen/conditions/model/aerobic_power.dart';
+import 'package:web_test2/screen/measurement/subScreen/conditions/model/bmi.dart';
+import 'package:web_test2/screen/measurement/subScreen/conditions/model/diabetes.dart';
+
+import '../../conditions/data_table/HR_percentiles_table.dart';
+import '../../conditions/data_table/bmi_table.dart';
+import '../../conditions/data_table/diabetes_table.dart';
 
 class IntensitySelectionProvider extends ChangeNotifier {
   IntensityState intensityState;
@@ -85,6 +92,9 @@ class MeasurementCalculatedState {
   final double neutralGauge;
   final double goodHealthGauge;
   final double optimalHealthGauge;
+  final String bpmLevel;
+  final String bmiCategory;
+  final String diabetesLevel;
 
   MeasurementCalculatedState({
     required this.percentage,
@@ -103,6 +113,9 @@ class MeasurementCalculatedState {
     required this.neutralGauge,
     required this.goodHealthGauge,
     required this.optimalHealthGauge,
+    required this.bpmLevel,
+    required this.bmiCategory,
+    required this.diabetesLevel,
   });
 
   MeasurementCalculatedState copyWith({
@@ -122,6 +135,9 @@ class MeasurementCalculatedState {
     double? neutralGauge,
     double? goodHealthGauge,
     double? optimalHealthGauge,
+    String? bpmLevel,
+    String? bmiCategory,
+    String? diabetesLevel,
   }) {
     return MeasurementCalculatedState(
       bmi: bmi ?? this.bmi,
@@ -140,6 +156,9 @@ class MeasurementCalculatedState {
       goodHealthGauge: goodHealthGauge ?? this.goodHealthGauge,
       neutralGauge: neutralGauge ?? this.neutralGauge,
       optimalHealthGauge: optimalHealthGauge ?? this.optimalHealthGauge,
+      bpmLevel: bpmLevel ?? this.bpmLevel,
+      bmiCategory: bmiCategory ?? this.bmiCategory,
+      diabetesLevel: diabetesLevel ?? this.diabetesLevel,
     );
   }
 
@@ -160,11 +179,14 @@ class MeasurementCalculatedState {
     goodHealthGauge: 0,
     diseaseGauge: 0,
     poorHealthGauge: 0,
+    bpmLevel: '',
+    bmiCategory: '',
+    diabetesLevel: '',
       );
 }
 
 final measurementCalculatedStateProvider =
-    ChangeNotifierProvider<MeasurementCalculatedStateProvider>((ref) {
+    ChangeNotifierProvider.autoDispose<MeasurementCalculatedStateProvider>((ref) {
   return MeasurementCalculatedStateProvider(
       measurementCalculatedState: MeasurementCalculatedState.empty());
 });
@@ -176,6 +198,9 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
       {required this.measurementCalculatedState});
 
   int calculateAge(String birthDay) {
+    if (birthDay ==''){
+      return 0;
+    } else {
     DateTime today = DateTime.now();
     DateTime birthDate = DateFormat('yyyy-MM-dd').parse(birthDay);
 
@@ -184,7 +209,7 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
         (today.month == birthDate.month && today.day < birthDate.day)) {
       age--;
     }
-    return age;
+    return age;}
   }
 
   // void setBMI(int userHeight, int userWeight) {
@@ -215,6 +240,40 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
               : 0;
       double vo2Max = 6.7 - (2.82 * genderFactor) + (0.056 * exhaustionSecond);
       return vo2Max = double.parse(vo2Max.toStringAsFixed(2));
+    }
+  }
+
+  String getBpmLevel(int age, int? bpmData, List<HrPercentilesModel> data){
+    int bpm = bpmData ?? 0;
+    if (age <19){
+      return '';
+    } else {
+      HrPercentilesModel? matchingModel = data.firstWhere(
+            (model) => model.age == age,
+        // orElse: () => null,
+      );
+      if (matchingModel != null) {
+        // Determine the field based on the point value
+        if (bpm >= matchingModel.p95) {
+          return 'p100';
+        } else if (bpm >= matchingModel.p90) {
+          return 'p95';
+        } else if (bpm >= matchingModel.p75) {
+          return 'p90';
+        } else if (bpm >= matchingModel.p50) {
+          return 'p75';
+        } else if (bpm >= matchingModel.p25) {
+          return 'p50';
+        } else if (bpm >= matchingModel.p10) {
+          return 'p25';
+        } else if (bpm >= matchingModel.p5) {
+          return 'p10';
+        } else {
+          return 'p5';
+        }
+      } else {
+        return 'No Data';
+      }
     }
   }
 
@@ -289,6 +348,37 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
 
     return aerobicPowerModel;
   }
+
+  String getBmiCategory(double? bmiData, List<BmiModel> data) {
+    double? bmi = bmiData ?? 0;
+    String category = '정의되지 않음'; // 기본적으로 정의되지 않음으로 설정
+
+    for (int i = 0; i < data.length; i++) {
+      if (bmi >= data[i].range) {
+        category = data[i].category;
+      } else {
+        break; // bmi가 현재 range보다 작으면 더 이상 비교할 필요 없으므로 반복문 종료
+      }
+    }
+
+    return category;
+  }
+
+  String getDiabetesLevel(int hrr1, List<DiabetesModel> data) {
+    String category = '정의되지 않음'; // 기본적으로 정의되지 않음으로 설정
+
+    for (int i = 0; i < data.length; i++) {
+      if (hrr1 >= data[i].range) {
+        category = data[i].category;
+      } else {
+        break; // bmi가 현재 range보다 작으면 더 이상 비교할 필요 없으므로 반복문 종료
+      }
+    }
+
+    return category;
+  }
+
+
 
   void gaugeValue(
       List<AerobicPowerModel> data, String fieldName) {
@@ -370,12 +460,17 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
     String gender = member.gender == '남성' ? 'm' : 'w';
     String ageRoundDown = (age ~/ 10 * 10).toString();
     String conditionField = gender + ageRoundDown;
+    int bpm = measurement.bpm ?? 0;
 
     int percentage =
         getEqualCondition(aerobicPowerData, conditionField, Vo2Max).percentage;
     String healthStatus =
         getEqualCondition(aerobicPowerData, conditionField, Vo2Max).healthStatus;
+    int hrr1 = (measurement.bpmMax?? 0) - (measurement.bpm1m ?? 0);
     gaugeValue(aerobicPowerBoundary,conditionField);
+    String bpmLevel = getBpmLevel(age, bpm, hrPercentilesData);
+    String bpmCategory = getBmiCategory(bmi, bmiData);
+    String diabetesLevel = getDiabetesLevel(hrr1, diabetesData);
     measurementCalculatedState = measurementCalculatedState.copyWith(
       bmi: bmi,
       age: age,
@@ -387,6 +482,9 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
       conditionField: conditionField,
       percentage: percentage,
       healthStatus: healthStatus,
+      bpmLevel: bpmLevel,
+      bmiCategory: bpmCategory,
+      diabetesLevel: diabetesLevel,
     );
 
     notifyListeners();

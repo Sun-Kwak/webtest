@@ -223,7 +223,7 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
               IconButton(
                 onPressed: () {
                   selectedScreenIndexController.setSelectedIndex(3);
-                  measurementInputController.recall(selectedMember);
+                  measurementInputController.recall(selectedMember.displayName);
                   measurementCalculatedStateController.selectedMeasurement(measurement: Measurement.empty(), member: selectedMember);
 
                   selectedMeasurementController.getLatestMeasurement(selectedMember.id,measurementState);

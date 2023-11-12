@@ -27,35 +27,35 @@ class MeasurementProvider extends StateNotifier<List<Measurement>> {
   }
 }
 
-// class SelectedMeasurementIDProvider extends StateNotifier<String?> {
-//   SelectedMeasurementIDProvider(String? initialValue) : super(initialValue);
-//
-//   void setSelectedRow(String? newValue) {
-//     state = newValue;
-//   }
-//   notifyListeners() {
-//     // TODO: implement notifyListeners
-//     throw UnimplementedError();
-//   }
-// }
-//
-// final selectedMeasurementIdProvider =
-// StateNotifierProvider<SelectedMeasurementIDProvider, String?>((ref) {
-//   return SelectedMeasurementIDProvider(null);
-// });
-// //------------------------------------------------------------------------------
-// final selectedMeasurementProvider = Provider<Measurement>((ref) {
-//   final measurementsState = ref.watch(filteredMeasurementProvider);
-//   final selectedID = ref.watch(selectedMeasurementIdProvider);
-//   Measurement selectedMeasurement;
-//   if (selectedID == null || measurementsState.isEmpty) {
-//     selectedMeasurement = Measurement.empty();
-//   } else {
-//     selectedMeasurement =
-//         measurementsState.firstWhere((element) => element.docId == selectedID);
-//   }
-//   return selectedMeasurement;
-// });
+class SelectedScheduleMeasurementIDProvider extends StateNotifier<String?> {
+  SelectedScheduleMeasurementIDProvider(String? initialValue) : super(initialValue);
+
+  void setSelectedRow(String? newValue) {
+    state = newValue;
+  }
+  notifyListeners() {
+    // TODO: implement notifyListeners
+    throw UnimplementedError();
+  }
+}
+
+final selectedScheduleMeasurementIdProvider =
+StateNotifierProvider<SelectedScheduleMeasurementIDProvider, String?>((ref) {
+  return SelectedScheduleMeasurementIDProvider(null);
+});
+//------------------------------------------------------------------------------
+final selectedScheduleMeasurementProvider = Provider.autoDispose<Measurement>((ref) {
+  final measurementsState = ref.watch(measurementProvider);
+  final selectedID = ref.watch(selectedScheduleMeasurementIdProvider);
+  Measurement selectedMeasurement;
+  if (selectedID == null || measurementsState.isEmpty) {
+    selectedMeasurement = Measurement.empty();
+  } else {
+    selectedMeasurement =
+        measurementsState.firstWhere((element) => element.docId == selectedID);
+  }
+  return selectedMeasurement;
+});
 
 // final filterMeasurement =
 // StateProvider<String?>((ref) => null);
@@ -188,6 +188,36 @@ class SelectedReferenceMeasurementProvider extends StateNotifier<Measurement> {
 
 
 }
+
+final measurementScheduleProvider = Provider<List<Meeting>>(
+
+      (ref) {
+        List<Meeting> data = [];
+        final measurementState = ref.watch(measurementProvider);
+        for (var measurementItem in measurementState) {
+          DateTime startDate = measurementItem.startDate!;
+          DateTime endDate = measurementItem.endDate!;
+          String name = '${measurementItem.memberName}님/측정';
+          String id = measurementItem.docId;
+          // String displayName = measurementItem.displayName;
+          Meeting newMeeting = Meeting(name, startDate, endDate, Color(0xFF81B3FF),id); // Colors.blue는 임의로 지정한 배경색
+          data.add(newMeeting);
+        }
+        DateTime now = DateTime.now();
+        // final DateTime today = DateTime.now();
+        final DateTime startTime =
+        DateTime(now.year, now.month, now.day, now.hour +1, 15, 20);
+        final DateTime endTime = startTime.add(const Duration(hours: 2));
+        final DateTime startTime2 =
+        DateTime(now.year, now.month, now.day +1, now.hour +1, 15, 20);
+        final DateTime endTime2 = startTime.add(const Duration(hours: 2));
+        data.add(Meeting(
+            '해린님/유추', startTime, endTime, Color(0xFFFF8181),null));
+        data.add(Meeting(
+            '민지님/PT', startTime2, endTime2, Color(0xFFFF8181),null));
+        return data;
+  },
+);
 
 
 

@@ -12,6 +12,7 @@ import 'package:web_test2/common/component/input_widget/custom_dateSelection_inp
 import 'package:web_test2/common/component/input_widget/custom_number_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_seachable_dropdown_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_text_input_widget.dart';
+import 'package:web_test2/common/component/input_widget/custom_timeSelection_inpout_widget.dart';
 import 'package:web_test2/common/component/output_widget/custom_text_output_widget.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
@@ -27,7 +28,9 @@ class MeasurementInputForm extends ConsumerStatefulWidget {
   final Measurement measurement;
   final VoidCallback onSavePressed;
   final VoidCallback onRefreshPressed;
+  final VoidCallback onCancelPressed;
   const MeasurementInputForm({
+    required this.onCancelPressed,
     required this.onSavePressed,
     required this.onRefreshPressed,
     required this.measurement,
@@ -42,16 +45,43 @@ class MeasurementInputForm extends ConsumerStatefulWidget {
 class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
   late Measurement updatingMeasurement;
   TextEditingController nameController = TextEditingController();
+  TextEditingController userHeightController = TextEditingController();
+  TextEditingController userWeightController = TextEditingController();
+  TextEditingController smmController = TextEditingController();
+  TextEditingController bfmController = TextEditingController();
+  TextEditingController bfpController = TextEditingController();
+  TextEditingController bpmController = TextEditingController();
+  TextEditingController stage0Controller = TextEditingController();
+  TextEditingController stage1Controller = TextEditingController();
+  TextEditingController stage2Controller = TextEditingController();
+  TextEditingController stage3Controller = TextEditingController();
+  TextEditingController stage4Controller = TextEditingController();
+  TextEditingController stage5Controller = TextEditingController();
+  TextEditingController stage6Controller = TextEditingController();
+  TextEditingController stage7Controller = TextEditingController();
+  TextEditingController stage8Controller = TextEditingController();
+  TextEditingController bpmMaxController = TextEditingController();
+  TextEditingController bpm1mController = TextEditingController();
+  TextEditingController bpm2mController = TextEditingController();
+  TextEditingController bpm3mController = TextEditingController();
+  TextEditingController secondsController = TextEditingController();
   DateTime today = DateTime.now();
-  DateTime? selectedDate;
-  String formattedDate ="${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
-  String? searchSelectedValue;
+  DateTime selectedDate = DateTime.now();
+  late TimeOfDay startTime;
+  TimeOfDay? endTime;
+  late DateTime startDate;
+  late DateTime endDate;
+  // String formattedStartTime = "${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}";
+  // String formattedEndTime = "${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}";
+  // String formattedDate ="${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
+  String? searchMemberValue;
+  late String searchPICValue;
   // String? selectedMember;
   String? selectedValue = 'Karvonen';
-  double userHeight = 0;
-  double userWeight = 0;
+  late double userHeight;
+  late double userWeight;
   double? bMI;
-  String exhaustionTime = '';
+  late String exhaustionTime;
   int? exhaustionSeconds = 0;
   int? bpmMax = 0;
   int? bpm1m = 0;
@@ -69,17 +99,61 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
 
     super.initState();
     updatingMeasurement = widget.measurement;
+    nameController.text = widget.measurement.memberName;
+    searchMemberValue = widget.measurement.memberName;
+    searchPICValue = widget.measurement.PICName;
+    selectedDate = widget.measurement.startDate ?? DateTime.now();
+    startTime = widget.measurement.startDate == null ? TimeOfDay.fromDateTime(DateTime.now()):TimeOfDay.fromDateTime(widget.measurement.startDate!);
+    startDate = widget.measurement.startDate ?? DateTime.now();
+    endDate = widget.measurement.endDate ?? DateTime.now();
+    endTime = widget.measurement.endDate == null ? null : TimeOfDay.fromDateTime(endDate);
+    userHeightController.text = widget.measurement.userHeight == null ? '' : widget.measurement.userHeight.toString();
+    userWeightController.text = widget.measurement.userWeight == null ? '' : widget.measurement.userWeight.toString();
+    smmController.text = widget.measurement.smm == null ? '' : widget.measurement.smm.toString();
+    bfmController.text = widget.measurement.bfm == null ? '' : widget.measurement.bfm.toString();
+    bfpController.text = widget.measurement.bfp == null ? '' : widget.measurement.bfp.toString();
+    bpmController.text = widget.measurement.bpm == null ? '' : widget.measurement.bpm.toString();
+    stage0Controller.text = widget.measurement.stage0 == null ? '' : widget.measurement.stage0.toString();
+    stage1Controller.text = widget.measurement.stage1 == null ? '' : widget.measurement.stage1.toString();
+    stage2Controller.text = widget.measurement.stage2 == null ? '' : widget.measurement.stage2.toString();
+    stage3Controller.text = widget.measurement.stage3 == null ? '' : widget.measurement.stage3.toString();
+    stage4Controller.text = widget.measurement.stage4 == null ? '' : widget.measurement.stage4.toString();
+    stage5Controller.text = widget.measurement.stage5 == null ? '' : widget.measurement.stage5.toString();
+    stage6Controller.text = widget.measurement.stage6 == null ? '' : widget.measurement.stage6.toString();
+    stage7Controller.text = widget.measurement.stage7 == null ? '' : widget.measurement.stage7.toString();
+    stage8Controller.text = widget.measurement.stage8 == null ? '' : widget.measurement.stage8.toString();
+    bpmMaxController.text = widget.measurement.bpmMax == null ? '' : widget.measurement.bpmMax.toString();
+    bpm1mController.text = widget.measurement.bpm1m == null ? '' : widget.measurement.bpm1m.toString();
+    bpm2mController.text = widget.measurement.bpm2m == null ? '' : widget.measurement.bpm2m.toString();
+    bpm3mController.text = widget.measurement.bpm3m == null ? '' : widget.measurement.bpm3m.toString();
+    secondsController.text = widget.measurement.exhaustionSeconds == null ? '' : widget.measurement.exhaustionSeconds.toString();
+    userHeight = widget.measurement.userHeight ?? 0;
+    userWeight = widget.measurement.userWeight ?? 0;
+    calculateBMI();
+    bpmMax = widget.measurement.bpmMax ?? 0;
+    bpm1m = widget.measurement.bpm1m ?? 0;
+    bpm2m = widget.measurement.bpm2m ?? 0;
+    bpm3m = widget.measurement.bpm3m ?? 0;
+    _onBpmMaxChanged(bpmMax.toString());
+    exhaustionSeconds = widget.measurement.exhaustionSeconds ?? 0;
+    exhaustionTime = secondsToMinutes(exhaustionSeconds.toString());
+    //
+    // calculateVo2Max(
+    //
+    // );
+
   }
 
 
   Future<void> _selectDate(BuildContext context) async {
-    DateTime now = DateTime.now();
+
+
     DateTime threeYearsLater =
-        now.add(const Duration(days: 3 * 365)); // 3 years later from now
+    selectedDate.add(const Duration(days: 3 * 365)); // 3 years later from now
 
     DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: now,
+      initialDate: selectedDate,
       firstDate: DateTime(2023),
       lastDate: threeYearsLater,
     );
@@ -88,13 +162,75 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
 
       setState(() {
         selectedDate = pickedDate;
-        formattedDate = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
+        startDate = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          startTime.hour,
+          startTime.minute,
+        );
+
+        endDate = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+        );
+        // formattedDate = "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
       });
       //   // memberInputController.onDateChange(formattedDate);
       // }  else{
       //   // memberInputController.onDateChange('날짜 선택');
     }
   }
+
+  Future<void> _selectStartTime(BuildContext context) async {
+    DateTime now = DateTime.now();
+    TimeOfDay initialTime = TimeOfDay.fromDateTime(now); // 현재 시간을 기본값으로 설정
+
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: initialTime, // 초기 시간을 설정
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        startTime = pickedTime;
+        startDate = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          startTime.hour,
+          startTime.minute,
+        );
+
+      });
+    }
+  }
+
+  Future<void> _selectEndTime(BuildContext context) async {
+    DateTime now = DateTime.now();
+    TimeOfDay initialTime = TimeOfDay.fromDateTime(now); // 현재 시간을 기본값으로 설정
+
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: initialTime, // 초기 시간을 설정
+    );
+
+    if (pickedTime != null) {
+      setState(() {
+        endTime = pickedTime;
+        if(endTime != null){
+        endDate = DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          endTime!.hour,
+          endTime!.minute,
+        );}
+      });
+    }
+  }
+
 
   void _onHeightChanged(String value) {
     setState(() {
@@ -191,21 +327,27 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
   }
 
   void calculateBMI() {
+    if(userHeight == 0 || userWeight == 0){
+      bMI = null;
+    } else {
     double heightInMeter = userHeight / 100;
     double bmi = userWeight / (heightInMeter * heightInMeter);
     setState(() {
       bMI = double.parse(bmi.toStringAsFixed(2));
-    });
+    });}
   }
   void resetFields() {
+
     final selectedPICController = ref.watch(selectedPICIdProvider.notifier);
     final String signedInUser = ref.watch(signedInUserProvider).value!.id;
+    final editing = ref.watch(measurementEditingProvider.notifier);
 
     selectedPICController.setSelectedPIC(signedInUser);
     final selectedMemberIdController =
     ref.watch(selectedMemberIdProvider.notifier);
+
     selectedMemberIdController.setSelectedRow(0);
-    selectedDate = null;
+    editing.toggleStatus(false);
   }
 
   void _showConfirmationDialog(BuildContext context) {
@@ -216,6 +358,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
     final intensitySelectionController = ref.watch(intensitySelectionProvider.notifier);
     final selectedMember = ref.watch(selectedMemberProvider);
     final measurementCalculateController = ref.watch(measurementCalculatedStateProvider.notifier);
+    final selectedScheduleMeasurementController = ref.watch(selectedScheduleMeasurementIdProvider.notifier);
 
     showDialog(
       context: context,
@@ -241,6 +384,8 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               onPressed: () {
                 intensitySelectionController.setSelectedIntensityValue(0, 0);
                 selectedMeasurementController.removeState();
+                resetFields();
+                widget.onCancelPressed();
                 Navigator.of(context).pop(); // 다이얼로그 닫기
               },
             ),
@@ -254,6 +399,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 measurementController.getMeasurements();
                 selectedMeasurementController.getLatestMeasurement(selectedMember.id,measurementState);
                 measurementCalculateController.selectedMeasurement(measurement: updatingMeasurement, member: selectedMember);
+                resetFields();
                 // selectedRow.setSelectedRow(0);
                 // memberRepository.disableMember(member, controller);
                 Navigator.of(context).pop(); // 다이얼로그 닫기
@@ -281,7 +427,10 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
     final intensityController = ref.watch(intensitySelectionProvider.notifier);
     final intensityState = ref.watch(intensitySelectionProvider);
     final measurementState = ref.watch(measurementProvider);
+    final isEditing = ref.watch(measurementEditingProvider);
     final measurementCalculated = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
+
+    calculateVo2Max(selectedMember.gender,exhaustionTime);
 
     DateTime today = DateTime.now();
     DateTime birthDate = selectedMember.id != 0
@@ -325,6 +474,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
     Member member = Member.empty();
     Measurement measurement = Measurement.empty();
     MeasurementCalculatedState measurementCalculatedState = MeasurementCalculatedState.empty();
+    // searchPICValue = selectedPIC.displayName;
 
 
 
@@ -351,7 +501,8 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 ),
               ),
               CustomRefreshIcon(onPressed: () {
-                // print(exhaustionSeconds);
+                print(isEditing.isEditing);
+                selectedMeasurementController.removeState();
                 resetFields();
                 widget.onRefreshPressed();
               }),
@@ -375,7 +526,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               _NameField(
                 controller: nameController,
                 list: members,
-                selectedValue: selectedMember.displayName,
+                selectedValue: searchMemberValue,
                 labelBoxWidth: labelBoxWidth,
                 textBoxWidth: textBoxWidth,
                 idSelector: (member) => member.id,
@@ -394,6 +545,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                   // measurementCalculatedStateController.selectedMeasurement(measurement: updatingMeasurement, member: selectedMember);
                   setState(() {
                     selectedValue = 'Karvonen';
+                    searchMemberValue = selectedDropdownData.selectedTitle;
                   });
                   measurementInputController.onNameChange(selectedDropdownData.selectedTitle);
                 },
@@ -404,7 +556,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               CustomSearchDropdownWidget(
                 idSelector: (employee) => employee.id,
                 labelBoxWidth: labelBoxWidth,
-                selectedValue: selectedPIC.displayName,
+                selectedValue: searchPICValue == '' ? selectedPIC.displayName : searchPICValue,
                 label: '담당자',
                 textBoxWidth: textBoxWidth,
                 list: employees,
@@ -413,6 +565,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 onTap: () {
                   selectedPICController
                       .setSelectedPIC(selectedDropdownData.selectedId);
+                  searchPICValue = selectedDropdownData.selectedTitle!;
                 },
                 color: CUSTOM_BLUE.withOpacity(0.1),
                 errorText: null,
@@ -428,7 +581,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 onTap: () {
                   _selectDate(context);
                 },
-                selectedDate: selectedDate ?? today,
+                selectedDate: selectedDate,
                 labelBoxWidth: labelBoxWidth,
                 label: '날짜선택',
               ),
@@ -524,7 +677,22 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
               SizedBox(
                 width: 20,
               ),
+              CustomTimeSelectionInputWidget(
+                color: CUSTOM_BLUE.withOpacity(0.1),
+                onTap: (){
+                  _selectStartTime(context);
+                },
+                label: '시작시간',
+                labelBoxWidth:labelBoxWidth,
+                textBoxWidth: textBoxWidth,
+                selectedTime: startTime,
+                errorText: null,
+              ),
+              SizedBox(
+                width: widgetGap,
+              ),
               CustomNumberInputWidget(
+                controller: userHeightController,
                 isDouble: true,
                 onChanged: (v) {
                   _onHeightChanged(v);
@@ -543,6 +711,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: userWeightController,
                 isDouble: true,
                 onChanged: (v) {
                   _onWeightChanged(v);
@@ -551,8 +720,6 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                         userWeight: double.parse(v)
                     );
                   });
-                  print(updatingMeasurement.userHeight);
-                  print(updatingMeasurement.userWeight);
                 },
                 label: '체중',
                 textBoxWidth: textBoxWidth,
@@ -579,6 +746,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                controller: smmController,
                 isDouble: true,
                 onChanged: (v) {
                   setState(() {
@@ -596,6 +764,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: bfmController,
                 isDouble: true,
                 onChanged: (v) {
                   setState(() {
@@ -613,6 +782,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: bfpController,
                 isDouble: true,
                 onChanged: (v) {
                   setState(() {
@@ -630,6 +800,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: bpmController,
                 onChanged: (v) {
                   bpm = int.parse(v);
                   setState(() {
@@ -675,6 +846,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                controller: stage0Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -691,6 +863,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: stage1Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -707,6 +880,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: stage2Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -730,6 +904,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                controller: stage3Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -746,6 +921,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: stage4Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -762,6 +938,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: stage5Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -785,6 +962,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                controller: stage6Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -801,6 +979,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: stage7Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -817,6 +996,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: stage8Controller,
                 onChanged: (v) {
                   setState(() {
                     updatingMeasurement = updatingMeasurement.copyWith(
@@ -861,6 +1041,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                controller: bpmMaxController,
                 onChanged: (v) {
                   _onBpmMaxChanged(v);
                   setState(() {
@@ -878,6 +1059,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: bpm1mController,
                 onChanged: (v) {
                   _onBpm1mChanged(v);
                   setState(() {
@@ -895,6 +1077,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: bpm2mController,
                 onChanged: (v) {
                   _onBpm2mChanged(v);
                   setState(() {
@@ -912,6 +1095,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                controller: bpm3mController,
                 onChanged: (v) {
                   _onBpm3mChanged(v);
                   setState(() {
@@ -1058,6 +1242,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                controller: secondsController,
                 onChanged: (v) {
                   String formattedTime = secondsToMinutes(v);
                   double calculatedValue =
@@ -1173,6 +1358,17 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                     : intensityState.intensityState.percent60.toString(),
                 label: '60%',
               ),
+              SizedBox(
+                width: widgetGap,
+              ),
+              CustomTextOutputWidget(
+                labelBoxWidth: labelBoxWidth,
+                textBoxWidth: textBoxWidth,
+                outputText: selectedMember.id == 0
+                    ? ''
+                    : intensityState.intensityState.percent70.toString(),
+                label: '70%',
+              )
             ],
           ),
           SizedBox(
@@ -1182,17 +1378,6 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
             children: [
               SizedBox(
                 width: 20,
-              ),
-              CustomTextOutputWidget(
-                labelBoxWidth: labelBoxWidth,
-                textBoxWidth: textBoxWidth,
-                outputText: selectedMember.id == 0
-                    ? ''
-                    : intensityState.intensityState.percent70.toString(),
-                label: '70%',
-              ),
-              SizedBox(
-                width: widgetGap,
               ),
               CustomTextOutputWidget(
                 labelBoxWidth: labelBoxWidth,
@@ -1224,6 +1409,20 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                     : intensityState.intensityState.percent100.toString(),
                 label: '100%',
               ),
+              SizedBox(
+                width: widgetGap,
+              ),
+              CustomTimeSelectionInputWidget(
+                color: CUSTOM_BLUE.withOpacity(0.1),
+                onTap: (){
+                  _selectEndTime(context);
+                },
+                label: '종료시간',
+                labelBoxWidth:labelBoxWidth,
+                textBoxWidth: textBoxWidth,
+                selectedTime: endTime,
+                errorText: null,
+              ),
             ],
           ),
           Expanded(
@@ -1239,7 +1438,10 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                   measurement: updatingMeasurement,
                   memberId: selectedMember.id,
                   PICId: selectedPIC.id,
-                  date: formattedDate,
+                  PICName: selectedPIC.displayName,
+                  startDate: startDate,
+                  endDate: endDate,
+                  endTime: endTime,
                 ),
               ),
             ),
@@ -1256,25 +1458,34 @@ class _AddMeasurementButton extends ConsumerWidget {
   final Measurement measurement;
   final int memberId;
   final String PICId;
-  final String date;
+  final String PICName;
+  final DateTime startDate;
+  final DateTime endDate;
+  final TimeOfDay? endTime;
 
 
   const _AddMeasurementButton({
     required this.onPressed,
-    required this.date,
+    required this.startDate,
+    required this.endDate,
+    required this.endTime,
     required this.measurement,
     required this.memberId,
     required this.PICId,
+    required this.PICName,
 
     Key? key,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    DateTime now = DateTime.now();
+    DateTime _endDate = DateTime.now();
 
     final measurementInputState = ref.watch(measurementInputProvider);
     final bool isValidated = measurementInputState.status.isValidated;
     final measurementInputController = ref.read(measurementInputProvider.notifier);
+    final measurementController = ref.read(measurementProvider.notifier);
 
 
     return SizedBox(
@@ -1282,8 +1493,18 @@ class _AddMeasurementButton extends ConsumerWidget {
       child: ElevatedButton(
         onPressed: isValidated
             ? () {
-
-          measurementInputController.addMeasurement(measurement, memberId, PICId,date);
+          if(endTime == null){
+            _endDate = DateTime(
+              endDate.year,
+              endDate.month,
+              endDate.day,
+              now.hour,
+              now.minute,
+            );
+          } else {
+            _endDate = endDate;
+          }
+          measurementInputController.addMeasurement(measurement, memberId, PICId, PICName,startDate,_endDate,measurementController);
 
           onPressed();
         }
@@ -1308,7 +1529,7 @@ class _NameField<T, U> extends ConsumerWidget {
   final double textBoxWidth;
   final TextEditingController controller;
   final GestureTapCallback onTap;
-  final String selectedValue;
+  final String? selectedValue;
   final U Function(T) idSelector;
   final String Function(T) titleSelector;
   final String Function(T) subtitleSelector;

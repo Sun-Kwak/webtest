@@ -41,8 +41,8 @@ class MeasurementInputController extends StateNotifier<MeasurementInputState> {
     );
   }
 
-  void recall(Member member) {
-    var name = Name.dirty(member.displayName);
+  void recall(String memberName) {
+    var name = Name.dirty(memberName);
     state = state.copyWith(
       name: name,
       status: Formz.validate([
@@ -52,14 +52,17 @@ class MeasurementInputController extends StateNotifier<MeasurementInputState> {
 
   }
 
-  void addMeasurement(Measurement measurement,int memberId, String PICId, String date) async {
+  void addMeasurement(Measurement measurement,int memberId, String PICId, String PICName, DateTime startDate, DateTime endDate, MeasurementProvider measurementProvider) async {
     if (!state.status.isValidated) return;
     state = state.copyWith(status: FormzStatus.submissionInProgress);
     try {
       Measurement newMeasurement = measurement.copyWith(
+        memberName: state.name.value,
         memberId: memberId,
         PICId: PICId,
-        testDate: date,
+        PICName: PICName,
+        startDate: startDate,
+        endDate: endDate,
       );
       state = state.copyWith(status: FormzStatus.submissionSuccess);
       resetAll();
@@ -68,8 +71,12 @@ class MeasurementInputController extends StateNotifier<MeasurementInputState> {
       if (_measurementEditingProvider.isEditing == true) {
         await _measurementRepository.updateMeasurement(newMeasurement);
       } else {
+        newMeasurement = newMeasurement.copyWith(
+            createdAt: DateTime.now()
+        );
         await _measurementRepository.addMeasurement(newMeasurement);
       }
+      measurementProvider.getMeasurements();
 
     } on MeasurementAddFailure catch (e) {
       state = state.copyWith(

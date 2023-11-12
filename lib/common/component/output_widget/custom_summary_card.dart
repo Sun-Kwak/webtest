@@ -24,6 +24,7 @@ class _MemberSummaryCardState extends ConsumerState<MemberSummaryCard> {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final membersCount = ref.watch(membersCountProvider);
+    final selectedMemberIdController = ref.watch(selectedMemberIdProvider.notifier);
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(6)),
@@ -55,6 +56,7 @@ class _MemberSummaryCardState extends ConsumerState<MemberSummaryCard> {
                   message: '검색',
                   child: AnimatedObject(
                     onTap: () {
+                      selectedMemberIdController.setSelectedRow(0);
                       ref
                           .read(filterMember.notifier)
                           .update((state) => MembersFilterState.all);
@@ -81,6 +83,7 @@ class _MemberSummaryCardState extends ConsumerState<MemberSummaryCard> {
                     message: '검색',
                     child: AnimatedObject(
                       onTap: () {
+                        selectedMemberIdController.setSelectedRow(0);
                         ref
                             .read(filterMember.notifier)
                             .update((state) => MembersFilterState.isNew);
@@ -105,6 +108,7 @@ class _MemberSummaryCardState extends ConsumerState<MemberSummaryCard> {
                     message: '검색',
                     child: AnimatedObject(
                       onTap: () {
+                        selectedMemberIdController.setSelectedRow(0);
                         ref
                             .read(filterMember.notifier)
                             .update((state) => MembersFilterState.activated);
@@ -131,6 +135,7 @@ class _MemberSummaryCardState extends ConsumerState<MemberSummaryCard> {
                     message: '검색',
                     child: AnimatedObject(
                       onTap: () {
+                        selectedMemberIdController.setSelectedRow(0);
                         ref.read(filterMember.notifier).update((state) => MembersFilterState.expired);
                         // widget.onTap();
                       },

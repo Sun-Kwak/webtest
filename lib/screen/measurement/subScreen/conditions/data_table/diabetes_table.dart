@@ -17,7 +17,7 @@ class DiabetesTable extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-                '#2. BMI'),
+                '#4.Diabetes'),
             SizedBox(
               height: 10,
             ),
@@ -28,7 +28,7 @@ class DiabetesTable extends StatelessWidget {
                 TextStyle(fontSize: 10, fontFamily: 'SebangGothic'),
                 headingTextStyle:
                 TextStyle(fontSize: 11, fontFamily: 'SebangGothic'),
-                columnSpacing: 35,
+                columnSpacing: 30,
                 horizontalMargin: 0,
                 dataRowMinHeight: 35,
                 dataRowMaxHeight: 35,
@@ -36,14 +36,15 @@ class DiabetesTable extends StatelessWidget {
 
                 // dataRowMaxHeight: 30,
                 columns: [
-                  DataColumn(label: Text('당뇨구간')),
                   DataColumn(label: Text('범위')),
+                  DataColumn(label: Text('구간')),
+
                 ],
                 rows: diabetesData
                     .map((data) => DataRow(
                   cells: [
-                    DataCell(Text(data.category)),
                     DataCell(Text(data.range.toString())),
+                    DataCell(Text(data.category)),
                   ],
                 ))
                     .toList(),

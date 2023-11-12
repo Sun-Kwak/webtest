@@ -36,11 +36,21 @@ class _MeasurementViewState extends ConsumerState<MeasurementView> {
 
     final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
+    Measurement measurement = selectedMeasurementState;
+
     final selectedMember = ref.watch(selectedMemberProvider);
+    final selectedMemberController = ref.watch(selectedMemberIdProvider.notifier);
     final intensitySelectionController = ref.watch(intensitySelectionProvider.notifier);
     final measurementCalculatedStateController = ref.watch(measurementCalculatedStateProvider.notifier);
+    final selectedScheduleMeasurementController = ref.watch(selectedScheduleMeasurementIdProvider.notifier);
+    final intensityController = ref.watch(intensitySelectionProvider.notifier);
+    measurement = measurement.copyWith(
+      memberName: selectedMember.displayName,
+      memberId: selectedMember.id,
+    );
     final List<Widget> subContents = [
       MeasurementAndAppointmentView(
+        selectedMeasurement: measurement,
         onPressed: (){
           _onPressed();
         },
@@ -48,6 +58,7 @@ class _MeasurementViewState extends ConsumerState<MeasurementView> {
       const ReportView(),
       const ConditionsView(),
     ];
+    MeasurementCalculatedState measurementCalculatedState = MeasurementCalculatedState.empty();
 
     return Scrollbar(
       thumbVisibility: true,
@@ -84,6 +95,7 @@ class _MeasurementViewState extends ConsumerState<MeasurementView> {
                         setState(() {
                           groupValue = v;
                           if(v == 1){
+
                             // selectedMeasurementController.getLatestMeasurement(selectedMember.id);
                             // print(selectedMeasurementState.userWeight);
                             if(selectedMember.id !=0) {
@@ -96,8 +108,14 @@ class _MeasurementViewState extends ConsumerState<MeasurementView> {
                             // selectedMeasurementController.setSelectedRow(lastedSavedMeasurement.docId);
                           }
                           if(v == 0){
+                            selectedMemberController.setSelectedRow(0);
+                            selectedScheduleMeasurementController.setSelectedRow(null);
+                            measurementCalculatedStateController.selectedMeasurement(measurement: measurement, member: selectedMember);
+                            measurementCalculatedState = ref.watch(measurementCalculatedStateProvider).measurementCalculatedState;
+                            intensityController.setSelectedIntensityValue(
+                                measurementCalculatedState.karMax, 0);
                             // intensitySelectionController.setSelectedIntensityValue(0, 0);
-                            // selectedMeasurementController.removeState();
+                            selectedMeasurementController.removeState();
                           }
 
                         });
@@ -167,7 +185,7 @@ class _MeasurementViewState extends ConsumerState<MeasurementView> {
           ),
         ),
         AnimatedContainer(
-          duration: Duration(milliseconds: 500),
+          duration: Duration(milliseconds: 1000),
           width: groupValue == index ? textPainter.width * 0.9 : 0,
           height: 3,
           curve: Curves.fastOutSlowIn,

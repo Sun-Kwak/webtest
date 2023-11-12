@@ -16,4 +16,6 @@ dependencies:
   kakao_flutter_sdk: ^1.6.0
   syncfusion_flutter_datagrid: ^23.1.36
   syncfusion_flutter_core: ^23.1.36
+  syncfusion_flutter_calendar: ^23.1.42
+
 

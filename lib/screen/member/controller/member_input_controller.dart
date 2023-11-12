@@ -92,7 +92,10 @@ class MemberInputController extends StateNotifier<MemberInputState> {
   }
 
   void addMember(Member member, MembersProvider membersProvider) async {
-    if (!state.status.isValidated) return;
+    // if (memberEditingProvider.isEditing == true){
+    //
+    // }
+      if (!state.status.isValidated) return;
     state = state.copyWith(status: FormzStatus.submissionInProgress);
     try {
       Member newMember = member.copyWith(
@@ -114,6 +117,9 @@ class MemberInputController extends StateNotifier<MemberInputState> {
       if (memberEditingProvider.isEditing == true) {
         await _memberRepository.updateMember(newMember);
       } else {
+        newMember = newMember.copyWith(
+          createdAt: DateTime.now()
+        );
         await _memberRepository.addMember(newMember);
       }
       membersProvider.getMembers();

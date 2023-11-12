@@ -6,8 +6,11 @@ import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_v
 
 class MeasurementAndAppointmentView extends ConsumerStatefulWidget {
   final VoidCallback onPressed;
+  final Measurement selectedMeasurement;
 
-  const MeasurementAndAppointmentView({required this.onPressed, super.key});
+  const MeasurementAndAppointmentView({
+    required this.selectedMeasurement,
+    required this.onPressed, super.key});
 
   @override
   ConsumerState<MeasurementAndAppointmentView> createState() =>
@@ -17,22 +20,63 @@ class MeasurementAndAppointmentView extends ConsumerStatefulWidget {
 class _MeasurementAndAppointmentViewState
     extends ConsumerState<MeasurementAndAppointmentView> {
   UniqueKey _key = UniqueKey();
+  late Measurement _selectedMeasurement;
+
 
   void _onPressed() {
+    final measurementController = ref.watch(selectedScheduleMeasurementIdProvider.notifier);
+
+
+    final selectedPICState = ref.watch(selectedPICProvider);
+    measurementController.setSelectedRow(null);
+    final measurement = ref.watch(selectedScheduleMeasurementProvider);
+    setState(() {
+      _selectedMeasurement = measurement;
+      _selectedMeasurement = _selectedMeasurement.copyWith(
+        PICId: selectedPICState.id,
+        PICName: selectedPICState.displayName,
+      );
+    });
+
+
+    setState(() {
+      _key = UniqueKey(); // 키를 변경하여 하위 위젯을 재빌드합니다.
+    });
+  }
+
+  void _onRecallPressed() {
+
+    final measurement = ref.watch(selectedScheduleMeasurementProvider);
+
+    _selectedMeasurement = measurement;
     setState(() {
       _key = UniqueKey(); // 키를 변경하여 하위 위젯을 재빌드합니다.
     });
   }
 
   @override
+  void initState() {
+    super.initState();
+    _selectedMeasurement = widget.selectedMeasurement;
+
+
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final measurement = ref.watch(selectedMeasurementProvider);
+    final measurement = ref.watch(selectedScheduleMeasurementProvider);
+    final selectedMember = ref.watch(selectedMemberProvider);
+    final selectedPICState = ref.watch(selectedPICProvider);
+    // final measurement = ref.watch(selectedMeasurementProvider);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         MeasurementInputForm(
           key: _key,
-          measurement: measurement,
+          measurement: _selectedMeasurement,
+          onCancelPressed: (){
+            _onPressed();
+          },
           onSavePressed: () {
             _onPressed();
             widget.onPressed();
@@ -44,7 +88,12 @@ class _MeasurementAndAppointmentViewState
         SizedBox(
           width: 10,
         ),
-        AppointmentInputForm(),
+        AppointmentInputForm(
+          onPressed: (){
+
+            _onRecallPressed();
+          },
+        ),
       ],
     );
   }
