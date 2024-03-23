@@ -487,6 +487,6 @@ class MeasurementCalculatedStateProvider extends ChangeNotifier {
       diabetesLevel: diabetesLevel,
     );
 
-    notifyListeners();
+    // notifyListeners();
   }
 }

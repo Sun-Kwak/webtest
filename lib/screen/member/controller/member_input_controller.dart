@@ -1,4 +1,3 @@
-
 import 'package:form_validator/form_validators.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:authentication_repository/authentication_repository.dart';
@@ -7,14 +6,13 @@ import 'package:authentication_repository/src/members_repository.dart';
 
 final memberInputProvider =
     StateNotifierProvider.autoDispose<MemberInputController, MemberInputState>(
-  (ref) => MemberInputController(ref.watch(memberRepositoryProvider), ref.watch(memberEditingProvider)),
+  (ref) => MemberInputController(
+      ref.watch(memberRepositoryProvider), ref.watch(memberEditingProvider)),
 );
 
 class MemberInputController extends StateNotifier<MemberInputState> {
   final MemberRepository _memberRepository;
   final MemberEditingProvider memberEditingProvider;
-
-
 
   MemberInputController(this._memberRepository, this.memberEditingProvider)
       : super(const MemberInputState());
@@ -23,12 +21,12 @@ class MemberInputController extends StateNotifier<MemberInputState> {
     final name = Name.dirty(value);
 
     state = state.copyWith(
-        name: name,
-        status: Formz.validate([
-          name,
-          state.date,
-          state.phone,
-        ]),
+      name: name,
+      status: Formz.validate([
+        name,
+        state.date,
+        state.phone,
+      ]),
     );
   }
 
@@ -56,7 +54,6 @@ class MemberInputController extends StateNotifier<MemberInputState> {
     );
   }
 
-
   void resetAll() {
     const name = Name.pure();
     const date = Date.pure();
@@ -77,7 +74,6 @@ class MemberInputController extends StateNotifier<MemberInputState> {
     var name = Name.dirty(member.displayName);
     var phone = Phone.dirty(member.phoneNumber);
     var date = Date.dirty(member.birthDay);
-    // final selectedMember = member;
     state = state.copyWith(
       name: name,
       date: date,
@@ -88,16 +84,12 @@ class MemberInputController extends StateNotifier<MemberInputState> {
         name,
       ]),
     );
-
   }
 
   void addMember(Member member, MembersProvider membersProvider) async {
-    // if (memberEditingProvider.isEditing == true){
-    //
-    // }
-      if (!state.status.isValidated) return;
+    if (!state.status.isValidated) return;
     state = state.copyWith(status: FormzStatus.submissionInProgress);
-    try {
+
       Member newMember = member.copyWith(
         displayName: state.name.value,
         gender: member.gender,
@@ -107,26 +99,30 @@ class MemberInputController extends StateNotifier<MemberInputState> {
         signUpPath: member.signUpPath,
         referralID: member.referralID,
         referralName: member.referralName,
-        // accountLinkID: member.accountLinkID,
         memo: member.memo,
       );
-      state = state.copyWith(status: FormzStatus.submissionSuccess);
-      resetAll();
 
-
+    try {
       if (memberEditingProvider.isEditing == true) {
         await _memberRepository.updateMember(newMember);
       } else {
-        newMember = newMember.copyWith(
-          createdAt: DateTime.now()
-        );
-        await _memberRepository.addMember(newMember);
+        newMember = newMember.copyWith(createdAt: DateTime.now());
+        await _memberRepository.createMember(newMember);
       }
+      state = state.copyWith(status: FormzStatus.submissionSuccess);
+      resetAll();
       membersProvider.getMembers();
-
-    } on MemberAddFailure catch (e) {
+    } on UpdateMemberFailure catch (e) {
+      print('Caught UpdateMemberFailure: ${e.toString()}');
       state = state.copyWith(
-          status: FormzStatus.submissionFailure, errorMessage: e.code);
+        status: FormzStatus.submissionFailure,
+        errorMessage: e.code,
+      );
+    } catch (e) {
+      print('Caught unexpected exception: ${e.toString()}');
+      state = state.copyWith(
+          status: FormzStatus.submissionFailure,
+          errorMessage: e.toString());
     }
   }
 }

@@ -28,38 +28,6 @@ class MembersViewState extends ConsumerState<MembersView> {
   }
   final ScrollController controller = ScrollController();
 
-  // bool isEditing = false;
-  // Member member = Member.empty();
-  // late List<Member> members;
-
-  //
-  // void onEditButtonClicked() {
-  //   final isEditingControl = ref.watch(memberEditingProvider);
-  //   final selectedMember = ref.watch(selectedMemberProvider);
-  //   setState(() {
-  //     if (isEditingControl.isEditing == true) {
-  //       member = selectedMember;
-  //     }
-  //   });
-  // }
-  // //
-  // void inputButtonsClicked() async {
-  //   setState(() {
-  //     final selectedMember = ref.watch(selectedMemberProvider);
-  //
-  //     member = selectedMember;
-  //
-  //   });
-  // }
-
-//   void filterMember() {
-//     final filteredMembers = ref.watch(filteredMembersProvider);
-//     setState(() {
-//       members = filteredMembers;
-//     });
-// }
-
-
   @override
   void initState() {
     super.initState();
@@ -69,7 +37,7 @@ class MembersViewState extends ConsumerState<MembersView> {
   @override
   Widget build(BuildContext context) {
     final members = ref.watch(filteredMembersProvider);
-    final isEditingControl = ref.watch(memberEditingProvider);
+    // final isEditingControl = ref.watch(memberEditingProvider);
     final selectedMemberController =
     ref.watch(selectedMemberIdProvider.notifier);
     selectedMember = ref.watch(selectedMemberProvider);
@@ -100,7 +68,7 @@ class MembersViewState extends ConsumerState<MembersView> {
                             _onPressed();
                             selectedMemberController.setSelectedRow(0);
                           },
-                          isEditing: isEditingControl.isEditing,
+                          // isEditing: isEditingControl.isEditing,
                           member: selectedMember,
                         ),
                         SizedBox(

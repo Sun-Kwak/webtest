@@ -50,6 +50,7 @@ class LoadingSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 50,
+      width: double.infinity,
       child: Center(
         child: LoadingAnimationWidget.flickr(
           leftDotColor: PRIMARY_COLOR,

@@ -13,8 +13,10 @@ class CustomPhoneInputWidget extends StatelessWidget {
   final double? textBoxWidth;
   final TextEditingController? controller;
   final String? errorText;
+  // final String initialValue;
 
   const CustomPhoneInputWidget({
+    // required this.initialValue,
     this.errorText,
     this.controller,
     this.labelBoxWidth = 50,
@@ -57,7 +59,7 @@ class CustomPhoneInputWidget extends StatelessWidget {
             ),
 
             CustomInputFormField(
-
+              // initialValue: initialValue,
               controller: controller,
               hintText: '숫자만 입력 (010 제외)',
               width: textBoxWidth,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:web_test2/common/component/custom_text_fromfield.dart';
 import 'package:web_test2/common/component/size_fade_switcher.dart';
-import 'package:web_test2/common/const/colors.dart';
 
 class CustomTextInputWidget extends StatelessWidget {
   final double? height;
@@ -13,22 +12,25 @@ class CustomTextInputWidget extends StatelessWidget {
   final double? textBoxWidth;
   final TextEditingController? controller;
   final String? errorText;
+  final bool? isLarge;
 
   const CustomTextInputWidget({
+    this.isLarge  = false,
     this.errorText,
     this.controller,
     this.labelBoxWidth = 50,
-    this.textBoxWidth = 170,
+    this.textBoxWidth,
     this.hintText,
     required this.label,
     this.isRequired = false,
     required this.onChanged,
-    this.height = 37,
+    this.height,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    double _height = height ?? (isLarge == true ? 75 : 37);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -37,7 +39,7 @@ class CustomTextInputWidget extends StatelessWidget {
           children: [
             SizedBox(
                 width: labelBoxWidth,
-                height: height,
+                height: _height,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -49,7 +51,7 @@ class CustomTextInputWidget extends StatelessWidget {
                 )),
             SizedBox(
               width: 10,
-              height: height,
+              height: _height,
               child: Center(
                 child: isRequired == true
                     ? const Text('*', style: TextStyle(color: Colors.redAccent))
@@ -58,12 +60,14 @@ class CustomTextInputWidget extends StatelessWidget {
             ),
 
             CustomInputFormField(
+              // initialValue: initialValue,
               controller: controller,
               hintText: hintText,
-              width: textBoxWidth,
-              height: height,
+              width: textBoxWidth ?? (isLarge == true ? 440 : 170) ,
+              height: _height,
               onChanged: onChanged,
               errorText: errorText,
+              maxLines: isLarge == true ? 4 : 1,
             ),
           ],
         ),
@@ -86,68 +90,3 @@ class CustomTextInputWidget extends StatelessWidget {
   }
 }
 
-class LargeTextInputWidget extends StatelessWidget {
-  final double? height;
-  final double? textHeight;
-  final bool? isRequired;
-  final String label;
-  final String? hintText;
-  final ValueChanged<String>? onChanged;
-  final double? labelBoxWidth;
-  final double? textBoxWidth;
-  final TextEditingController? controller;
-
-  const LargeTextInputWidget({
-    this.controller,
-    this.labelBoxWidth = 50,
-    this.textBoxWidth = 440,
-    this.hintText,
-    required this.label,
-    this.isRequired = false,
-    required this.onChanged,
-    this.height = 75,
-    this.textHeight = 40,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          width: labelBoxWidth,
-          height: textHeight,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                label,
-
-                // style: TextStyle(fontSize: textHeight! * 0.35),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          height: height,
-          width: 10,
-          child: Center(
-            child: isRequired == true
-                ? const Text('*', style: TextStyle(color: CUSTOM_RED))
-                : null,
-          ),
-        ),
-        CustomInputFormField(
-            controller: controller,
-            maxLines: 4,
-            hintText: hintText,
-            width: textBoxWidth,
-            height: height,
-            onChanged: onChanged
-        ),
-      ],
-    );
-  }
-}

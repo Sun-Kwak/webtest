@@ -12,6 +12,7 @@ import 'package:web_test2/screen/measurement/measurement_view.dart';
 import 'package:web_test2/screen/member/member_view.dart';
 import 'package:web_test2/screen/settings_view.dart';
 
+import '../../screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
 
 class RootTab extends ConsumerStatefulWidget {
   const RootTab({super.key});
@@ -22,6 +23,7 @@ class RootTab extends ConsumerStatefulWidget {
 
 class _RootTabState extends ConsumerState<RootTab>
     with SingleTickerProviderStateMixin {
+  double zoomLevel = 1.0;
   String dropdownValue = '동천역';
   late TabController controller;
   int _selectedIndex = 0;
@@ -43,10 +45,11 @@ class _RootTabState extends ConsumerState<RootTab>
   void tabListener() {
     // final selectedScreenIndex = ref.watch(selectedScreenIndexProvider);
     // // if (this.mounted) {
-      setState(() {
-        _selectedIndex = controller.index;
-      });
-    }
+    setState(() {
+      _selectedIndex = controller.index;
+    });
+  }
+
   // }
   final List<Widget> mainContents = [
     const MembersView(),
@@ -58,7 +61,6 @@ class _RootTabState extends ConsumerState<RootTab>
     const SettingsView(),
   ];
 
-
   @override
   Widget build(BuildContext context) {
     final authController = ref.read(userMeProvider.notifier);
@@ -66,20 +68,25 @@ class _RootTabState extends ConsumerState<RootTab>
     final selectedIDController = ref.watch(selectedMemberIdProvider.notifier);
     final memberController = ref.watch(membersProvider.notifier);
     final double screenWidth = MediaQuery.of(context).size.width;
-    final selectedScreenIndexController = ref.watch(selectedScreenIndexProvider.notifier);
+    final selectedScreenIndexController =
+        ref.watch(selectedScreenIndexProvider.notifier);
     final selectedIndex = ref.watch(selectedScreenIndexProvider);
-    final EdgeInsets appBarMargin = screenWidth <= 640 ? const EdgeInsets.only(left: 20,top: 12) : screenWidth < 1200 || isSwitched == false ? const EdgeInsets.only(left: 100,top: 12) : const EdgeInsets.only(left: 170,top: 12);
+    final EdgeInsets appBarMargin = screenWidth <= 640
+        ? const EdgeInsets.only(left: 20, top: 12)
+        : screenWidth < 1200 || isSwitched == false
+            ? const EdgeInsets.only(left: 100, top: 12)
+            : const EdgeInsets.only(left: 170, top: 12);
 
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 29,
+        toolbarHeight: 35,
         leadingWidth: 300,
         leading: Container(
           margin: appBarMargin,
           child: Align(
             alignment: Alignment.centerLeft,
             child: DropdownButton<String>(
-              underline: const SizedBox(),
+                underline: const SizedBox(),
                 value: dropdownValue,
                 icon: const Icon(Icons.arrow_drop_down),
                 onChanged: (newValue) {
@@ -119,18 +126,16 @@ class _RootTabState extends ConsumerState<RootTab>
                 icon: const Icon(Icons.notifications_none_outlined),
                 color: BODY_TEXT_COLOR,
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    '${signInUserState.value?.displayName} 님',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                  color: BODY_TEXT_COLOR,
-                  fontSize: 14,
-                    ),
+              FractionalTranslation(
+                translation: Offset(0,0.3),
+                child: Text(
+                  '${signInUserState.value?.displayName} 님',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: BODY_TEXT_COLOR,
+                    fontSize: 14,
                   ),
-                ],
+                ),
               ),
               const SizedBox(
                 width: 20,
@@ -157,6 +162,9 @@ class _RootTabState extends ConsumerState<RootTab>
               // unselectedItemColor: CONSTRAINT_PRIMARY_COLOR,
               type: BottomNavigationBarType.fixed,
               onTap: (int index) {
+                final selectedMeasurementController =
+                    ref.watch(selectedMeasurementProvider.notifier);
+                selectedMeasurementController.removeState();
                 selectedScreenIndexController.setSelectedIndex(index);
                 controller.animateTo(index);
               },
@@ -195,21 +203,22 @@ class _RootTabState extends ConsumerState<RootTab>
         children: [
           if (screenWidth >= 640)
             NavigationRail(
-              groupAlignment: -1,
+
               useIndicator: true,
               indicatorColor: CONSTRAINT_PRIMARY_COLOR,
-              minExtendedWidth: 90,
+              minExtendedWidth: 150,
               minWidth: 80,
               trailing: Expanded(
                 child: screenWidth >= 1200
                     ? Switch(
                         value: isSwitched,
                         activeColor: Colors.white,
+                        inactiveTrackColor: PRIMARY_COLOR,
                         onChanged: (value) {
-                            setState(() {
-                              isSwitched = value;
-                            });
-                          },
+                          setState(() {
+                            isSwitched = value;
+                          });
+                        },
                       )
                     : const SizedBox(),
               ),
@@ -220,34 +229,41 @@ class _RootTabState extends ConsumerState<RootTab>
                       : false,
               selectedIndex: selectedIndex,
               onDestinationSelected: (int index) {
+                final selectedMeasurementController =
+                    ref.watch(selectedMeasurementProvider.notifier);
+                selectedMeasurementController.removeState();
                 selectedScreenIndexController.setSelectedIndex(index);
                 setState(() {
                   _selectedIndex = index;
                 });
-                if(_selectedIndex == 0) {
+                if (_selectedIndex == 0) {
                   memberController.getMembers();
                   selectedIDController.setSelectedRow(0);
-
-                  print(_selectedIndex);
                 }
-
-                }
-              ,
+              },
               elevation: 5,
               backgroundColor: PRIMARY_COLOR,
               selectedIconTheme: const IconThemeData(color: Colors.white),
-              selectedLabelTextStyle: const TextStyle(color: Colors.white,fontWeight: FontWeight.w400,fontFamily: 'SebangGothic'),
-              unselectedLabelTextStyle:
-                  const TextStyle(color: INPUT_BORDER_COLOR,fontWeight: FontWeight.w100,fontFamily: 'SebangGothic'),
+              selectedLabelTextStyle: const TextStyle(
+
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: 'SebangGothic'),
+              unselectedLabelTextStyle: const TextStyle(
+                  color: INPUT_BORDER_COLOR,
+                  fontWeight: FontWeight.w100,
+                  fontFamily: 'SebangGothic'),
               unselectedIconTheme:
                   const IconThemeData(color: INPUT_BORDER_COLOR),
-              // groupAlignment: 50,
               destinations: const [
                 NavigationRailDestination(
                     icon: Icon(Icons.people), label: Text('회원관리 ')),
+
                 NavigationRailDestination(
                     icon: Icon(Icons.edit_calendar_outlined),
-                    label: Text('계약관리 ',)),
+                    label: Text(
+                      '계약관리 ',
+                    )),
                 NavigationRailDestination(
                     icon: Icon(Icons.calendar_month), label: Text('강의등록 ')),
                 NavigationRailDestination(
@@ -262,10 +278,14 @@ class _RootTabState extends ConsumerState<RootTab>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 40,),
+                const SizedBox(
+                  height: 40,
+                ),
                 Expanded(
                     child: Padding(
-                  padding: screenWidth>640 ? const EdgeInsets.only(left: 10, top: 13,right: 10) : const EdgeInsets.only(left: 10, top: 3,right: 10) ,
+                  padding: screenWidth > 640
+                      ? const EdgeInsets.only(left: 10, top: 13, right: 10)
+                      : const EdgeInsets.only(left: 10, top: 3, right: 10),
                   child: mainContents[selectedIndex],
                 )),
               ],

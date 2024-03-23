@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/common/data_table/custom_grid_column.dart';
 import 'package:web_test2/common/data_table/custom_sfDataGrid.dart';

@@ -17,18 +17,11 @@ import 'package:web_test2/screen/member/data/member_data_table.dart';
 
 import '../../measurement/subScreen/measurement&appointment_view/controller/measurement_input_controller.dart';
 
-// final memberSearchFormStateProvider =
-//     StateProvider<MemberSearchFormState>((ref) {
-//   return MemberSearchFormState();
-// });
-
 class MemberSearchForm extends ConsumerStatefulWidget {
-  // final VoidCallback onTap;
   final List<Member> members;
   final VoidCallback onPressed;
 
   const MemberSearchForm({
-    // required this.onTap,
     required this.members,
     required this.onPressed,
     super.key,
@@ -39,18 +32,7 @@ class MemberSearchForm extends ConsumerStatefulWidget {
 }
 
 class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
-  // bool isRotated = false;
   bool showMore = false;
-
-  // @override
-  // void didUpdateWidget(MemberSearchForm oldWidget) {
-  //   super.didUpdateWidget(oldWidget);
-  //   if (widget.members != oldWidget.members) {
-  //     setState(() {
-  //       widget.members;
-  //     });
-  //   }
-  // }
 
   void _showConfirmationDialog(BuildContext context) {
     final memberRepository = ref.watch(memberRepositoryProvider);
@@ -68,10 +50,10 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
             color: Colors.amber,
             size: 50,
           ),
-          content: selectedMember.status == '활성' ? Text(
+          content: selectedMember.status == '활성' ? const Text(
             '선택 회원 사용중단 하시겠습니까?',
             style: TextStyle(color: PRIMARY_COLOR),
-          ) : Text(
+          ) : const Text(
             '선택 회원 재사용 하시겠습니까?',
             style: TextStyle(color: PRIMARY_COLOR),
           ),
@@ -104,15 +86,8 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
 
   @override
   Widget build(BuildContext context) {
-
     final filteredMembers = ref.watch(filteredMembersProvider);
-
     final double screenWidth = MediaQuery.of(context).size.width;
-    // final double formWidth = screenWidth < 650
-    //     ? screenWidth - 20
-    //     : showMore
-    //         ? 2000
-    //         : screenWidth - 710;
     final double formWidth = showMore ? 2000 : screenWidth <= 640 ? screenWidth - 20 : screenWidth < 1487 ? 777 : screenWidth -710;
 
 
@@ -165,6 +140,7 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
     final userme = ref.watch(userMeProvider);
     final measurementState = ref.watch(measurementProvider);
     final intensityController = ref.watch(intensitySelectionProvider.notifier);
+    // final updatingMemberState = ref.watch(updatingMemberProvider.notifier);
 
 
     // Member member = Member.empty();
@@ -205,6 +181,7 @@ class MemberSearchFormState extends ConsumerState<MemberSearchForm> {
                   if (selectedMember.id != 0) {
                     editing.toggleStatus(true);
                     memberInputController.recall(selectedMember);
+                    // updatingMemberState.setNewState(selectedMember);
                     widget.onPressed();
                   }
                 },

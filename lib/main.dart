@@ -1,10 +1,12 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:web_test2/common/const/colors.dart';
+import 'package:web_test2/common/fRouter.dart';
 import 'package:web_test2/common/view/splash_screen.dart';
 import 'package:web_test2/firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -16,17 +18,17 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "env");
 
-
-
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   KakaoSdk.init(
     nativeAppKey: dotenv.env['NATIVEAPPKEY'],
     javaScriptAppKey: dotenv.env['JAVASCRIPTAPPKEY'],
   );
-  runApp(
-    const ProviderScope(child: MyApp()),
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends ConsumerWidget {
@@ -34,14 +36,12 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
-
-      var screenSize = MediaQuery.of(context).size;
-      print('화면 너비: ${screenSize.width}');
-      print('화면 높이: ${screenSize.height}');
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   var screenSize = MediaQuery.of(context).size;
+    //   print('화면 너비: ${screenSize.width}');
+    //   print('화면 높이: ${screenSize.height}');
+    // });
     final authenticationState = ref.watch(userMeProvider);
-
 
     Widget getHome() {
       if (authenticationState.status == AuthenticationStatus.authenticated) {
@@ -55,10 +55,19 @@ class MyApp extends ConsumerWidget {
     }
 
     return MaterialApp(
-      initialRoute: "/",
+      onGenerateRoute: (settings) {
+        if (settings.name?.startsWith('/details') == true) {
+          List<String> documentIds = settings.name!.split('/').last.split(',');
+          return MaterialPageRoute(
+            builder: (context) {
+              return DetailsPage(documentIds: documentIds);
+            },
+          );
+        }
+        return null;
+      },
       routes: {
-        "/report":(context)=>ReportPdfForm()
-        //add more pages here
+        '/report': (context) => const ReportPdfForm(),
       },
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

@@ -105,7 +105,7 @@ class _AppointmentInputFormState extends ConsumerState<AppointmentInputForm> {
                     labelBoxWidth: 50,
                     outputText: formattedDate,
                   ),
-                  SizedBox(width: 10,),
+                  const SizedBox(width: 10,),
                   CustomTextOutputWidget(
                     border: false,
                     textColor: Colors.white,
@@ -116,7 +116,7 @@ class _AppointmentInputFormState extends ConsumerState<AppointmentInputForm> {
                     labelBoxWidth: 50,
                     outputText: selectedSchedule,
                   ),
-                  SizedBox(width: 10,),
+                  const SizedBox(width: 10,),
                   Tooltip(
                     message: '선택 수정',
                     child: AnimatedObject(
@@ -134,60 +134,36 @@ class _AppointmentInputFormState extends ConsumerState<AppointmentInputForm> {
                         }
 
                       },
-                        child: Icon(Icons.edit_calendar,color: PRIMARY_COLOR,)),
+                        child: const Icon(Icons.edit_calendar,color: PRIMARY_COLOR,)),
                   ),
-                  SizedBox(width: 10,),
+                  const SizedBox(width: 10,),
                   Tooltip(
                     message: '예약 추가',
                     child: AnimatedObject(
                         onTap: (){
                         },
-                        child: Icon(Icons.add_alarm,color: PRIMARY_COLOR,)),
+                        child: const Icon(Icons.add_alarm,color: PRIMARY_COLOR,)),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   CustomRefreshIcon(onPressed: () {
                   }),
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 8, left: 8),
+            const Padding(
+              padding: EdgeInsets.only(right: 8, left: 8),
               child: Divider(),
             ),
             Container(
               height: 1200,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                // border: Border.all(color: INPUT_BORDER_COLOR,width: 1),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SfCalendar(
-                  onTap: (CalendarTapDetails details){
-                    setState(() {
-                      selectedDate = details.date!;
-
-                      formattedDate = "${details.date!.year}-${details.date!.month.toString().padLeft(2, '0')}-${details.date!.day.toString().padLeft(2, '0')}";
-                      if(details.appointments != null && details.appointments!.isNotEmpty){
-
-                      String selectedStartTime =  DateFormat('hh:mm').format(details.appointments![0].from);
-                      selectedSchedule = details.appointments![0].eventName + ' ' +selectedStartTime;
-                        selectedScheduleMeasurementIdController.setSelectedRow(details.appointments![0].id);
-                      // Measurement measurement = ref.watch(selectedScheduleMeasurementProvider);
-                      // selectedMemberIdController.setSelectedRow(measurement.memberId);
-                      }
-                      // selectedScheduleMeasurementIdController.setSelectedRow(details.appointments![0].id);
-                    });
-                    // final DateTime? date = details.date;
-                    // final Appointment? occurrenceAppointment =
-                    // MeetingDataSource(data).getOccurrenceAppointment('', date!, '');
-                    // print(occurrenceAppointment);
-                    // print(details.targetElement.name);
-                    // print(MeetingDataSource(data).getOccurrenceAppointment(null, details.date!, ''));
-                    // print(details.appointments![0].id);
-                  },
                   viewHeaderHeight: 40,
-                  viewHeaderStyle: ViewHeaderStyle(
+                  viewHeaderStyle: const ViewHeaderStyle(
                     backgroundColor: TABLE_HEADER_COLOR
                   ),
                   allowedViews: const <CalendarView>[
@@ -197,18 +173,31 @@ class _AppointmentInputFormState extends ConsumerState<AppointmentInputForm> {
                     CalendarView.month,
                     CalendarView.schedule
                   ],
-                  // allowViewNavigation: true,
                   headerHeight: 40,
-                  appointmentTextStyle: TextStyle(letterSpacing: 2),
+                  appointmentTextStyle: const TextStyle(letterSpacing: 2),
                   headerStyle: const CalendarHeaderStyle(
                     textAlign: TextAlign.end,
-                    // backgroundColor: CUSTOM_BLACK,
                     textStyle: TextStyle(color: CUSTOM_BLACK),
                   ),
+                  onTap: (CalendarTapDetails details){
+                    setState(() {
+                      selectedDate = details.date!;
+                      formattedDate = "${details.date!.year}-${details.date!.month.toString().padLeft(2, '0')}-${details.date!.day.toString().padLeft(2, '0')}";
+                      if(details.appointments != null && details.appointments!.isNotEmpty){
+                        String selectedStartTime =  DateFormat('hh:mm').format(details.appointments![0].from);
+                        selectedSchedule = details.appointments![0].eventName + ' ' +selectedStartTime;
+                        selectedScheduleMeasurementIdController.setSelectedRow(details.appointments![0].id);
+                      }
+                    });
+                  },
                   showNavigationArrow: true,
                   showCurrentTimeIndicator: true,
                   dataSource: MeetingDataSource(measurementScheduleState),
                   monthViewSettings: const MonthViewSettings(
+                    agendaStyle: AgendaStyle(
+                      //   appointmentTextStyle: TextStyle(color: Colors.white),
+                      // placeholderTextStyle: TextStyle(color: Colors.white60),
+                    ),
                       appointmentDisplayMode:
                           MonthAppointmentDisplayMode.appointment,
                       dayFormat: 'EEE',
@@ -244,7 +233,7 @@ class _AppointmentInputFormState extends ConsumerState<AppointmentInputForm> {
                         DateTime.sunday,
                         DateTime.saturday
                       ]),
-                  scheduleViewSettings:  ScheduleViewSettings(
+                  scheduleViewSettings:  const ScheduleViewSettings(
                     hideEmptyScheduleWeek: true,
                     monthHeaderSettings: MonthHeaderSettings(
                       height: 70,
@@ -252,6 +241,7 @@ class _AppointmentInputFormState extends ConsumerState<AppointmentInputForm> {
                       backgroundColor: CUSTOM_BLACK,
                       monthTextStyle: TextStyle(fontSize: 20)
                     ),
+                    appointmentTextStyle: TextStyle(color: Colors.white),
                   ),
                 ),
               ),

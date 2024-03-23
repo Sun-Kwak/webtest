@@ -102,12 +102,14 @@ class CustomInputFormField extends StatelessWidget {
   final double? height;
   final double? width;
   final int? maxLines;
+  // final String initialValue;
   final TextEditingController? controller;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
 
 
   const CustomInputFormField({
+    // required this.initialValue,
     this.controller,
     this.maxLines = 1,
     this.width =250,
@@ -138,10 +140,12 @@ class CustomInputFormField extends StatelessWidget {
       child: TextFormField(
         inputFormatters: inputFormatters,
         keyboardType: keyboardType,
+        // initialValue: initialValue,
         controller: controller,
         maxLines: maxLines,
         style: const TextStyle(
           fontSize: 12,
+          color: PRIMARY_COLOR
         ),
         focusNode: focusNode,
         onFieldSubmitted: (value) {
@@ -177,6 +181,8 @@ class CustomInputFormField extends StatelessWidget {
 }
 
 class PhoneInputFormatter extends TextInputFormatter {
+  static const kPhoneNumberPrefix = '010-';
+
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
@@ -186,23 +192,28 @@ class PhoneInputFormatter extends TextInputFormatter {
       selection: TextSelection.collapsed(offset: formattedText.length),
     );
   }
+
   String _getFormattedPhoneNumber(String value) {
-    value = value.replaceAll("-", "").replaceAll(" ", "");
+    value = _cleanPhoneNumber(value);
+
     if (value.length == 1) {
-      value = '010-' + value.substring(0, value.length);
+      value = kPhoneNumberPrefix + value.substring(0, value.length);
     } else if (value.length < 4) {
-      value = '010-';
-    } else if (value.length >= 8) {
-      value = '010-' + value.substring(3,7) + '-' +value.substring(7,value.length);
-    } else  {
-      value = '010-' + value.substring(3,value.length);
+      value = kPhoneNumberPrefix;
+    } else if (value.length >= 8 && value.length < 12) {
+      value = '$kPhoneNumberPrefix${value.substring(3, 7)}-${value.substring(7, value.length)}';
+    } else {
+      value = kPhoneNumberPrefix + value.substring(3, value.length);
     }
-    // else {
-    //   value = '010-' + value.substring(0, value.length);
-    // }
+
     return value;
   }
+
+  String _cleanPhoneNumber(String value) {
+    return value.replaceAll(RegExp(r'[-\s]'), '');
+  }
 }
+
 
 
 

@@ -11,7 +11,6 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
   final Color? color;
   final bool? showId;
   final String? errorText;
-  // final ValueChanged<String?>? onChanged;
 
   final double? height;
   final bool? isRequired;
@@ -36,7 +35,6 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
     required this.list,
     this.labelBoxWidth = 50,
     this.textBoxWidth = 170,
-    // required this.onChanged,
     required this.selectedValue,
     this.hintText,
     required this.label,
@@ -58,7 +56,6 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  // style: TextStyle(fontSize: height! * 0.35),
                 ),
               ],
             )),
@@ -101,7 +98,6 @@ class CustomSearchDropdownWidget<T, U> extends StatelessWidget {
                 ),
               ): const SizedBox.shrink(),
             )
-
           ],
         ),
       ],
@@ -114,7 +110,6 @@ class CustomSearchDropdownFormField<T, U> extends ConsumerStatefulWidget {
   final Color? color;
   final bool? showId;
 
-  // final ValueChanged<String?>? onChanged;
   final FocusNode? focusNode;
   final FocusNode? onFieldSubmitted;
   final double? height;
@@ -162,7 +157,6 @@ class CustomSearchDropdownFormFieldState<T, U>
   late OverlayEntry floatingDropdown;
   final layerLink = LayerLink();
   late List<T> _list;
-  // late T? partId;
   late String partTitle;
   late List<T> _displayedList;
   late List<T> _filteredList;
@@ -171,7 +165,6 @@ class CustomSearchDropdownFormFieldState<T, U>
   @override
   void initState() {
     actionKey = LabeledGlobalKey(widget.hintText);
-    // partId = null;
     partTitle = '';
     selectedValue = widget.selectedValue;
     super.initState();
@@ -202,10 +195,7 @@ class CustomSearchDropdownFormFieldState<T, U>
     _filteredList = _displayedList;
 
     return OverlayEntry(builder: (context) {
-      // var setProvider = SelectedDropdownIDProvider(
-      //   initialId: widget.idSelector,
-      //   initialTitle: partTitle,
-      // );
+
       final selectedDropdownData = ref.watch(selectedDropdownIDProvider.notifier);
       return GestureDetector(
         behavior: HitTestBehavior.opaque,
@@ -227,9 +217,9 @@ class CustomSearchDropdownFormFieldState<T, U>
                     autofocus: true,
                     onChanged: searchMember,
                     decoration:  InputDecoration(
-                      prefixIcon: Icon(Icons.search,color: CONSTRAINT_PRIMARY_COLOR,),
+                      prefixIcon: const Icon(Icons.search,color: CONSTRAINT_PRIMARY_COLOR,),
                       hintText: widget.hintText,
-                      hintStyle: TextStyle(fontSize: 11),
+                      hintStyle: const TextStyle(fontSize: 11),
                     ),
                   ),
                 ),
@@ -248,9 +238,9 @@ class CustomSearchDropdownFormFieldState<T, U>
                        var part = _filteredList[index];
                     return Material(
                       child: ListTile(
-                        leading: Container(
-                          width: 40,
-                          height: 40,
+                        leading: SizedBox(
+                          width: 45,
+                          height: 45,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -263,11 +253,11 @@ class CustomSearchDropdownFormFieldState<T, U>
                                 ),
                                 child: const Icon(Icons.person),
                               ),
-                              widget.showId == false ? SizedBox() : Center(child: Text(widget.idSelector!(part).toString(),style: const TextStyle(color: PRIMARY_COLOR),)),
+                              widget.showId == false ? const SizedBox() : Center(child: Text(widget.idSelector!(part).toString(),style: const TextStyle(color: PRIMARY_COLOR),)),
                             ],
                           ),
                         ),
-                        title: Text(widget.titleSelector(part)),
+                        title: Text(widget.titleSelector(part),style: const TextStyle(fontSize: 12),),
                         subtitle: Text(widget.subtitleSelector(part),style: const TextStyle(fontSize: 9),),
                         onTap: (){
                           setState(() {
@@ -357,13 +347,6 @@ class CustomSearchDropdownFormFieldState<T, U>
   }
 }
 
-// class DropdownData<T, U> {
-//   final U? id;
-//   final String title;
-//
-//   DropdownData({required this.id, required this.title});
-// }
-
 class SelectedDropdownIDProvider<U> extends ChangeNotifier {
   U selectedId;
  String? selectedTitle;
@@ -387,33 +370,5 @@ final selectedDropdownIDProvider = ChangeNotifierProvider<SelectedDropdownIDProv
   );
 });
 
-// class SelectedDropdownIDProvider<T, U> extends ChangeNotifier {
-//   U? id;
-//   String title;
-//
-//   SelectedDropdownIDProvider({U? initialId, required String initialTitle})
-//       : id = initialId,
-//         title = initialTitle;
-//
-//   DropdownData<T, U> getValues() {
-//     return DropdownData<T, U>(
-//       id: id,
-//       title: title,
-//     );
-//   }
-//
-//   void setValues({U? newId, required String newTitle}) {
-//     id = newId;
-//     title = newTitle;
-//     notifyListeners(); // 상태가 변경됨을 알림
-//   }
-// }
-//
-// final selectedDropdownIDProvider = ChangeNotifierProvider<SelectedDropdownIDProvider>((ref) {
-//   return SelectedDropdownIDProvider(
-//     initialId: (T) => null , // 초기 ID 로직을 여기에 추가
-//     initialTitle: '',
-//   );
-// });
 
 

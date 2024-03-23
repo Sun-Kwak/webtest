@@ -159,6 +159,8 @@ class Member {
     };
   }
 
+
+
   factory Member.fromFirestore(DocumentSnapshot doc) {
     final map = doc.data() as Map<String, dynamic>;
     return Member(
@@ -254,3 +256,4 @@ enum MembersCountFilterState {
   contractCount,
   expiredCount,
 }
+

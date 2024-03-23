@@ -692,6 +692,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: userHeightController,
                 isDouble: true,
                 onChanged: (v) {
@@ -711,6 +712,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: userWeightController,
                 isDouble: true,
                 onChanged: (v) {
@@ -746,6 +748,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: smmController,
                 isDouble: true,
                 onChanged: (v) {
@@ -764,6 +767,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: bfmController,
                 isDouble: true,
                 onChanged: (v) {
@@ -782,6 +786,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: bfpController,
                 isDouble: true,
                 onChanged: (v) {
@@ -800,6 +805,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: bpmController,
                 onChanged: (v) {
                   bpm = int.parse(v);
@@ -846,6 +852,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage0Controller,
                 onChanged: (v) {
                   setState(() {
@@ -863,6 +870,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage1Controller,
                 onChanged: (v) {
                   setState(() {
@@ -880,6 +888,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage2Controller,
                 onChanged: (v) {
                   setState(() {
@@ -904,6 +913,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage3Controller,
                 onChanged: (v) {
                   setState(() {
@@ -921,6 +931,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage4Controller,
                 onChanged: (v) {
                   setState(() {
@@ -938,6 +949,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage5Controller,
                 onChanged: (v) {
                   setState(() {
@@ -962,6 +974,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage6Controller,
                 onChanged: (v) {
                   setState(() {
@@ -979,6 +992,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage7Controller,
                 onChanged: (v) {
                   setState(() {
@@ -996,6 +1010,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: stage8Controller,
                 onChanged: (v) {
                   setState(() {
@@ -1041,6 +1056,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: bpmMaxController,
                 onChanged: (v) {
                   _onBpmMaxChanged(v);
@@ -1059,6 +1075,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: bpm1mController,
                 onChanged: (v) {
                   _onBpm1mChanged(v);
@@ -1077,6 +1094,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: bpm2mController,
                 onChanged: (v) {
                   _onBpm2mChanged(v);
@@ -1095,6 +1113,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: widgetGap,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: bpm3mController,
                 onChanged: (v) {
                   _onBpm3mChanged(v);
@@ -1242,6 +1261,7 @@ class MeasurementInputFormState extends ConsumerState<MeasurementInputForm> {
                 width: 20,
               ),
               CustomNumberInputWidget(
+                // initialValue: '',
                 controller: secondsController,
                 onChanged: (v) {
                   String formattedTime = secondsToMinutes(v);
@@ -1516,7 +1536,7 @@ class _AddMeasurementButton extends ConsumerWidget {
           backgroundColor: PRIMARY_COLOR,
           padding: EdgeInsets.zero,
         ),
-        child: const Text('등록'),
+        child: const Text('등록',style: TextStyle(color: Colors.white),),
       ),
     );
   }

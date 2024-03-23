@@ -1,9 +1,9 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_test2/common/const/colors.dart';
-import 'package:web_test2/screen/empty_view.dart';
 import 'package:web_test2/screen/measurement/subScreen/conditions/conditions_View.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/measurement&appointment_view.dart';
@@ -32,6 +32,9 @@ class _MeasurementViewState extends ConsumerState<MeasurementView> {
 
   @override
   Widget build(BuildContext context) {
+
+
+
     final measurementController = ref.watch(measurementProvider.notifier);
 
     final selectedMeasurementController = ref.watch(selectedMeasurementProvider.notifier);

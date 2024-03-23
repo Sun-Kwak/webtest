@@ -70,7 +70,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
           borderRadius: BorderRadius.circular(8),
           color: Colors.white,
         ),
-        width: 1390,
+        width: 1350,
         height: 800,
         child: selectedMeasurementState.docId == ''
             ? Center(
@@ -116,7 +116,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         '${(intensityMax * 0.5).toStringAsFixed(0)}-${(intensityMax * 0.6).toStringAsFixed(0)}';
 
     return SizedBox(
-      width: 690,
+      width: 650,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +210,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 ],
               ),
               SizedBox(
-                width: 65,
+                width: 30,
               ),
               SizedBox(
                   height: 150,
@@ -241,7 +241,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 width: 20,
               ),
               noticeText(),
-              SizedBox(width: 50),
+              SizedBox(width: 20),
               Container(
                 width: 200,
                 height: 200,
@@ -389,7 +389,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 : '매우 좋음';
 
     return SizedBox(
-      width: 690,
+      width: 650,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -461,10 +461,10 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Container(
-                      width: 180, child: Center(child: Text(diabetesStatus))),
+                      width: 150, child: Center(child: Text(diabetesStatus))),
                   _buildThermometer(context),
                   Container(
-                      width: 180, child: Center(child: Text(diabetesNotice))),
+                      width: 150, child: Center(child: Text(diabetesNotice))),
                 ],
               ),
             ],
@@ -513,7 +513,8 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                 dataSource: chartData,
                 xValueMapper: (ExhaustionModel data, _) => data.month,
                 yValueMapper: (ExhaustionModel data, _) => data.seconds,
-                sortingOrder: SortingOrder.descending,
+                sortingOrder: SortingOrder.ascending,
+          sortFieldValueMapper: (ExhaustionModel data, _) => data.seconds,
                 pointColorMapper: (ExhaustionModel data, _) => data.color,
                 name: '탈진시간'
                 // Sorting based on the specified field
@@ -666,7 +667,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         : '${selectedReferenceMeasurementState.startDate!.year}-${selectedReferenceMeasurementState.startDate!.month}-${selectedReferenceMeasurementState.startDate!.day}';
 
     return SizedBox(
-      width: 490,
+      width: 450,
       height: 200,
       child: SfCartesianChart(
           tooltipBehavior: TooltipBehavior(enable: true),
@@ -685,6 +686,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
             ),
             BarSeries<HrrModel, String>(
               name: '비교 $endMonth',
+              dataLabelSettings: DataLabelSettings(),
               dataSource: chartData,
               xValueMapper: (HrrModel data, _) => data.hrr,
               yValueMapper: (HrrModel data, _) => data.currentValue,
@@ -842,7 +844,7 @@ class _ReportFormState extends ConsumerState<ReportForm> {
         ),
         SizedBox(
             height: 120,
-            width: 665,
+            width: 630,
             child: Column(
               children: [
                 Row(
@@ -854,19 +856,19 @@ class _ReportFormState extends ConsumerState<ReportForm> {
                     Container(
                       color: CUSTOM_RED.withOpacity(0.3),
                       height: 40,
-                      width: 665 / 3,
+                      width: 630 / 3,
                       child: Center(child: Text('Pre-mature Death')),
                     ),
                     Container(
                       color: CUSTOM_YELLOW.withOpacity(0.3),
                       height: 40,
-                      width: 665 / 3,
+                      width: 630 / 3,
                       child: Center(child: Text('Comfort Zone')),
                     ),
                     Container(
                       color: CUSTOM_GREEN.withOpacity(0.3),
                       height: 40,
-                      width: 665 / 3,
+                      width: 630 / 3,
                       child: Center(
                         child: Text(
                           'High-level Wellness',

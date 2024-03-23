@@ -123,7 +123,7 @@ class NaverLogo extends ConsumerWidget {
     return AnimatedObject(
       onTap: (){
       },
-      child: CircularSvgImage(
+      child: const CircularSvgImage(
         assetPath: "asset/btn_naver.svg",
         borderColor: INPUT_BORDER_COLOR,
         borderWidth: 0,

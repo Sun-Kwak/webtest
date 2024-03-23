@@ -65,7 +65,7 @@ class SignOutFailure implements Exception {
 class AuthenticationRepository {
   final _firebaseAuthDataSource = FirebaseAuthRemoteDataSource();
   final _firebaseAuth = FirebaseAuth.instance;
-  final _googleSignIn = GoogleSignIn.standard();
+  final _googleSignIn = GoogleSignIn();
   final _kakaoSignIn = kakao.UserApi.instance;
   final _employeeRepository = EmployeeRepository();
 
@@ -83,13 +83,13 @@ class AuthenticationRepository {
     );
     try {
       await FirebaseAuth.instance.signInWithCustomToken(token);
-      _employeeRepository.signUpSetUserData(
-          user.kakaoAccount!.email!, user.kakaoAccount!.profile!.nickname!);
+      // _employeeRepository.signUpSetUserData(
+      //     user.kakaoAccount!.email!, user.kakaoAccount!.profile!.nickname!);
       // SharedPreferences prefs = await SharedPreferences.getInstance();
       // prefs.remove('flutter.com.kakao.token.version');
       // _kakaoSignIn.logout();
 
-      kakao.UserApi.instance.logout();
+      // kakao.UserApi.instance.logout();
 
 
     } catch (e) {
@@ -107,7 +107,6 @@ class AuthenticationRepository {
         email: email,
         password: password,
       );
-      _employeeRepository.signUpSetUserData(email, displayName);
     } on FirebaseAuthException catch (e) {
       throw SignUpWithEmailAndPasswordFailure(e.code);
     }
@@ -124,9 +123,9 @@ class AuthenticationRepository {
         try {
           await _googleSignIn.signIn();
         } catch (e) {
-
+          print(e);
           googleSignInAccount =
-              await _googleSignIn.signInSilently(); // 실패한 경우 null 반환
+              await _googleSignIn.signInSilently();
         }
       }
 
@@ -141,9 +140,6 @@ class AuthenticationRepository {
         final userCredential =
             await _firebaseAuth.signInWithCredential(credential);
 
-        final email = userCredential.user?.email;
-        final displayName = userCredential.user?.displayName;
-        _employeeRepository.signUpSetUserData(email!, displayName!);
 
       }
     } on FirebaseAuthException catch (e) {
@@ -189,9 +185,11 @@ class AuthenticationRepository {
   Future<void> signOut() async {
     try {
       await Future.wait([
-        _firebaseAuth.signOut(),
+
         _googleSignIn.signOut(),
-        // _kakaoSignIn.logout(),
+        _googleSignIn.disconnect(),
+        _kakaoSignIn.logout(),
+        _firebaseAuth.signOut(),
         // kakao.UserApi.instance.logout(),
       ]);
     } catch (e) {

@@ -17,6 +17,7 @@ class MeasurementProvider extends StateNotifier<List<Measurement>> {
     getMeasurements();
   }
 
+
   Future<void> getMeasurements() async {
     try {
       List<Measurement> measurements = await repository.getMeasurementData();
@@ -200,7 +201,7 @@ final measurementScheduleProvider = Provider<List<Meeting>>(
           String name = '${measurementItem.memberName}님/측정';
           String id = measurementItem.docId;
           // String displayName = measurementItem.displayName;
-          Meeting newMeeting = Meeting(name, startDate, endDate, Color(0xFF81B3FF),id); // Colors.blue는 임의로 지정한 배경색
+          Meeting newMeeting = Meeting(name, startDate, endDate, Color(0xFF81B3FF).withOpacity(0.5),id); // Colors.blue는 임의로 지정한 배경색
           data.add(newMeeting);
         }
         DateTime now = DateTime.now();
@@ -212,9 +213,9 @@ final measurementScheduleProvider = Provider<List<Meeting>>(
         DateTime(now.year, now.month, now.day +1, now.hour +1, 15, 20);
         final DateTime endTime2 = startTime.add(const Duration(hours: 2));
         data.add(Meeting(
-            '해린님/유추', startTime, endTime, Color(0xFFFF8181),null));
+            '해린님/유추', startTime, endTime, Color(0xFFFF8181).withOpacity(0.5),null));
         data.add(Meeting(
-            '민지님/PT', startTime2, endTime2, Color(0xFFFF8181),null));
+            '민지님/PT', startTime2, endTime2, Color(0xFFFF8181).withOpacity(0.5),null));
         return data;
   },
 );

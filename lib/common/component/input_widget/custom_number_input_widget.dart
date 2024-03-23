@@ -15,8 +15,10 @@ class CustomNumberInputWidget extends StatelessWidget {
   final TextEditingController? controller;
   final String? errorText;
   final bool? isDouble;
+  // final String initialValue;
 
   const CustomNumberInputWidget({
+    // required this.initialValue,
     this.isDouble = false,
     this.errorText,
     this.controller,
@@ -61,6 +63,7 @@ class CustomNumberInputWidget extends StatelessWidget {
             ),
 
             CustomInputFormField(
+              // initialValue: initialValue,
               controller: controller,
               hintText: hintText,
               width: textBoxWidth,

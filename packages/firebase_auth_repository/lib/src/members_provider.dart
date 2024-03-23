@@ -1,6 +1,5 @@
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter/material.dart';
 
 final membersProvider =
     StateNotifierProvider<MembersProvider, List<Member>>((ref) {
@@ -19,7 +18,7 @@ class MembersProvider extends StateNotifier<List<Member>> {
 
   Future<void> getMembers() async {
     try {
-      List<Member> members = await repository.getMembersData();
+      List<Member> members = await repository.readMembers();
       state = members;
     } catch (e) {
       print('Error: $e');
@@ -28,7 +27,7 @@ class MembersProvider extends StateNotifier<List<Member>> {
 
   Future<void> getDisabledMembers() async {
     try {
-      List<Member> members = await repository.getDisabledMembersData();
+      List<Member> members = await repository.readDisabledMembers();
       state = members;
     } catch (e) {
 
@@ -99,8 +98,22 @@ final selectedMemberProvider = Provider<Member>((ref) {
   return selectedMember;
 });
 
-//------------------------------------------------------------------------------
-
+// class UpdatingMemberProvider extends StateNotifier<Member> {
+//   UpdatingMemberProvider(Member initialValue) : super(initialValue);
+//
+//   void setNewState(Member newValue) {
+//     state = newValue;
+//   }
+//   notifyListeners() {
+//     // TODO: implement notifyListeners
+//     throw UnimplementedError();
+//   }
+// }
+//
+// final updatingMemberProvider =
+// StateNotifierProvider<UpdatingMemberProvider, Member>((ref) {
+//   return UpdatingMemberProvider(Member.empty());
+// });
 //---------------------------------------------------------------------------------
 final membersCountProvider = Provider<MemberCountModel>(
   (ref) {
@@ -149,26 +162,5 @@ final monthlyCountProvider = Provider<List<MonthlyMemberModel>>(
   },
 );
 
-//---------------------------------------------------------------------------
-
-// class SelectedReferralIDProvider extends ChangeNotifier {
-//   int? selectedReferralId;
-//   String? selectedReferralName;
-//
-//   SelectedReferralIDProvider(
-//       {required this.selectedReferralId, required this.selectedReferralName});
-//
-//   void setSelectedReferralID(int? newId, String? newValue) {
-//     selectedReferralId = newId;
-//     selectedReferralName = newValue;
-//   }
-// }
-//
-// final selectedReferralIDProvider =
-//     ChangeNotifierProvider<SelectedReferralIDProvider>((ref) {
-//   return SelectedReferralIDProvider(
-//       selectedReferralId: null, selectedReferralName: null);
-// });
-//-----------------------------------------------------------------
 
 

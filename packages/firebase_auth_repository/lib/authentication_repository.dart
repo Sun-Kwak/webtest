@@ -15,6 +15,7 @@ export 'src/auth_repo_provider.dart';
 export 'src/measurement_model.dart';
 export 'src/measurement_repository.dart';
 export 'src/measurement_provider.dart';
+export 'src/firebase_provider.dart';
 
 
 

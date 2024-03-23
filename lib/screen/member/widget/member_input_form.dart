@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:authentication_repository/authentication_repository.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -14,28 +13,21 @@ import 'package:web_test2/common/component/input_widget/custom_dropdown_input_wi
 import 'package:web_test2/common/component/input_widget/custom_genderSelection_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_phone_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_seachable_dropdown_input_widget.dart';
-import 'package:web_test2/common/component/input_widget/memberinput_member_search_dropdown_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_search_text_input_widget.dart';
 import 'package:web_test2/common/component/input_widget/custom_text_input_widget.dart';
 import 'package:web_test2/common/const/colors.dart';
 import 'package:web_test2/screen/member/controller/member_input_controller.dart';
 import 'package:web_test2/screen/member/controller/member_input_state.dart';
-import 'package:authentication_repository/src/members_repository.dart';
-
-// final memberInputFormStateProvider = StateProvider<MemberInputFormState>((ref) {
-//   return MemberInputFormState();
-// });
+// import 'package:authentication_repository/src/members_repository.dart';
 
 class MemberInputForm extends ConsumerStatefulWidget {
   final Member member;
-  final bool isEditing;
   final VoidCallback onSavePressed;
   final VoidCallback onRefreshPressed;
 
   const MemberInputForm({
     required this.onSavePressed,
     required this.onRefreshPressed,
-    required this.isEditing,
     required this.member,
     super.key,
   });
@@ -67,8 +59,6 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
   ];
   @override
   void initState() {
-    // member = widget.member;
-    // selectedGender = member.gender;
     super.initState();
     updatingMember = widget.member;
     nameController.text = widget.member.displayName;
@@ -86,14 +76,10 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
     final selectedRowController = ref.watch(selectedMemberIdProvider.notifier);
     final isEditingController = ref.watch(memberEditingProvider.notifier);
     final memberInputController = ref.watch(memberInputProvider.notifier);
-    // final selectedReferralController =
-    //     ref.watch(selectedReferralIDProvider.notifier);
-
+    selectedRowController.setSelectedRow(0);
+    isEditingController.toggleStatus(false);
+    memberInputController.resetAll();
     setState(() {
-      selectedRowController.setSelectedRow(0);
-      // selectedReferralController.setSelectedReferralID(null, null);
-      isEditingController.toggleStatus(false);
-      memberInputController.resetAll();
       updatingMember = Member.empty();
     });
   }
@@ -132,9 +118,6 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
   @override
   Widget build(BuildContext context) {
     final members = ref.watch(membersProvider);
-    // final selectedReferral = ref.watch(selectedReferralIDProvider);
-    // final selectedReferralController =
-    //     ref.watch(selectedReferralIDProvider.notifier);
     final selectedDropdownData = ref.watch(selectedDropdownIDProvider);
     ref.listen<MemberInputState>(
       memberInputProvider,
@@ -142,9 +125,9 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
         if (current.status.isSubmissionInProgress) {
           LoadingSheet.show(context);
         } else if (current.status.isSubmissionFailure) {
+          Navigator.of(context).pop();
           CustomMessageScreen.showMessage(context, '${current.errorMessage}',
               Colors.red, Icons.dangerous_outlined);
-          // ErrorDialog.show(context, '${current.errorMessage}');
         } else if (current.status.isSubmissionSuccess) {
           Navigator.of(context).pop();
           CustomMessageScreen.showMessage(
@@ -184,8 +167,9 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 ),
               ),
               CustomRefreshIcon(onPressed: () {
-                resetFields();
+
                 widget.onRefreshPressed();
+                resetFields();
               }),
             ],
           ),
@@ -330,9 +314,6 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                       referralName: selectedDropdownData.selectedTitle,
                     );
                   });
-                  // selectedReferralController.setSelectedReferralID(
-                  //     selectedDropdownData.selectedId,
-                  //     selectedDropdownData.selectedTitle);
                 },
                 // color: CUSTOM_BLUE.withOpacity(0.1),
                 errorText: null,
@@ -367,7 +348,8 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
               const SizedBox(
                 width: 20,
               ),
-              LargeTextInputWidget(
+              CustomTextInputWidget(
+                isLarge: true,
                 labelBoxWidth: labelBoxWidth,
                 controller: memoController,
                 label: '메모',
@@ -383,7 +365,6 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
               ),
             ],
           ),
-          //
           const SizedBox(
             height: 10,
           ),
@@ -393,10 +374,7 @@ class MemberInputFormState extends ConsumerState<MemberInputForm> {
                 width: 100,
                 child: _AddMemberButton(
                   onPressed: () {
-
                     widget.onSavePressed();
-                    // resetFields();
-                    // updatingMember = Member.empty();
                   },
                   member: updatingMember,
                 ),
@@ -445,7 +423,7 @@ class _AddMemberButton extends ConsumerWidget {
           backgroundColor: PRIMARY_COLOR,
           padding: EdgeInsets.zero,
         ),
-        child: const Text('등록'),
+        child: const Text('등록',style: TextStyle(color: Colors.white),),
       ),
     );
   }
@@ -527,6 +505,7 @@ class _PhoneField extends ConsumerStatefulWidget {
   final double textBoxWidth;
   final TextEditingController controller;
 
+
   const _PhoneField({
     required this.labelBoxWidth,
     required this.textBoxWidth,
@@ -538,21 +517,19 @@ class _PhoneField extends ConsumerStatefulWidget {
 }
 
 class _PhoneFieldState extends ConsumerState<_PhoneField> {
-  Stream<bool> _verifyPhoneNumber(String phone) async* {
-
-
-    if (phone.length == 13) {
-      final memberRepository = ref.read(memberRepositoryProvider);
-      bool isPhoneNumberDuplicate =
-          await memberRepository.checkPhoneNumber(phone);
-      yield !isPhoneNumberDuplicate;
-    } else {
-      yield false;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    Stream<bool> verifyPhoneNumber(String phone) async* {
+      if (phone.length == 13) {
+        final memberRepository = ref.read(memberRepositoryProvider);
+        bool isPhoneNumberDuplicate =
+        await memberRepository.checkPhoneNumber(phone);
+        yield !isPhoneNumberDuplicate;
+      } else {
+        yield false;
+      }
+    }
     final memberInputState = ref.watch(memberInputProvider);
     final showError = memberInputState.phone.invalid;
     final memberInputController = ref.read(memberInputProvider.notifier);
@@ -577,7 +554,7 @@ class _PhoneFieldState extends ConsumerState<_PhoneField> {
           width: 5,
         ),
         StreamBuilder<bool>(
-          stream: _verifyPhoneNumber(widget.controller.text),
+          stream: verifyPhoneNumber(widget.controller.text),
           initialData: false, // 초기값 설정
           builder: (context, snapshot) {
             if (!showIcon) {

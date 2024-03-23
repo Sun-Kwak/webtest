@@ -5,9 +5,11 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kakao_flutter_sdk_share/kakao_flutter_sdk_share.dart';
 import 'package:web_test2/common/component/animated_Object.dart';
 import 'package:web_test2/common/component/input_widget/custom_seachable_dropdown_input_widget.dart';
 import 'package:web_test2/common/const/colors.dart';
+import 'package:web_test2/common/fRouter.dart';
 import 'package:web_test2/screen/measurement/subScreen/measurement&appointment_view/controller/appointment_provider.dart';
 import 'package:web_test2/screen/measurement/subScreen/report_view/widget/report_form.dart';
 
@@ -111,7 +113,7 @@ class _ReportFilterFormState extends ConsumerState<ReportFilterForm> {
           borderRadius: BorderRadius.circular(8),
           color: Colors.white,
         ),
-        width: 350,
+        width: 400,
         height: 800,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
@@ -120,16 +122,71 @@ class _ReportFilterFormState extends ConsumerState<ReportFilterForm> {
             children: [
               Row(
                 children: [
-                  AnimatedObject(
-                    onTap: () {
-                      widget.onTap();
-                      // handlePrint();
-                    },
-                    child: Icon(
-                      Icons.print_outlined,
-                      color: PRIMARY_COLOR,
+                  Tooltip(
+                    message: '인쇄',
+                    child: AnimatedObject(
+                      onTap: () {
+                        widget.onTap();
+                        // handlePrint();
+                      },
+                      child: Icon(
+                        Icons.print_outlined,
+                        color: PRIMARY_COLOR,
+                      ),
                     ),
                   ),
+                  SizedBox(width: 10,),
+                  Tooltip(
+                    message: '카카오톡 공유',
+                    child: AnimatedObject(child: Icon(Icons.share,color: PRIMARY_COLOR,), onTap: () async{
+                      String baseUrl = 'https://web-test2-7a646.web.app/#/details/';
+                      String firstParam = selectedMeasurementState.docId;
+                      String secondParam = selectedReferenceMeasurementState.docId;
+                      String url = secondParam != '' ? '$baseUrl$firstParam,$secondParam' : '$baseUrl$firstParam';
+                      if(firstParam != '') {
+                      final TextTemplate defaultText = TextTemplate(
+                        text:
+                        '이미지 텍스트 변경 가능',
+                        link: Link(
+                          webUrl: Uri.parse(url),
+                          mobileWebUrl: Uri.parse(url),
+                        ),
+                      );
+                      try {
+                        Uri shareUrl = await WebSharerClient.instance
+                            .makeDefaultUrl(template: defaultText);
+                        await launchBrowserTab(shareUrl, popupOpen: true);
+                      } catch (error) {
+                        print('카카오톡 공유 실패 $error');
+                      }
+                    }}),
+                  ),
+                  // AnimatedObject(onTap: (){
+                  //   String firstParam = selectedMeasurementState.docId;
+                  //   String secondParam = selectedReferenceMeasurementState.docId;
+                  //   if(firstParam != ''){
+                  //   if (secondParam.isNotEmpty){
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => DetailsPage(
+                  //           documentIds: [firstParam, secondParam],
+                  //         ),
+                  //       ),
+                  //     );
+                  //   } else {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => DetailsPage(
+                  //           documentIds: [firstParam],
+                  //         ),
+                  //       ),
+                  //     );
+                  //   }}
+                  //
+                  //
+                  // }, child: Icon(Icons.add)),
                   Spacer(),
 
                   // Text(selectedMeasurementState.docId)
@@ -181,7 +238,7 @@ class _ReportFilterFormState extends ConsumerState<ReportFilterForm> {
                     labelBoxWidth: 50,
                     selectedValue: selectedMember.displayName,
                     label: '회원선택',
-                    textBoxWidth: 150,
+                    textBoxWidth: 175,
                     list: members,
                     titleSelector: (member) => member.displayName,
                     subtitleSelector: (member) => member.phoneNumber,
@@ -222,7 +279,7 @@ class _ReportFilterFormState extends ConsumerState<ReportFilterForm> {
                   Column(
                     children: [
                       Container(
-                        width: 155,
+                        width: 180,
                         height: 25,
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -260,7 +317,7 @@ class _ReportFilterFormState extends ConsumerState<ReportFilterForm> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        width: 155,
+                        width: 180,
                         height: 25,
                         decoration: BoxDecoration(
                           border: Border.all(
@@ -316,7 +373,7 @@ class _MeasurementBaselineCardState
     final selectedMemberState = ref.watch(selectedMemberProvider);
     return Container(
       height: 600,
-      width: 150,
+      width: 170,
       child: ListView.separated(
         padding: EdgeInsets.all(1),
         separatorBuilder: (BuildContext context, int index) {
@@ -410,7 +467,7 @@ class _MeasurementReferenceCardState
     final selectedMeasurementState = ref.watch(selectedMeasurementProvider);
     return Container(
       height: 600,
-      width: 150,
+      width: 170,
       child: ListView.separated(
         padding: EdgeInsets.all(1),
         separatorBuilder: (BuildContext context, int index) {

@@ -38,7 +38,7 @@ class MeasurementRepository {
       await docRef.update({'docId': docRef.id, 'updatedBy': user?.displayName});
 
     } on FirebaseException catch (e) {
-      throw MemberAddFailure(e.toString());
+      throw CreateMemberFailure(e.toString());
     }
   }
 

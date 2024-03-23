@@ -39,7 +39,7 @@ dependencies:
   firebase_core: ^2.20.0
 #  firebase_auth: ^4.8.0
 #  cloud_firestore: ^4.9.0
-  flutter_riverpod: ^2.0.2
+  flutter_riverpod: ^2.4.9
   riverpod_annotation: 2.1.5
   sprung: ^3.0.0
   loading_animation_widget:
@@ -78,6 +78,10 @@ dependencies:
   printing: ^5.11.1
   universal_html: ^2.0.0
   screenshot: ^2.1.0
+  fluro: ^2.0.5
+  kakao_flutter_sdk_share: ^1.7.0
+  kakao_flutter_sdk_talk: ^1.7.0
+  kakao_flutter_sdk_friend: ^1.7.0
 
 
 
